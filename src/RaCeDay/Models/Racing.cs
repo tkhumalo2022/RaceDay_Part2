@@ -22,6 +22,7 @@ public class RaceCategory
     public decimal DistanceKm { get; set; }
     public decimal EntryFee { get; set; }
     public int MaxParticipants { get; set; }
+    public int CurrentParticipants { get; set; }
 }
 public class Enrolment
 {

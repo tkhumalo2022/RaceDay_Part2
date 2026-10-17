@@ -83,7 +83,7 @@ public class RaceWorkflow(ApplicationDbContext db)
         UserId(actor); await FindEvent(eventId);
         return await db.Categories.AsNoTracking().Where(c => c.EventId == eventId).OrderBy(c => c.DistanceKm)
             .Select(c => new CategoryDto(c.Id, c.EventId, c.CategoryName, c.DistanceKm, c.EntryFee, c.MaxParticipants,
-                db.Enrolments.Count(e => e.CategoryId == c.Id))).ToListAsync();
+                c.CurrentParticipants)).ToListAsync();
     }
     public async Task<CategoryDto> WriteCategory(ClaimsPrincipal actor, int eventId, int? id, CategoryInput input)
     {
@@ -92,7 +92,7 @@ public class RaceWorkflow(ApplicationDbContext db)
         Own(await LockEvent(eventId), userId);
         var item = id is int key ? await db.Categories.SingleOrDefaultAsync(c => c.Id == key && c.EventId == eventId)
             ?? throw new WorkflowException(404, "Category not found.") : new RaceCategory { EventId = eventId };
-        var count = id is null ? 0 : await db.Enrolments.CountAsync(e => e.CategoryId == id);
+        var count = id is null ? 0 : await db.Categories.Where(c => c.Id == id).Select(c => c.CurrentParticipants).SingleAsync();
         if (input.MaxParticipants < count) throw new WorkflowException(409, "Capacity cannot be less than existing entries.");
         var name = input.CategoryName.Trim();
         if (await db.Categories.AnyAsync(c => c.EventId == eventId && c.Id != (id ?? 0) && c.CategoryName == name))
@@ -124,7 +124,7 @@ public class RaceWorkflow(ApplicationDbContext db)
             ?? throw new WorkflowException(400, "Choose a category belonging to this event.");
         if (await db.Enrolments.AnyAsync(e => e.CategoryId == category.Id && e.ParticipantId == userId))
             throw new WorkflowException(409, "You already have an entry for this race category.");
-        if (await db.Enrolments.CountAsync(e => e.CategoryId == category.Id) >= category.MaxParticipants)
+        if (category.CurrentParticipants >= category.MaxParticipants)
             throw new WorkflowException(409, "This category is full.");
         var entry = new Enrolment { EventId = eventId, CategoryId = category.Id, ParticipantId = userId };
         db.Enrolments.Add(entry); await Save(); await tx.CommitAsync(); return entry;

@@ -7,11 +7,24 @@ using RaCeDay.Models;
 
 namespace RaCeDay.Controllers;
 
-public sealed class ApiRegisterInput
+public sealed class ApiRegisterInput : IValidatableObject
 {
     [Required, StringLength(60)] public string FirstName { get; set; } = "";
     [Required, StringLength(60)] public string LastName { get; set; } = "";
     [StringLength(30)] public string? Gender { get; set; }
+    [StringLength(100)] public string? OrganiserName { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    [Phone, StringLength(20)] public string? PhoneNumber { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext context)
+    {
+        if (Role == "Organiser" && string.IsNullOrWhiteSpace(OrganiserName))
+            yield return new("Organisers must provide an organisation name.", [nameof(OrganiserName)]);
+        if (Role == "Participant" &&
+            (DateOfBirth is null || DateOfBirth < new DateOnly(1900, 1, 1) ||
+             DateOfBirth > DateOnly.FromDateTime(DateTime.UtcNow)))
+            yield return new("Participants must provide a valid date of birth.", [nameof(DateOfBirth)]);
+    }
     [Required, EmailAddress] public string Email { get; set; } = "";
     [Required, RegularExpression("^(Participant|Organiser)$")]
     public string Role { get; set; } = "Participant";
@@ -47,7 +60,10 @@ public class AuthApiController(
         {
             UserName = email, Email = email,
             FirstName = input.FirstName.Trim(), LastName = input.LastName.Trim(),
-            Gender = string.IsNullOrWhiteSpace(input.Gender) ? null : input.Gender.Trim()
+            Gender = string.IsNullOrWhiteSpace(input.Gender) ? null : input.Gender.Trim(),
+            OrganiserName = input.Role == "Organiser" ? input.OrganiserName?.Trim() : null,
+            DateOfBirth = input.Role == "Participant" ? input.DateOfBirth : null,
+            PhoneNumber = string.IsNullOrWhiteSpace(input.PhoneNumber) ? null : input.PhoneNumber.Trim()
         };
         var created = await users.CreateAsync(user, input.Password);
         if (!created.Succeeded)

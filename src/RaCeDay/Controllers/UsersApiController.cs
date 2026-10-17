@@ -11,7 +11,8 @@ namespace RaCeDay.Controllers;
 public class UsersApiController(UserManager<ApplicationUser> users, SignInManager<ApplicationUser> signIn) : ControllerBase
 {
     private static UserProfileDto ViewUser(ApplicationUser u) =>
-        new(u.Id, u.Email, u.FirstName, u.LastName, u.Gender, u.PhoneNumber);
+        new(u.Id, u.Email, u.FirstName, u.LastName, u.Gender, u.PhoneNumber,
+            u.OrganiserName, u.DateOfBirth, u.CreatedAt);
 
     /// <summary>Get the signed-in user profile.</summary>
     [HttpGet("me")]
@@ -34,6 +35,10 @@ public class UsersApiController(UserManager<ApplicationUser> users, SignInManage
         var phone = string.IsNullOrWhiteSpace(input.PhoneNumber) ? null : input.PhoneNumber.Trim();
         if (phone != user.PhoneNumber) user.PhoneNumberConfirmed = false;
         user.PhoneNumber = phone;
+        if (User.IsInRole("Organiser") && !string.IsNullOrWhiteSpace(input.OrganiserName))
+            user.OrganiserName = input.OrganiserName.Trim();
+        if (User.IsInRole("Participant") && input.DateOfBirth.HasValue)
+            user.DateOfBirth = input.DateOfBirth;
         var result = await users.UpdateAsync(user);
         if (!result.Succeeded)
             return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
@@ -43,4 +48,5 @@ public class UsersApiController(UserManager<ApplicationUser> users, SignInManage
     }
 }
 
-public record UserProfileDto(string Id, string? Email, string FirstName, string LastName, string? Gender, string? PhoneNumber);
+public record UserProfileDto(string Id, string? Email, string FirstName, string LastName,
+    string? Gender, string? PhoneNumber, string? OrganiserName, DateOnly? DateOfBirth, DateTime CreatedAt);

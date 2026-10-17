@@ -105,6 +105,39 @@ public class CoreWorkflowTests(IdentityFixture fixture) : IClassFixture<Identity
     }
 
     [Fact]
+    public async Task Part1CategoryCountsAreStoredAndUpdatedBySqlServerTrigger()
+    {
+        using var owner = await Actor("Organiser");
+        using var participant = await Actor("Participant");
+        var raceId = await NewEvent(owner);
+        var categoryId = await NewCategory(owner, raceId, capacity: 1);
+        var before = await owner.GetFromJsonAsync<JsonElement>($"/api/events/{raceId}/categories");
+        Assert.Equal(0, before[0].GetProperty("currentParticipants").GetInt32());
+
+        var entryId = await Created(await participant.PostAsJsonAsync(
+            $"/api/events/{raceId}/enrolments", new { categoryId }));
+        var after = await owner.GetFromJsonAsync<JsonElement>($"/api/events/{raceId}/categories");
+        Assert.Equal(1, after[0].GetProperty("currentParticipants").GetInt32());
+
+        using (var scope = fixture.Factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<RaCeDay.Data.ApplicationDbContext>();
+            Assert.Equal(1, (await db.Categories.FindAsync(categoryId))!.CurrentParticipants);
+        }
+
+        Assert.Equal(HttpStatusCode.OK,
+            (await owner.PutAsJsonAsync($"/api/events/{raceId}", Event("Closed"))).StatusCode);
+        await Created(await owner.PostAsJsonAsync($"/api/enrolments/{entryId}/results", new
+        {
+            startTime = "08:00:00", finishTime = "08:25:00",
+            overallPosition = 1, resultStatus = "Finished"
+        }));
+        var finished = await owner.GetFromJsonAsync<JsonElement>($"/api/events/{raceId}/categories");
+        // The Part 1 SQL trigger counts Registered, not completed, entries.
+        Assert.Equal(0, finished[0].GetProperty("currentParticipants").GetInt32());
+    }
+
+    [Fact]
     public async Task ConcurrentLastPlaceRequestsCannotOverbook()
     {
         using var owner = await Actor("Organiser"); using var p1 = await Actor("Participant"); using var p2 = await Actor("Participant");

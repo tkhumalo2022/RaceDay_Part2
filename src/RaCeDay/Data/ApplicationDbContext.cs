@@ -16,6 +16,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.Entity<ApplicationUser>(u =>
+        {
+            u.Property(x => x.OrganiserName).HasMaxLength(100);
+            u.Property(x => x.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
+            u.ToTable("AspNetUsers", t =>
+            {
+                t.HasCheckConstraint("CK_User_DateOfBirth",
+                    "[DateOfBirth] IS NULL OR [DateOfBirth] >= '1900-01-01'");
+            });
+        });
         builder.Entity<RaceEvent>(e =>
         {
             e.ToTable("Event", t =>
@@ -36,17 +46,23 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             e.ToTable("Race_Category", t =>
             {
                 t.HasCheckConstraint("CK_Category_Values", "[DistanceKm] > 0 AND [EntryFee] >= 0 AND [MaxParticipants] > 0");
+                t.HasCheckConstraint("CK_Category_CurrentParticipants", "[CurrentParticipants] >= 0 AND [CurrentParticipants] <= [MaxParticipants]");
             });
             e.Property(x => x.CategoryName).HasMaxLength(100);
             e.Property(x => x.DistanceKm).HasPrecision(6, 2);
             e.Property(x => x.EntryFee).HasPrecision(10, 2);
+            e.Property(x => x.CurrentParticipants).HasDefaultValue(0);
             e.HasIndex(x => new { x.EventId, x.CategoryName }).IsUnique();
             e.HasAlternateKey(x => new { x.Id, x.EventId });
             e.HasOne<RaceEvent>().WithMany().HasForeignKey(x => x.EventId).OnDelete(DeleteBehavior.Restrict);
         });
         builder.Entity<Enrolment>(e =>
         {
-            e.ToTable("Enrolment", t => t.HasCheckConstraint("CK_Enrolment_Status", "[Status] IN ('Registered','Completed','Withdrawn','Cancelled')"));
+            e.ToTable("Enrolment", t =>
+            {
+                t.HasCheckConstraint("CK_Enrolment_Status", "[Status] IN ('Registered','Completed','Withdrawn','Cancelled')");
+                t.HasTrigger("trg_Enrolment_UpdateCategoryCount");
+            });
             e.Property(x => x.Status).HasMaxLength(20);
             e.Property(x => x.RaceNumber).HasMaxLength(32);
             e.HasIndex(x => x.RaceNumber).IsUnique();
@@ -60,6 +76,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         {
             e.ToTable("Payment", t =>
             {
+                t.HasTrigger("trg_Payment_ValidateAmount");
                 t.HasCheckConstraint("CK_Payment_Amount", "[Amount] >= 0");
                 t.HasCheckConstraint("CK_Payment_Method", "[PaymentMethod] IN ('Card','EFT','Cash','Other')");
                 t.HasCheckConstraint("CK_Payment_Status", "[Status] IN ('Pending','Paid','Failed','Refunded')");

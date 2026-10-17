@@ -171,6 +171,14 @@ namespace RaCeDay.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
+                    b.Property<DateOnly?>("DateOfBirth")
+                        .HasColumnType("date");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -206,6 +214,10 @@ namespace RaCeDay.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("OrganiserName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -239,7 +251,10 @@ namespace RaCeDay.Data.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("AspNetUsers", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_User_DateOfBirth", "[DateOfBirth] IS NULL OR [DateOfBirth] >= '1900-01-01'");
+                        });
                 });
 
             modelBuilder.Entity("RaCeDay.Models.Enrolment", b =>
@@ -287,8 +302,12 @@ namespace RaCeDay.Data.Migrations
 
                     b.ToTable("Enrolment", null, t =>
                         {
+                            t.HasTrigger("trg_Enrolment_UpdateCategoryCount");
+
                             t.HasCheckConstraint("CK_Enrolment_Status", "[Status] IN ('Registered','Completed','Withdrawn','Cancelled')");
                         });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("RaCeDay.Models.PaymentAttempt", b =>
@@ -335,12 +354,16 @@ namespace RaCeDay.Data.Migrations
 
                     b.ToTable("Payment", null, t =>
                         {
+                            t.HasTrigger("trg_Payment_ValidateAmount");
+
                             t.HasCheckConstraint("CK_Payment_Amount", "[Amount] >= 0");
 
                             t.HasCheckConstraint("CK_Payment_Method", "[PaymentMethod] IN ('Card','EFT','Cash','Other')");
 
                             t.HasCheckConstraint("CK_Payment_Status", "[Status] IN ('Pending','Paid','Failed','Refunded')");
                         });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("RaCeDay.Models.RaceCategory", b =>
@@ -355,6 +378,11 @@ namespace RaCeDay.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("CurrentParticipants")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.Property<decimal>("DistanceKm")
                         .HasPrecision(6, 2)
@@ -377,6 +405,8 @@ namespace RaCeDay.Data.Migrations
 
                     b.ToTable("Race_Category", null, t =>
                         {
+                            t.HasCheckConstraint("CK_Category_CurrentParticipants", "[CurrentParticipants] >= 0 AND [CurrentParticipants] <= [MaxParticipants]");
+
                             t.HasCheckConstraint("CK_Category_Values", "[DistanceKm] > 0 AND [EntryFee] >= 0 AND [MaxParticipants] > 0");
                         });
                 });

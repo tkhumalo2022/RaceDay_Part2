@@ -18,7 +18,7 @@ public class RegisterModel(
 
     public string? ReturnUrl { get; private set; }
 
-    public class InputModel
+    public class InputModel : IValidatableObject
     {
         [Required, StringLength(60), Display(Name = "First name")]
         public string FirstName { get; set; } = string.Empty;
@@ -28,6 +28,27 @@ public class RegisterModel(
 
         [StringLength(30)]
         public string? Gender { get; set; }
+
+        [StringLength(100), Display(Name = "Organisation name")]
+        public string? OrganiserName { get; set; }
+
+        [DataType(DataType.Date), Display(Name = "Date of birth")]
+        public DateOnly? DateOfBirth { get; set; }
+
+        [Phone, StringLength(20), Display(Name = "Phone number")]
+        public string? PhoneNumber { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext context)
+        {
+            if (Role == "Organiser" && string.IsNullOrWhiteSpace(OrganiserName))
+                yield return new("Organisers must provide an organisation name.", [nameof(OrganiserName)]);
+            if (Role == "Participant")
+            {
+                if (DateOfBirth is null || DateOfBirth < new DateOnly(1900, 1, 1) ||
+                    DateOfBirth > DateOnly.FromDateTime(DateTime.UtcNow))
+                    yield return new("Participants must enter a valid date of birth.", [nameof(DateOfBirth)]);
+            }
+        }
 
         // The official POE permits selecting either application role.
         // Admin is never offered or accepted during self-registration.
@@ -61,7 +82,10 @@ public class RegisterModel(
             Email = Input.Email.Trim(),
             FirstName = Input.FirstName.Trim(),
             LastName = Input.LastName.Trim(),
-            Gender = string.IsNullOrWhiteSpace(Input.Gender) ? null : Input.Gender.Trim()
+            Gender = string.IsNullOrWhiteSpace(Input.Gender) ? null : Input.Gender.Trim(),
+            OrganiserName = Input.Role == "Organiser" ? Input.OrganiserName?.Trim() : null,
+            DateOfBirth = Input.Role == "Participant" ? Input.DateOfBirth : null,
+            PhoneNumber = string.IsNullOrWhiteSpace(Input.PhoneNumber) ? null : Input.PhoneNumber.Trim()
         };
 
         var created = await users.CreateAsync(user, Input.Password);

@@ -102,6 +102,29 @@ public class PaymentWorkflowTests(IdentityFixture fixture) : IClassFixture<Ident
     }
 
     [Fact]
+    public async Task Part1PaymentTriggerRejectsIncorrectAmountsEvenOutsideApi()
+    {
+        using var organiser = await Actor("Organiser");
+        using var participant = await Actor("Participant");
+        var (_, entryId) = await CreateEntry(organiser, participant);
+        using (var scope = fixture.Factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            db.Payments.Add(new PaymentAttempt
+            {
+                EnrolmentId = entryId, Amount = 1m, PaymentMethod = "Cash",
+                Status = "Pending", TransactionReference = "BADAMOUNT-" + Guid.NewGuid().ToString("N")
+            });
+            await Assert.ThrowsAsync<DbUpdateException>(() => db.SaveChangesAsync());
+        }
+        using (var scope = fixture.Factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            Assert.False(await db.Payments.AnyAsync(p => p.EnrolmentId == entryId));
+        }
+    }
+
+    [Fact]
     public async Task ASettledPaymentPreventsNewAttemptsAndDatabasePreventsDoublePaid()
     {
         using var organiser = await Actor("Organiser");

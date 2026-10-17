@@ -49,6 +49,7 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
     private static Dictionary<string, string> Registration(string email) => new()
     {
         ["Input.FirstName"] = "Test", ["Input.LastName"] = "Participant",
+        ["Input.DateOfBirth"] = "2002-04-16",
         ["Input.Email"] = email, ["Input.Password"] = "Local-Test-123!",
         ["Input.ConfirmPassword"] = "Local-Test-123!", ["Input.Role"] = "Participant"
     };
@@ -68,6 +69,8 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
         var user = await users.FindByEmailAsync(email);
         Assert.NotNull(user);
         Assert.Equal(new[] { "Participant" }, await users.GetRolesAsync(user));
+        Assert.Equal(new DateOnly(2002, 4, 16), user.DateOfBirth);
+        Assert.Null(user.OrganiserName);
         using var fresh = fixture.Client();
         var login = new Dictionary<string, string>
         {
@@ -90,7 +93,7 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
         var csrf = await client.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
         client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", csrf.GetProperty("requestToken").GetString());
         var input = new {
-            firstName = "API", lastName = "Organiser", email, role = "Organiser",
+            firstName = "API", lastName = "Organiser", email, role = "Organiser", organiserName = "Durban Race Club",
             password = "Local-Test-123!", confirmPassword = "Local-Test-123!"
         };
         var registered = await client.PostAsJsonAsync("/api/auth/register", input);
@@ -138,6 +141,7 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
         var email = $"organiser-{Guid.NewGuid():N}@example.invalid";
         var form = Registration(email);
         form["Input.Role"] = "Organiser";
+        form["Input.OrganiserName"] = "Durban Training Races";
         form["__RequestVerificationToken"] = await IdentityFixture.Token(organiserClient, "/Identity/Account/Register");
         Assert.Equal(HttpStatusCode.Redirect, (await organiserClient.PostAsync(
             "/Identity/Account/Register", new FormUrlEncodedContent(form))).StatusCode);
@@ -148,6 +152,8 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
             var user = await users.FindByEmailAsync(email);
             Assert.NotNull(user);
             Assert.Equal(new[] { "Organiser" }, await users.GetRolesAsync(user));
+            Assert.Equal("Durban Training Races", user.OrganiserName);
+            Assert.Null(user.DateOfBirth);
         }
         Assert.Equal(HttpStatusCode.OK, (await organiserClient.GetAsync("/Dashboard/Organiser")).StatusCode);
         var blockedDashboard = await organiserClient.GetAsync("/Dashboard/Admin");
@@ -169,6 +175,36 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
     }
 
     [Fact]
+    public async Task RegistrationRequiresRoleSpecificDetails()
+    {
+        using var client = fixture.Client();
+        var participantEmail = $"missing-dob-{Guid.NewGuid():N}@example.invalid";
+        var form = Registration(participantEmail);
+        form.Remove("Input.DateOfBirth");
+        form["__RequestVerificationToken"] = await IdentityFixture.Token(client, "/Identity/Account/Register");
+        var invalidParticipant = await client.PostAsync(
+            "/Identity/Account/Register", new FormUrlEncodedContent(form));
+        Assert.Equal(HttpStatusCode.OK, invalidParticipant.StatusCode);
+        Assert.Contains("valid date of birth", await invalidParticipant.Content.ReadAsStringAsync());
+
+        using var organiserClient = fixture.Client();
+        var organiserEmail = $"missing-org-{Guid.NewGuid():N}@example.invalid";
+        var organiserForm = Registration(organiserEmail);
+        organiserForm["Input.Role"] = "Organiser";
+        organiserForm["__RequestVerificationToken"] =
+            await IdentityFixture.Token(organiserClient, "/Identity/Account/Register");
+        var invalidOrganiser = await organiserClient.PostAsync(
+            "/Identity/Account/Register", new FormUrlEncodedContent(organiserForm));
+        Assert.Equal(HttpStatusCode.OK, invalidOrganiser.StatusCode);
+        Assert.Contains("organisation name", await invalidOrganiser.Content.ReadAsStringAsync());
+
+        using var scope = fixture.Factory.Services.CreateScope();
+        var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        Assert.Null(await users.FindByEmailAsync(participantEmail));
+        Assert.Null(await users.FindByEmailAsync(organiserEmail));
+    }
+
+    [Fact]
     public async Task ProfileApiOnlyUpdatesSignedInAllowlistedFieldsAndRequiresCsrf()
     {
         using var anonymous = fixture.Client();
@@ -186,11 +222,14 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
         var update = await client.PutAsJsonAsync("/api/users/me", new
         {
             firstName = "New", lastName = "Person", gender = "Other",
-            phoneNumber = "0715551001", role = "Admin", email = "forged@example.invalid", id = "forged-id"
+            phoneNumber = "0715551001", dateOfBirth = "2003-05-20", organiserName = "Fake Club",
+            role = "Admin", email = "forged@example.invalid", id = "forged-id"
         });
         Assert.Equal(HttpStatusCode.OK, update.StatusCode);
         var after = await update.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal("New", after.GetProperty("firstName").GetString());
+        Assert.Equal("2003-05-20", after.GetProperty("dateOfBirth").GetString());
+        Assert.Equal(JsonValueKind.Null, after.GetProperty("organiserName").ValueKind);
         Assert.Equal(email, after.GetProperty("email").GetString());
         Assert.Equal(before.GetProperty("id").GetString(), after.GetProperty("id").GetString());
 

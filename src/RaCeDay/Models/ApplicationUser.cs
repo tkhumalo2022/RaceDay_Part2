@@ -15,6 +15,15 @@ public class ApplicationUser : IdentityUser
     [StringLength(30)]
     public string? Gender { get; set; }
 
+    // Part 1 used separate Organiser and Participant profiles. These additional
+    // fields preserve the data while Identity keeps account credentials secure.
+    [StringLength(100)]
+    public string? OrganiserName { get; set; }
+
+    public DateOnly? DateOfBirth { get; set; }
+
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
     // Do not store uploads or absolute local paths here.
     [StringLength(260)]
     public string? ProfileImagePath { get; set; }

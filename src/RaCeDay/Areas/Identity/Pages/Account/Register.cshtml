@@ -15,6 +15,16 @@
     <span asp-validation-for="Input.LastName" class="text-danger"></span>
     <label asp-for="Input.Gender"></label>
     <input asp-for="Input.Gender" />
+    <p>Participants must give their date of birth. Organisers must give their organisation name.</p>
+    <label asp-for="Input.OrganiserName"></label>
+    <input asp-for="Input.OrganiserName" autocomplete="organization" />
+    <span asp-validation-for="Input.OrganiserName" class="text-danger"></span>
+    <label asp-for="Input.DateOfBirth"></label>
+    <input asp-for="Input.DateOfBirth" type="date" />
+    <span asp-validation-for="Input.DateOfBirth" class="text-danger"></span>
+    <label asp-for="Input.PhoneNumber"></label>
+    <input asp-for="Input.PhoneNumber" type="tel" autocomplete="tel" />
+    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
     <label asp-for="Input.Role"></label>
     <select asp-for="Input.Role">
         <option value="Participant">Participant</option>
