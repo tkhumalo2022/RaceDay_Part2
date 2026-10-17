@@ -1,12 +1,7 @@
 name: Build and test RaCeDay Part 2
 
-on:
-  push:
-    branches:
-      - main
-      - feat/identity-foundation
-      - 'recovery/**'
-  pull_request:
+# The marking brief requires validation on every push, including new feature branches.
+on: [push, pull_request]
 
 permissions:
   contents: read
@@ -54,6 +49,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: raced-day-tests
+          name: raceday-test-results
           path: tests/RaCeDay.Tests/TestResults/**/*.trx
           if-no-files-found: warn
