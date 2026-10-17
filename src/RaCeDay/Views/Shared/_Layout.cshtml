@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - RaceDay</title>
+    <style>
+        body { margin: 0 auto; max-width: 58rem; padding: 1.5rem; font: 1rem/1.5 system-ui, sans-serif; color: #222; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        nav ul { display: flex; gap: 1rem; list-style: none; }
+        input { display: block; width: 100%; max-width: 28rem; padding: .6rem; }
+        label { display: block; margin-top: .8rem; }
+        button { padding: .6rem 1rem; margin-top: 1rem; cursor: pointer; }
+        .text-danger { color: #b01a1a; }
+        a { color: #164785; }
+    </style>
+</head>
+<body>
+    <header>
+        <strong><a href="/">RaceDay</a></strong>
+        <nav aria-label="Account"><partial name="_LoginPartial" /></nav>
+    </header>
+    <main>@RenderBody()</main>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
