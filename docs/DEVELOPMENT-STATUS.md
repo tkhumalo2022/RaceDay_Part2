@@ -1,37 +1,36 @@
-# RaceDay Part 2 — development status (17 October 2026)
+# RaCeDay Part 2 — verified development status (17 October 2026)
 
-**Repository:** isolated recovery working copy, branch `recovery/part2-20261017`. This is **not** the previously lost original student application. Original starter copies are preserved separately. The official ARC POE Part 2 rubric has not been read (the local DOCX is encrypted and ARC browser access was not available). No marks percentage can be justified.
+The original student Visual Studio application is still missing. This is an **isolated recovery branch**, `recovery/part2-20261017`, not a restoration or submission of the original application.
 
-## Verified locally
+The official IIE 2026 PROG6212 POE Part 2 instructions were **visually inspected** in the open authenticated SharePoint Word Online tab. Relevant pages: Part 2 brief 9–11, marking rubric 17–18. See `docs/OFFICIAL_PART2_RUBRIC_AUDIT.md` for the **100-mark allocation**. This document is protected, so visual access does not make it a normal downloadable/plaintext document.
 
-- `.NET 10` Release build with `--warnaserror`: **0 warnings, 0 errors**.
-- SQL Server LocalDB integration suite: **24 passed, 0 failed, 0 skipped**. TRX: `tests/RaCeDay.Tests/TestResults/RaceDay-Part2-final.trx`.
-- Complete EF Core migration chain on **isolated test databases**: `InitialIdentity`, `RaceWorkflowCore`, `PaymentAttempts`, `PerCategoryEnrolmentUniqueness`. Original application databases were not migrated.
-- Identity: register/login, Admin/Organiser/Participant roles, role seeding, dashboard access restrictions, profile updates, CSRF protection and anonymous denial.
-- MVC pages plus REST API and Swagger for Events/Categories/Enrolments/Results and authenticated GET/PUT `/api/users/me`. Organiser ownership and participant privacy tested.
-- Enrollment capacities and deadline checks; concurrent last-place requests tested; same participant can enter *different* categories but not the same category twice, matching the accessible Part 1 plan.
-- Payment-attempt REST and MVC with amount equality, limited role access, unique reference and pending-only status. Database filtered index prohibits more than one Paid payment per enrolment; tests check the rule. This is **not a real gateway** and does not confirm funds.
-- Generic production error page to avoid a broken `/Home/Error` handler.
+## Locally implemented and verified
 
-## Missing or not yet independently verified
+- `.NET 10` ASP.NET Core Identity MVC and API, SQL Server EF Core Code-First migrations.
+- MVC public registration chooses Organiser or Participant; API has CSRF-protected JSON register/login/logout, and anonymous CSRF token endpoint. Admin self-registration is rejected; Identity hashes passwords; cookie session retains role claims.
+- Role-protected Admin/Organiser/Participant dashboards, profile editing + GET/PUT API, restricted Event/Category/Enrolment/Result workflows, pending-only Payment attempts and Swagger UI.
+- SQL Server LocalDB unit/integration tests cover core positive/negative cases, concurrency and role ownership. **26 tests passed** after adding API auth; Release compilation had **0 errors and 0 warnings**. CI verification has not occurred.
+- New Windows GitHub Actions workflow configured to build **and run LocalDB tests** on pushes/PRs; this is only a local change, not a green CI run.
+- Previous manual runtime smoke test demonstrated HTTP 200 home/login/Swagger and HTTP 401 for anonymous API access. That test predates the latest auth endpoints and must be repeated after commit.
 
-- Original source recovery and integration.
-- Official marking rubric, submission instructions and marks.
-- Part 1 described JWT-based `POST /api/auth/register` and `POST /api/auth/login`, while this recovery build currently uses ASP.NET Identity cookie authentication; rubric decision needed.
-- Production email sender, confirmation/recovery, security review and release deployment.
-- Payment processing and settlement webhooks (only mock Pending records exist).
-- Real-browser screenshots, Swagger/manual walkthrough, SSMS screenshots and evidence-to-rubric mapping.
-- CI/remote branch verification for this new work.
+## Confirmed official Part 2 gaps
 
-## Safety and delivery
+1. The **25-mark API/database** category requires EF schema to match the approved Part 1 ERD and SQL script. Existing Identity-based model differs materially from the Part 1 separate Organiser/Participant tables, and must be reconciled or documented with lecturer approval.
+2. The **10-mark GitHub/CI** criterion asks for **20 meaningful Part 2 commits**, a successful GitHub Actions build/test on every push, and a green screenshot. Local commit count is not yet enough, and the revised workflow hasn't run remotely. Do not create filler commits.
+3. The **15-mark video** criterion requires a real unlisted YouTube demonstration of all endpoints, authentication, Swagger and tests, with the link in README. No video exists yet.
+4. Swagger endpoint descriptions and a complete browser-authenticated API demonstration still need rubric-aligned verification. MVC browser screens and local integration tests don't substitute for the live API demonstration.
+5. Confirm how the assessor interprets *server-side session*, because ASP.NET Identity encrypts role claims in an authentication cookie, while the highest rubric band literally says server-side session stores user ID and role.
+6. Get the original student project if accessible; no other student's source should be imported.
 
-- The original project remains unchanged; earlier backed-up work is in `outputs/RaceDay-local-backup`, and a further `outputs/RaceDay-pre-payments-backup` snapshot was created before these changes.
-- No course submission, GitHub push or merge is authorised/claimed.
-- See `README.md` for **isolated database** setup, `docs/SUBMISSION_EVIDENCE_CHECKLIST.md` for required demonstration evidence, and `docs/PAYMENT_WORKFLOW.md` for limitations.
+## Explicit scope decisions
 
-## Next steps
+- Part 2 requires a REST API; Docker containerisation and a fully themed MVC interface belong primarily to **Part 3**, not Part 2.
+- Part 1's endpoint plan suggested JWT; the official Part 2 brief asks for session authentication. This recovery implementation uses cookie-based Identity; document the difference.
+- Payment attempts are Pending records only, not a payment gateway and not real settlement.
+- Original application/database unchanged. No GitHub push, merge, deployment, ARC submission or marks claim has been made.
 
-1. Get the official rubric and compare it to the implementation.
-2. Verify the app manually in a browser using a new test database, capture screenshots and SQL/Swagger evidence.
-3. Address confirmed missing rubric functionality, particularly API auth design and any additional fields.
-4. Confirm any final local commits and only push/submit after approval.
+## Local evidence
+
+- Latest local test output: 26 passed, 0 failed, 0 skipped (rerun/preserve TRX before final submission).
+- Earlier screenshot and manual check folder: `outputs/RaceDay-evidence-20261017`, outside the Git repository.
+- See `docs/SUBMISSION_EVIDENCE_CHECKLIST.md`, `README.md` and the official audit for outstanding steps.

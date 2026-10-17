@@ -7,7 +7,7 @@ This file replaces an earlier starter-only checklist which incorrectly implied m
 - `ApplicationUser : IdentityUser` has FirstName, LastName, Gender and ProfileImagePath.
 - `ApplicationDbContext : IdentityDbContext<ApplicationUser>` uses SQL Server.
 - Registration and login use `ApplicationUser` consistently.
-- Roles: Admin, Organiser, Participant. **Public registration assigns Participant only.** Other roles require authorised administration.
+- Roles: Admin, Organiser, Participant. **Public registration lets users choose Organiser or Participant only.** Admin is never accepted through public registration; API and MVC flows are tested.
 - In Development, email confirmation is not required; outside Development it is required, and a real email sender must be added before production.
 - Role dashboards, profile editing, anti-forgery checks and SQL-backed integration tests exist.
 
@@ -25,4 +25,4 @@ For manual demonstration, select a **new** LocalDB database, follow the step-by-
 
 ## Scope caveat
 
-The original student solution and official Part 2 rubric have not been obtained. The Part 1 plan mentions JWT login and registration API endpoints; this current recovery branch uses cookie-based Identity and has not implemented those two API auth endpoints. Payment attempts are Pending-only, not real payments. See `docs/PAYMENT_WORKFLOW.md`.
+The original student solution has not been obtained. The official Part 2 rubric was visually inspected and mapped in `docs/OFFICIAL_PART2_RUBRIC_AUDIT.md`. The Part 1 plan mentions JWT, but this implementation deliberately uses cookie-based Identity sessions to match the official Part 2 session requirement. JSON register/login/logout endpoints exist. Pending payment attempts are not real payments.

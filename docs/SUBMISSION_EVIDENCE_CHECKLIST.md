@@ -1,6 +1,6 @@
 # RaCeDay PROG6212 Part 2 — submission evidence checklist
 
-This is a work-in-progress evidence checklist, **not the official marking rubric**. Obtain and read the ARC brief before naming a final grade or submitting.
+This is an evidence checklist mapped to the visually inspected official 100-mark Part 2 rubric, not a grade estimate. See `docs/OFFICIAL_PART2_RUBRIC_AUDIT.md` for the exact marking categories.
 
 ## Tests and source control
 
@@ -18,7 +18,7 @@ This is a work-in-progress evidence checklist, **not the official marking rubric
 
 ## Website and Swagger walkthrough
 
-- [ ] Participant registration and login (positive and invalid password).
+- [ ] Organiser **and** Participant registration/login via MVC and JSON API (including invalid password and blocked Admin signup).
 - [ ] Protected Admin/Organiser/Participant dashboard and forbidden cross-role access.
 - [ ] GET/PUT `/api/users/me` reads and updates the current profile without changing roles, email or another account.
 - [ ] Organiser creates/edits race and 2 categories; another organiser cannot edit them.
@@ -32,8 +32,8 @@ This is a work-in-progress evidence checklist, **not the official marking rubric
 ## Unverified / not ready
 
 - [ ] Original student Visual Studio solution recovered and compared.
-- [ ] ARC PROG6212 Part 2 rubric readable and item-by-item mapped.
-- [ ] Confirm whether JWT auth API, actual gateway settlement, statistics, profile pictures and additional field requirements are compulsory.
+- [x] Official Part 2 text/rubric visually inspected in the open SharePoint Word Online tab (pages 9–11, 17–18) and locally mapped; original copyrighted assessment not copied into Git.
+- [ ] Reconcile Part 1 schema (especially separate Organiser/Participant entities and event fields) against EF Identity model; document cookie-session versus Part 1 JWT plan. Part 3-only features such as Docker and themed MVC UI are not assessed in Part 2.
 - [ ] End-to-end testing against a lecturer-approved demo environment.
 - [ ] Submission package structure, references (if any), academic integrity and deadline reviewed.
 
