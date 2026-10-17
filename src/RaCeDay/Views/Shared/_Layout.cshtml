@@ -7,8 +7,11 @@
     <style>
         body { margin: 0 auto; max-width: 58rem; padding: 1.5rem; font: 1rem/1.5 system-ui, sans-serif; color: #222; }
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        nav ul { display: flex; gap: 1rem; list-style: none; }
-        input { display: block; width: 100%; max-width: 28rem; padding: .6rem; }
+        nav ul { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; padding-left: 0; list-style: none; }
+        input, select, textarea { display: block; box-sizing: border-box; width: 100%; max-width: 28rem; padding: .6rem; font: inherit; }
+        input[type=checkbox] { display: inline-block; width: auto; max-width: none; padding: 0; vertical-align: middle; }
+        input[type=hidden] { display: none; }
+        textarea { min-height: 5rem; }
         label { display: block; margin-top: .8rem; }
         button { padding: .6rem 1rem; margin-top: 1rem; cursor: pointer; }
         .text-danger { color: #b01a1a; }
