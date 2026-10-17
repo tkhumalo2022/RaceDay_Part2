@@ -14,7 +14,14 @@
     <input asp-for="Input.LastName" autocomplete="family-name" />
     <span asp-validation-for="Input.LastName" class="text-danger"></span>
     <label asp-for="Input.Gender"></label>
-    <input asp-for="Input.Gender" />
+    <select asp-for="Input.Gender">
+        <option value="">Prefer not to specify</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+        <option value="Prefer not to say">Prefer not to say</option>
+    </select>
+    <span asp-validation-for="Input.Gender" class="text-danger"></span>
     <p>Participants must give their date of birth. Organisers must give their organisation name.</p>
     <label asp-for="Input.OrganiserName"></label>
     <input asp-for="Input.OrganiserName" autocomplete="organization" />

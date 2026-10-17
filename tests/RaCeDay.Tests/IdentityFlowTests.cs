@@ -206,6 +206,44 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
     }
 
     [Fact]
+    public async Task ParticipantGenderMatchesApprovedPartOneValues()
+    {
+        using var client = fixture.Client();
+        var csrf = await client.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
+        client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", csrf.GetProperty("requestToken").GetString());
+
+        var input = new ApiRegisterInput
+        {
+            FirstName = "Gender", LastName = "Test",
+            Role = "Participant",
+            DateOfBirth = new DateOnly(2003, 6, 12),
+            Email = $"invalid-gender-{Guid.NewGuid():N}@example.invalid",
+            Gender = "InvalidValue",
+            Password = "Local-Test-123!", ConfirmPassword = "Local-Test-123!"
+        };
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PostAsJsonAsync("/api/auth/register", input)).StatusCode);
+
+        input.Email = $"allowed-gender-{Guid.NewGuid():N}@example.invalid";
+        input.Gender = "Prefer not to say";
+        Assert.Equal(HttpStatusCode.Created,
+            (await client.PostAsJsonAsync("/api/auth/register", input)).StatusCode);
+        var profile = await client.GetFromJsonAsync<JsonElement>("/api/users/me");
+        Assert.Equal("Prefer not to say", profile.GetProperty("gender").GetString());
+
+        client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
+        var signedInCsrf = await client.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
+        client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", signedInCsrf.GetProperty("requestToken").GetString());
+        var change = new ProfileViewModel
+        {
+            FirstName = "Gender", LastName = "Test", Gender = "InvalidValue",
+            DateOfBirth = new DateOnly(2003, 6, 12)
+        };
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await client.PutAsJsonAsync("/api/users/me", change)).StatusCode);
+    }
+
+    [Fact]
     public async Task RegistrationRequiresRoleSpecificDetails()
     {
         using var client = fixture.Client();

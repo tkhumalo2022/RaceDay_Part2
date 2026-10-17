@@ -8,7 +8,7 @@ public class ProfileViewModel : IValidatableObject
     public string FirstName { get; set; } = string.Empty;
     [Required, StringLength(60), Display(Name = "Last name")]
     public string LastName { get; set; } = string.Empty;
-    [StringLength(30)]
+    [StringLength(30), RegularExpression("^(Male|Female|Other|Prefer not to say)$", ErrorMessage = "Select a permitted gender option.")]
     public string? Gender { get; set; }
     [Phone, StringLength(30), Display(Name = "Phone number")]
     public string? PhoneNumber { get; set; }

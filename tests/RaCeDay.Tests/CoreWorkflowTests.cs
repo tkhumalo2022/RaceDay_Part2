@@ -84,6 +84,34 @@ public class CoreWorkflowTests(IdentityFixture fixture) : IClassFixture<Identity
     }
 
     [Fact]
+    public async Task RejectsWhitespaceOnlyEventAndCategoryFields()
+    {
+        using var organiser = await Actor("Organiser");
+        var input = new EventInput
+        {
+            EventName = "   ", Location = "Durban", EventType = "Run", Status = "Open",
+            EventDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(20)),
+            ClosingDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10))
+        };
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await organiser.PostAsJsonAsync("/api/events", input)).StatusCode);
+
+        input.EventName = "Durban Race";
+        input.Location = "  ";
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await organiser.PostAsJsonAsync("/api/events", input)).StatusCode);
+
+        var eventId = await NewEvent(organiser);
+        var category = new CategoryInput { CategoryName = "   ", DistanceKm = 5m, EntryFee = 50m, MaxParticipants = 2 };
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await organiser.PostAsJsonAsync($"/api/events/{eventId}/categories", category)).StatusCode);
+
+        var categoryId = await NewCategory(organiser, eventId);
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await organiser.PutAsJsonAsync($"/api/categories/{categoryId}", category)).StatusCode);
+    }
+
+    [Fact]
     public async Task CategoryCrudAndEventDeletionRespectOwnerAndValidation()
     {
         using var owner = await Actor("Organiser"); using var other = await Actor("Organiser");
@@ -239,5 +267,9 @@ public class CoreWorkflowTests(IdentityFixture fixture) : IClassFixture<Identity
         Assert.Contains("Enrol", createEntry.GetProperty("summary").GetString());
         var login = doc.GetProperty("paths").GetProperty("/api/auth/login").GetProperty("post");
         Assert.Contains("cookie", login.GetProperty("summary").GetString(), StringComparison.OrdinalIgnoreCase);
+        var session = doc.GetProperty("paths").GetProperty("/api/auth/session").GetProperty("get");
+        Assert.Contains("server-side session", session.GetProperty("summary").GetString(), StringComparison.OrdinalIgnoreCase);
+        var logout = doc.GetProperty("paths").GetProperty("/api/auth/logout").GetProperty("post");
+        Assert.Contains("Sign out", logout.GetProperty("summary").GetString(), StringComparison.OrdinalIgnoreCase);
     }
 }

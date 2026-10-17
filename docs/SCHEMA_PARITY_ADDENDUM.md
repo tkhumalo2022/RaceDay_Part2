@@ -15,6 +15,12 @@ The original Part 1 SQL and approval instructions are in `docs/part1`. **Do not 
 - New validation test `RegistrationRequiresRoleSpecificDetails` checks missing role-specific details are rejected.
 - All tests operate on newly named isolated LocalDB databases. They do not migrate `RaceDayDB` or the original student's app DB.
 
+## Additional Part 1-compatible input validation (17 October)
+- Participant `Gender` follows Part 1's permitted values: `Male`, `Female`, `Other`, or `Prefer not to say`. Leaving it blank remains optional. MVC registration/profile and API registration/profile all enforce this allowlist; MVC forms provide the corresponding choices.
+- A new integration test rejects an invalid registration value, accepts `Prefer not to say`, and rejects an invalid profile update. A separate test covers whitespace-only event names, locations and category names.
+- The isolated validation branch passed **34 LocalDB tests** and a Release build with **zero warnings/errors**; this statement is local evidence only, not a claim about a new GitHub CI run.
+- **Still different physically:** `AspNetUsers.Gender` has application-level validation, but it does not have the `CK_Participant_Gender` SQL CHECK constraint of Part 1. The separate role tables/keys also remain unresolved.
+
 ## Remaining physical schema differences
 
 - Part 1 stores separate `Organiser` and `Participant` tables with numeric IDs. Part 2 uses a shared `AspNetUsers` table with ASP.NET Identity string IDs, plus `AspNetUserRoles`. The new user fields reduce content gaps but **do not** make the physical schemas identical.

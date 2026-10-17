@@ -12,7 +12,7 @@ public sealed class ApiRegisterInput : IValidatableObject
 {
     [Required, StringLength(60)] public string FirstName { get; set; } = "";
     [Required, StringLength(60)] public string LastName { get; set; } = "";
-    [StringLength(30)] public string? Gender { get; set; }
+    [StringLength(30), RegularExpression("^(Male|Female|Other|Prefer not to say)$", ErrorMessage = "Select a permitted gender option.")] public string? Gender { get; set; }
     [StringLength(100)] public string? OrganiserName { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     [Phone, StringLength(20)] public string? PhoneNumber { get; set; }
@@ -111,7 +111,7 @@ public class AuthApiController(
         return Ok(new { userId = user.Id, roles = await users.GetRolesAsync(user) });
     }
 
-    /// <summary>Sign out and end the current cookie session.</summary>
+    /// <summary>Read the authenticated user's server-side session ID and role.</summary>
     [HttpGet("session"), Authorize]
     public IActionResult SessionStatus()
     {
@@ -124,6 +124,7 @@ public class AuthApiController(
         return Ok(new { userId = snapshot.UserId, role = snapshot.Role });
     }
 
+    /// <summary>Sign out, clear the server-side session and invalidate the Identity cookie.</summary>
     [HttpPost("logout"), Authorize]
     public async Task<IActionResult> Logout()
     {
