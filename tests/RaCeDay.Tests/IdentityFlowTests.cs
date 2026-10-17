@@ -50,7 +50,7 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
     {
         ["Input.FirstName"] = "Test", ["Input.LastName"] = "Participant",
         ["Input.Email"] = email, ["Input.Password"] = "Local-Test-123!",
-        ["Input.ConfirmPassword"] = "Local-Test-123!", ["Input.Role"] = "Admin"
+        ["Input.ConfirmPassword"] = "Local-Test-123!", ["Input.Role"] = "Participant"
     };
 
     [Fact]
@@ -80,6 +80,92 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
         login["Input.Password"] = "Local-Test-123!";
         login["__RequestVerificationToken"] = await IdentityFixture.Token(fresh, "/Identity/Account/Login");
         Assert.Equal(HttpStatusCode.Redirect, (await fresh.PostAsync("/Identity/Account/Login", new FormUrlEncodedContent(login))).StatusCode);
+    }
+
+    [Fact]
+    public async Task ApiAuthRegistersLogsInAndOutUsingCookieSessionWithCsrf()
+    {
+        using var client = fixture.Client();
+        var email = $"api-organiser-{Guid.NewGuid():N}@example.invalid";
+        var csrf = await client.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
+        client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", csrf.GetProperty("requestToken").GetString());
+        var input = new {
+            firstName = "API", lastName = "Organiser", email, role = "Organiser",
+            password = "Local-Test-123!", confirmPassword = "Local-Test-123!"
+        };
+        var registered = await client.PostAsJsonAsync("/api/auth/register", input);
+        Assert.Equal(HttpStatusCode.Created, registered.StatusCode);
+        var confirmation = await registered.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("Organiser", confirmation.GetProperty("role").GetString());
+        Assert.Equal("SignedIn", confirmation.GetProperty("status").GetString());
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/users/me")).StatusCode);
+
+        client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
+        var signedInToken = await client.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
+        client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", signedInToken.GetProperty("requestToken").GetString());
+        var loggedOut = await client.PostAsync("/api/auth/logout", null);
+        Assert.Equal(HttpStatusCode.NoContent, loggedOut.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/users/me")).StatusCode);
+
+        client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
+        var nextToken = await client.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
+        client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", nextToken.GetProperty("requestToken").GetString());
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PostAsJsonAsync(
+            "/api/auth/login", new { email, password = "Wrong-123!" })).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync(
+            "/api/auth/login", new { email, password = "Local-Test-123!" })).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/users/me")).StatusCode);
+
+        using var hostile = fixture.Client();
+        var hostileCsrf = await hostile.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
+        hostile.DefaultRequestHeaders.Add("X-CSRF-TOKEN", hostileCsrf.GetProperty("requestToken").GetString());
+        var invalidEmail = $"api-admin-{Guid.NewGuid():N}@example.invalid";
+        Assert.Equal(HttpStatusCode.BadRequest, (await hostile.PostAsJsonAsync("/api/auth/register",
+            new { firstName = "No", lastName = "Admin", email = invalidEmail, role = "Admin",
+                  password = "Local-Test-123!", confirmPassword = "Local-Test-123!" })).StatusCode);
+        using var scope = fixture.Factory.Services.CreateScope();
+        var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        Assert.Null(await users.FindByEmailAsync(invalidEmail));
+
+        using var anonymous = fixture.Client();
+        Assert.Equal(HttpStatusCode.BadRequest, (await anonymous.PostAsJsonAsync("/api/auth/register", input)).StatusCode);
+    }
+
+    [Fact]
+    public async Task RegistrationOffersOrganiserAndParticipantButRejectsAdmin()
+    {
+        using var organiserClient = fixture.Client();
+        var email = $"organiser-{Guid.NewGuid():N}@example.invalid";
+        var form = Registration(email);
+        form["Input.Role"] = "Organiser";
+        form["__RequestVerificationToken"] = await IdentityFixture.Token(organiserClient, "/Identity/Account/Register");
+        Assert.Equal(HttpStatusCode.Redirect, (await organiserClient.PostAsync(
+            "/Identity/Account/Register", new FormUrlEncodedContent(form))).StatusCode);
+
+        using (var scope = fixture.Factory.Services.CreateScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = await users.FindByEmailAsync(email);
+            Assert.NotNull(user);
+            Assert.Equal(new[] { "Organiser" }, await users.GetRolesAsync(user));
+        }
+        Assert.Equal(HttpStatusCode.OK, (await organiserClient.GetAsync("/Dashboard/Organiser")).StatusCode);
+        var blockedDashboard = await organiserClient.GetAsync("/Dashboard/Admin");
+        Assert.Equal(HttpStatusCode.Redirect, blockedDashboard.StatusCode);
+        Assert.Contains("AccessDenied", blockedDashboard.Headers.Location?.OriginalString);
+
+        using var hostileClient = fixture.Client();
+        var invalidEmail = $"admin-attempt-{Guid.NewGuid():N}@example.invalid";
+        var hostileForm = Registration(invalidEmail);
+        hostileForm["Input.Role"] = "Admin";
+        hostileForm["__RequestVerificationToken"] = await IdentityFixture.Token(hostileClient, "/Identity/Account/Register");
+        Assert.Equal(HttpStatusCode.OK, (await hostileClient.PostAsync(
+            "/Identity/Account/Register", new FormUrlEncodedContent(hostileForm))).StatusCode);
+        using (var scope = fixture.Factory.Services.CreateScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            Assert.Null(await users.FindByEmailAsync(invalidEmail));
+        }
     }
 
     [Fact]

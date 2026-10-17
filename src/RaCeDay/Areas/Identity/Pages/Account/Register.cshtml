@@ -4,7 +4,7 @@
     ViewData["Title"] = "Register";
 }
 <h1>Register</h1>
-<p>New accounts receive the Participant role. An administrator manages elevated roles.</p>
+<p>Choose whether to join races as a Participant or organise races as an Organiser. Administrator access is not available through registration.</p>
 <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
     <label asp-for="Input.FirstName"></label>
@@ -15,6 +15,12 @@
     <span asp-validation-for="Input.LastName" class="text-danger"></span>
     <label asp-for="Input.Gender"></label>
     <input asp-for="Input.Gender" />
+    <label asp-for="Input.Role"></label>
+    <select asp-for="Input.Role">
+        <option value="Participant">Participant</option>
+        <option value="Organiser">Organiser</option>
+    </select>
+    <span asp-validation-for="Input.Role" class="text-danger"></span>
     <label asp-for="Input.Email"></label>
     <input asp-for="Input.Email" autocomplete="email" />
     <span asp-validation-for="Input.Email" class="text-danger"></span>
@@ -24,5 +30,5 @@
     <label asp-for="Input.ConfirmPassword"></label>
     <input asp-for="Input.ConfirmPassword" autocomplete="new-password" />
     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-    <button type="submit">Create Participant account</button>
+    <button type="submit">Create account</button>
 </form>

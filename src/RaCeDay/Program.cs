@@ -44,7 +44,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "RaCeDay API", Version = "v1",
-        Description = "Sign in through Identity first. GET /api/antiforgery, then enter its requestToken in Authorize. Cookie-authenticated writes require X-CSRF-TOKEN." });
+        Description = "This API uses ASP.NET Identity cookie sessions. For public register/login calls, first GET /api/auth/antiforgery and enter its requestToken in Swagger Authorize as X-CSRF-TOKEN. Refresh the token after signing in for authenticated writes. No JWT is issued." });
     options.AddSecurityDefinition("CSRF", new OpenApiSecurityScheme { Type = SecuritySchemeType.ApiKey, In = ParameterLocation.Header, Name = "X-CSRF-TOKEN" });
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {

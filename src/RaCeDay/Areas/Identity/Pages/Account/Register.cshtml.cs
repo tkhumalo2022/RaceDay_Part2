@@ -29,6 +29,12 @@ public class RegisterModel(
         [StringLength(30)]
         public string? Gender { get; set; }
 
+        // The official POE permits selecting either application role.
+        // Admin is never offered or accepted during self-registration.
+        [Required, RegularExpression("^(Participant|Organiser)$",
+            ErrorMessage = "Choose Participant or Organiser."), Display(Name = "Register as")]
+        public string Role { get; set; } = "Participant";
+
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
 
@@ -66,8 +72,9 @@ public class RegisterModel(
             return Page();
         }
 
-        // Never grant privileged roles through a public registration request.
-        var assigned = await users.AddToRoleAsync(user, "Participant");
+        // Only the explicitly allowlisted application role can be self-selected.
+        // Public callers can never create or assign the Admin role.
+        var assigned = await users.AddToRoleAsync(user, Input.Role);
         if (!assigned.Succeeded)
         {
             await users.DeleteAsync(user);
@@ -76,7 +83,7 @@ public class RegisterModel(
             return Page();
         }
 
-        logger.LogInformation("A Participant account was registered.");
+        logger.LogInformation("A {RegistrationRole} account was registered.", Input.Role);
         if (users.Options.SignIn.RequireConfirmedAccount)
             return RedirectToPage("RegisterConfirmation", new { email = user.Email, returnUrl = ReturnUrl });
 
