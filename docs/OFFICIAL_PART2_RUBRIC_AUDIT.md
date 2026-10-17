@@ -11,7 +11,7 @@
 | Authentication and role-based access | 20 | Organiser and Participant selectable via MVC, API register/login/logout now exist, Identity hashes passwords, cookie session and protected roles tested | Verify official wording for server-side session, browser evidence and all protected API routes |
 | API endpoints and database | 25 | ASP.NET Core + SQL Server EF Core migrations; events, categories, enrolment, results, own profile and pending-only payment attempts | **Must reconcile EF schema with approved Part 1 ERD and SQL exactly.** Current EF Identity schema differs from Part 1's separate organiser and participant tables. Cookie session differs from JWT mentioned in the student's Part 1 endpoint plan |
 | Swagger integration | 10 | Live Swagger UI and JSON work; endpoints visible | Demonstrate each endpoint in same browser, ensure useful operation descriptions and request/response schemas |
-| Unit testing | 15 | 26 local automated unit/integration tests, roles and success/failure access | Must pass in a real GitHub Actions run; screenshots and wider failed-auth scenarios useful |
+| Unit testing | 15 | 31 locally passing automated tests, including SQL-trigger checks and role-specific registration | Must pass in a real GitHub Actions run; green CI screenshot absent |
 | Video presentation | 15 | None | Unlisted YouTube walkthrough demonstrating code, endpoints, auth, Swagger, unit tests; README link |
 | **Total** | **100** | **No estimated grade** | |
 

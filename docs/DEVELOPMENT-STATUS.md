@@ -1,36 +1,36 @@
-# RaCeDay Part 2 — verified development status (17 October 2026)
+# PROG6212 Part 2 — RaCeDay recovery project status
 
-The original student Visual Studio application is still missing. This is an **isolated recovery branch**, `recovery/part2-20261017`, not a restoration or submission of the original application.
+**Student:** Thabiso Khumalo
+**Date:** 17 October 2026
+**Project:** Isolated recovery branch `recovery/part2-20261017` of `tkhumalo2022/RaceDay_Part2`. The student's previously lost original Visual Studio solution remains unrecovered; this is a separate working copy.
 
-The official IIE 2026 PROG6212 POE Part 2 instructions were **visually inspected** in the open authenticated SharePoint Word Online tab. Relevant pages: Part 2 brief 9–11, marking rubric 17–18. See `docs/OFFICIAL_PART2_RUBRIC_AUDIT.md` for the **100-mark allocation**. This document is protected, so visual access does not make it a normal downloadable/plaintext document.
+The official IIE `PROG6212_POE.docx` was reviewed visually in the logged-in SharePoint tab. Part 2 (RESTful API Development) is **100 marks**, pages 9–11 and 17–18. See `OFFICIAL_PART2_RUBRIC_AUDIT.md`.
 
-## Locally implemented and verified
+## Verified locally
 
-- `.NET 10` ASP.NET Core Identity MVC and API, SQL Server EF Core Code-First migrations.
-- MVC public registration chooses Organiser or Participant; API has CSRF-protected JSON register/login/logout, and anonymous CSRF token endpoint. Admin self-registration is rejected; Identity hashes passwords; cookie session retains role claims.
-- Role-protected Admin/Organiser/Participant dashboards, profile editing + GET/PUT API, restricted Event/Category/Enrolment/Result workflows, pending-only Payment attempts and Swagger UI.
-- SQL Server LocalDB unit/integration tests cover core positive/negative cases, concurrency and role ownership. **26 tests passed** after adding API auth; Release compilation had **0 errors and 0 warnings**. CI verification has not occurred.
-- New Windows GitHub Actions workflow configured to build **and run LocalDB tests** on pushes/PRs; this is only a local change, not a green CI run.
-- Previous manual runtime smoke test demonstrated HTTP 200 home/login/Swagger and HTTP 401 for anonymous API access. That test predates the latest auth endpoints and must be repeated after commit.
+- Windows .NET 10 Release build: **0 errors, 0 warnings**, `--warnaserror`.
+- SQL Server LocalDB test suite: **31 passed, 0 failed, 0 skipped**, including API Identity role access, concurrency, event/category/enrolment/result workflow, profile updating, pending payment attempts, category-count SQL trigger, payment amount SQL trigger and role-specific registration.
+- Test report: `tests/RaCeDay.Tests/TestResults/Part2-AdditionalRegression.trx` (generated locally; ignored by Git).
+- MVC and JSON API register Organiser or Participant, never Admin. Participant DOB and Organiser name required for new registrations; phone/details stored with Identity profile. Profile API and form allow role-appropriate edits.
+- ASP.NET Identity stores hashed passwords, issues secure authentication cookies and restricts endpoints by role. Request tokens protect API writes.
+- Event/category management, capacity/date restrictions, private enrolments/results, pending-only payment attempt records, Swagger XML summaries.
+- Six forward EF migrations, including `Part1CategoryCountAndPaymentRules` and `RoleRegistrationProfileFields`; original database untouched. Tests create separate GUID-named SQL Server LocalDB databases.
+- `CurrentParticipants` is a database column maintained by a trigger; payments have a database-level amount-equality trigger and unique Paid safeguard.
+- Windows GitHub Actions workflow configured for **every push** with .NET build, SQL Server LocalDB tests and downloadable TRX test artifact. **This is local configuration only; no remote green build verified.**
 
-## Confirmed official Part 2 gaps
+## Unfinished / assessment risks
 
-1. The **25-mark API/database** category requires EF schema to match the approved Part 1 ERD and SQL script. Existing Identity-based model differs materially from the Part 1 separate Organiser/Participant tables, and must be reconciled or documented with lecturer approval.
-2. The **10-mark GitHub/CI** criterion asks for **20 meaningful Part 2 commits**, a successful GitHub Actions build/test on every push, and a green screenshot. Local commit count is not yet enough, and the revised workflow hasn't run remotely. Do not create filler commits.
-3. The **15-mark video** criterion requires a real unlisted YouTube demonstration of all endpoints, authentication, Swagger and tests, with the link in README. No video exists yet.
-4. Swagger endpoint descriptions and a complete browser-authenticated API demonstration still need rubric-aligned verification. MVC browser screens and local integration tests don't substitute for the live API demonstration.
-5. Confirm how the assessor interprets *server-side session*, because ASP.NET Identity encrypts role claims in an authentication cookie, while the highest rubric band literally says server-side session stores user ID and role.
-6. Get the original student project if accessible; no other student's source should be imported.
+- Exact Part 1 **physical** schema alignment is not complete. Part 1 defines separate integer-key `Organiser` and `Participant` tables; Identity uses shared `AspNetUsers` and string FKs. Added role-specific fields and SQL triggers improve parity, but a full redesign/lecturer approval is needed before claiming an exact match. See `PART1_SCHEMA_RECONCILIATION.md` and `SCHEMA_PARITY_ADDENDUM.md`.
+- No live GitHub Actions verification or green screenshot. The local history now reaches 20 commits including genuine feature, test, CI and documentation changes; only the assessor can judge whether all are meaningful. Recovery branch remains local pending approval to push. Never fabricate commits.
+- No real recorded and uploaded unlisted YouTube presentation. A student-led recording checklist exists at `SUBMISSION_VIDEO_SCRIPT.md`.
+- Full manual authenticated Swagger walkthrough after latest code change and rubric evidence screenshots not yet completed. Earlier browser screenshots are in `outputs/RaceDay-evidence-20261017` outside the repository.
+- Original Visual Studio project is not merged, production email confirmation and a real payments gateway are unimplemented; the latter is not an explicit Part 2 functional requirement.
+- There is no GitHub push, merge, deployment, YouTube URL, ARC submission or grade calculation.
 
-## Explicit scope decisions
+## Submission route
 
-- Part 2 requires a REST API; Docker containerisation and a fully themed MVC interface belong primarily to **Part 3**, not Part 2.
-- Part 1's endpoint plan suggested JWT; the official Part 2 brief asks for session authentication. This recovery implementation uses cookie-based Identity; document the difference.
-- Payment attempts are Pending records only, not a payment gateway and not real settlement.
-- Original application/database unchanged. No GitHub push, merge, deployment, ARC submission or marks claim has been made.
-
-## Local evidence
-
-- Latest local test output: 26 passed, 0 failed, 0 skipped (rerun/preserve TRX before final submission).
-- Earlier screenshot and manual check folder: `outputs/RaceDay-evidence-20261017`, outside the Git repository.
-- See `docs/SUBMISSION_EVIDENCE_CHECKLIST.md`, `README.md` and the official audit for outstanding steps.
+1. Review legacy schema mismatch with lecturer, or carry out a separate migration redesign against an **isolated** database only.
+2. Confirm permission to push this recovery branch, verify GitHub Actions and capture the actual green run.
+3. Create the student-led real video; make it Unlisted and paste the link into README.
+4. Record a Swagger demonstration, collect database/commit evidence, ensure the 20 meaningful commits are authentic.
+5. Check the resulting repo link and submit it yourself on ARC.

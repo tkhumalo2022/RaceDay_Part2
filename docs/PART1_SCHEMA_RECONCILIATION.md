@@ -5,11 +5,11 @@ Prepared 17 October 2026. Compared the submitted Part 1 SQL script in `docs/part
 | Part 1 requirement | Part 2 implementation | Status |
 | --- | --- | --- |
 | Separate `Organiser` and `Participant` tables with INT identity keys | Identity `AspNetUsers` shares string IDs; role assignments are in `AspNetUserRoles` | DIFFERENT; explicit lecturer approval or migration redesign required |
-| `Organiser_Name`, participant date of birth, created timestamps | Shared `ApplicationUser` has first/last name and gender; some fields not represented | MISSING / DIFFERENT |
+| `Organiser_Name`, participant date of birth, created timestamps | Shared `ApplicationUser` now includes `OrganiserName`, `DateOfBirth`, `CreatedAt`, validated during role signup | CONTENT ALIGNED, PHYSICAL TABLES STILL DIFFER |
 | `Event` table, owner foreign key, event date/location/type/status, closing date | `Event` table and validations exist, but owner FK uses Identity string and columns are PascalCase | PARTIALLY ALIGNED |
-| `Race_Category` with `Current_Participants` and trigger maintained count | `Race_Category` exists; current count is derived via workflow, with locking for capacity | BEHAVIOUR MATCHES, PHYSICAL SCHEMA DIFFERENT |
+| `Race_Category` with `Current_Participants` and trigger maintained count | `CurrentParticipants` is now stored with SQL Server insert/update/delete trigger and backfill; lock protects capacity | BEHAVIOUR MATCHES, COLUMN NAMES DIFFER |
 | Enrolment composite FK (category,event), unique participant+category and race number | Composite FK and uniqueness configured; participant FK is Identity string | PARTIALLY ALIGNED |
-| Payment method/status/amount checks, unique reference and one paid payment | EF constraints and filtered indexes configured; server only creates Pending attempts | PARTIALLY ALIGNED; Part 1 payment amount SQL trigger not carried over |
+| Payment method/status/amount checks, unique reference and one paid payment | EF constraints and filtered indexes, plus SQL Server amount-validation trigger; API creates Pending only | DATABASE RULE ALIGNED, COLUMN NAMES DIFFER |
 | Result table unique enrolment and finish-time/status checks | Corresponding indexes/checks configured | BEHAVIOUR ALIGNED, COLUMN NAMES DIFFERENT |
 | Part 1 login plan returns JWT | Official Part 2 explicitly asks user/role session; ASP.NET Identity cookie session used | DOCUMENTED CONTRACT CHANGE |
 
