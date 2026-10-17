@@ -16,7 +16,8 @@ public class ProfileController(UserManager<ApplicationUser> users, SignInManager
         return View(new ProfileViewModel
         {
             FirstName = user.FirstName, LastName = user.LastName,
-            Gender = user.Gender, PhoneNumber = user.PhoneNumber
+            Gender = user.Gender, PhoneNumber = user.PhoneNumber,
+            OrganiserName = user.OrganiserName, DateOfBirth = user.DateOfBirth
         });
     }
 
@@ -32,6 +33,10 @@ public class ProfileController(UserManager<ApplicationUser> users, SignInManager
         var phone = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim();
         if (phone != user.PhoneNumber) user.PhoneNumberConfirmed = false;
         user.PhoneNumber = phone;
+        if (User.IsInRole("Organiser") && !string.IsNullOrWhiteSpace(model.OrganiserName))
+            user.OrganiserName = model.OrganiserName.Trim();
+        if (User.IsInRole("Participant") && model.DateOfBirth.HasValue)
+            user.DateOfBirth = model.DateOfBirth;
         var result = await users.UpdateAsync(user);
         if (!result.Succeeded)
         {

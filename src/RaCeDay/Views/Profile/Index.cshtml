@@ -15,6 +15,16 @@
     <input asp-for="Gender" />
     <label asp-for="PhoneNumber"></label>
     <input asp-for="PhoneNumber" autocomplete="tel" />
+    @if (User.IsInRole("Organiser"))
+    {
+        <label asp-for="OrganiserName"></label>
+        <input asp-for="OrganiserName" autocomplete="organization" />
+    }
+    @if (User.IsInRole("Participant"))
+    {
+        <label asp-for="DateOfBirth"></label>
+        <input asp-for="DateOfBirth" type="date" />
+    }
     <button type="submit">Save profile</button>
 </form>
 <p><a asp-controller="Dashboard" asp-action="Index">Back to dashboard</a></p>
