@@ -72,10 +72,15 @@ public class CoreWorkflowTests(IdentityFixture fixture) : IClassFixture<Identity
         var mine = await participant.GetFromJsonAsync<JsonElement>("/api/results/me");
         Assert.Single(mine.EnumerateArray());
         Assert.Equal("Finished", mine[0].GetProperty("resultStatus").GetString());
+        Assert.Equal("08:30:00", mine[0].GetProperty("finishTime").GetString());
         Assert.Empty((await other.GetFromJsonAsync<JsonElement>("/api/results/me")).EnumerateArray());
         Assert.Empty((await other.GetFromJsonAsync<JsonElement>("/api/enrolments/me")).EnumerateArray());
         Assert.Equal(HttpStatusCode.OK, (await participant.GetAsync("/Entries")).StatusCode);
-        Assert.Contains("08:30", await participant.GetStringAsync("/Entries/Results"));
+        // The UI formats TimeOnly using the runner's current culture. Validate
+        // its semantic result separately from the invariant JSON API time.
+        var resultsPage = await participant.GetStringAsync("/Entries/Results");
+        Assert.Contains("Finished", resultsPage);
+        Assert.Contains("Durban Test Race", resultsPage);
     }
 
     [Fact]
