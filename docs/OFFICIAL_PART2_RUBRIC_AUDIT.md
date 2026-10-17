@@ -7,11 +7,11 @@
 | Official Part 2 marking criterion | Max marks | Verified in isolated local recovery branch | Unmet or not verified |
 | --- | ---: | --- | --- |
 | Correct submission | 5 | README and setup commands exist | No official GitHub link submitted, no CI screenshot or unlisted video URL |
-| GitHub and CI/CD | 10 | Git repository exists; Windows LocalDB build/test workflow prepared | Minimum **20 meaningful Part 2 commits** unproven; revised CI has not run on GitHub; green CI screenshot absent |
+| GitHub and CI/CD | 10 | Git repository exists; Windows LocalDB build/test workflow prepared | 23 commits at successful run; remote CI passed 32 tests, green screenshot captured. Qualitative assessment of commit history is still pending. |
 | Authentication and role-based access | 20 | Organiser and Participant selectable via MVC, API register/login/logout now exist, Identity hashes passwords, cookie authentication, server-side user-ID/role session and protected roles tested | Identity-authorisation and session storage now locally tested; confirm browser evidence for all protected API routes |
 | API endpoints and database | 25 | ASP.NET Core + SQL Server EF Core migrations; events, categories, enrolment, results, own profile and pending-only payment attempts | **Must reconcile EF schema with approved Part 1 ERD and SQL exactly.** Current EF Identity schema differs from Part 1's separate organiser and participant tables. Cookie session differs from JWT mentioned in the student's Part 1 endpoint plan |
 | Swagger integration | 10 | Live Swagger UI and JSON work; endpoints visible | Demonstrate each endpoint in same browser, ensure useful operation descriptions and request/response schemas |
-| Unit testing | 15 | 32 locally passing automated tests, including SQL-trigger checks and role-specific registration | Must pass in a real GitHub Actions run; green CI screenshot absent |
+| Unit testing | 15 | 32 locally passing automated tests, including SQL-trigger checks and role-specific registration | Verified **32 passing tests** on GitHub Actions run #39068333340; screenshot saved. |
 | Video presentation | 15 | None | Unlisted YouTube walkthrough demonstrating code, endpoints, auth, Swagger, unit tests; README link |
 | **Total** | **100** | **No estimated grade** | |
 
@@ -26,6 +26,6 @@
 ## Priorities by assessed impact
 
 1. Reconcile **25-mark schema/endpoints** against the approved Part 1 ERD and SQL, explain or correct deviations, and demonstrate all routes in Swagger.
-2. Make CI **actually run** on GitHub with passing SQL Server integration tests and preserve green screenshot; meet 20 authentic commits, never create filler commits.
+2. CI **passed** on GitHub with 32 SQL Server tests and genuine screenshot; verify the 20 meaningful commits qualitatively and do not create filler commits.
 3. Obtain a legitimate full application demo/video, add unlisted YouTube URL and README evidence (15 marks).
 4. Capture new screenshot evidence for session+role auth and the API; the latest isolated HTTP flow passed 21 checks including server-side session reads, and Swagger exposed 18 API paths.

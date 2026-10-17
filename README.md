@@ -16,6 +16,15 @@
 - Pending-only payment-attempt records with both API and **SQL-trigger** entry-fee amount validation, ownership control, unique transaction references and at most one `Paid` record per enrolment. **No real payment processing or confirmation exists.**
 - Automated SQL Server LocalDB integration tests for roles, Identity, forms, routes, business rules, concurrency and payment records.
 
+## GitHub and verified Part 2 CI
+
+- **Student:** Thabiso Khumalo
+- **Part 2 source branch:** [recovery/part2-20261017](https://github.com/tkhumalo2022/RaceDay_Part2/tree/recovery/part2-20261017). The default `main` branch is deliberately unchanged.
+- **Verified GitHub Actions build and test:** [Successful run #39068333340](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39068333340) on Windows (32 passed, 0 failed; Release build completed without compiler errors or warnings).
+- **Genuine screenshot:** [GitHub Actions success evidence](docs/evidence/GitHub-CI-Green-20261017.png). The GitHub run also retains the `raceday-test-results` artifact.
+- This branch contained **23 real commits** at the green CI run. Their individual relevance must be judged by the assessor; no filler commits have been added.
+- **Presentation video:** Not recorded/uploaded yet. Add Thabiso Khumalo's actual **unlisted YouTube video URL** here before submitting on ARC.
+
 ## Requirements
 
 Windows with .NET SDK 10, SQL Server LocalDB, and the `dotnet-ef` CLI (10.x). All commands below run in this repository root. Open `RaCeDay.slnx` in Visual Studio or a shell.
@@ -63,7 +72,7 @@ See `docs/PAYMENT_WORKFLOW.md`, `docs/SCHEMA_PARITY_ADDENDUM.md`, `docs/SUBMISSI
 - Part 1 planned JWT-based authentication, while Part 2 asks for user/role sessions. RaCeDay uses an Identity cookie plus a server-side memory-backed session carrying the user ID and role; no JWT is issued. The memory store is suitable for single-instance coursework and would require a distributed store for scaled production.
 - Real payment gateway and trusted settlement are not implemented. Payment records remain Pending.
 - Confirm the lecturer's role registration model, dashboard requirements and field names.
-- Verify that the **20 local commits represent meaningful Part 2 work**, push the branch only with approval, run the new GitHub Actions workflow and collect its genuine green CI screenshot. Local workflow is configured but has not run remotely.
+- The Part 2 branch was pushed with permission and its GitHub Actions workflow has passed remotely (32/32 tests on run #39068333340); verify that the commit history meets the lecturer's qualitative definition of 20 meaningful Part 2 commits.
 - Produce genuine browser, Swagger, LocalDB/SSMS and Git history evidence screenshots and an **unlisted YouTube walkthrough**, then add the video link to README.
 - Test deployment/release environment and production email confirmation if required.
-- Nothing is pushed, merged or submitted automatically.
+- Only the approved Part 2 recovery branch has been pushed. It has **not** been merged into `main` and nothing has been submitted to ARC.

@@ -16,21 +16,21 @@ The official IIE `PROG6212_POE.docx` was reviewed visually in the logged-in Shar
 - Event/category management, capacity/date restrictions, private enrolments/results, pending-only payment attempt records, Swagger XML summaries.
 - Six forward EF migrations, including `Part1CategoryCountAndPaymentRules` and `RoleRegistrationProfileFields`; original database untouched. Tests create separate GUID-named SQL Server LocalDB databases.
 - `CurrentParticipants` is a database column maintained by a trigger; payments have a database-level amount-equality trigger and unique Paid safeguard.
-- Windows GitHub Actions workflow configured for **every push** with .NET build, SQL Server LocalDB tests and downloadable TRX test artifact. **This is local configuration only; no remote green build verified.**
+- Windows GitHub Actions workflow runs on **every push** and verified remotely green on [run #39068333340](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39068333340): SQL Server LocalDB integration suite **32 passed, 0 failed**, compiler build successful. Real screenshot checked in at `docs/evidence/GitHub-CI-Green-20261017.png`; TRX test artifact available from GitHub.
 
 ## Unfinished / assessment risks
 
 - Exact Part 1 **physical** schema alignment is not complete. Part 1 defines separate integer-key `Organiser` and `Participant` tables; Identity uses shared `AspNetUsers` and string FKs. Added role-specific fields and SQL triggers improve parity, but a full redesign/lecturer approval is needed before claiming an exact match. See `PART1_SCHEMA_RECONCILIATION.md` and `SCHEMA_PARITY_ADDENDUM.md`.
-- No live GitHub Actions verification or green screenshot. The local history now reaches 20 commits including genuine feature, test, CI and documentation changes; only the assessor can judge whether all are meaningful. Recovery branch remains local pending approval to push. Never fabricate commits.
+- The approved recovery branch is now on GitHub. An initial CI run exposed a locale-dependent HTML assertion (31/32), fixed in commit `7611b47`; the second run **passed all 32**. Screenshot and real run URL retained. The 23 commits present at that run include substantive implementation/test/docs; only the assessor can decide if the 20-meaningful-commits rubric is fully met.
 - No real recorded and uploaded unlisted YouTube presentation. A student-led recording checklist exists at `SUBMISSION_VIDEO_SCRIPT.md`.
 - A full role-based HTTP walkthrough has been performed against a separate demonstration database: **21 expected status-code checks**, including server-side session reads for both roles, registration, owned events/categories, duplicate rejection, forbidden role action, pending-only payment, result recording and Swagger's **18 paths**. Evidence log: `outputs/RaceDay-Part2-LiveEvidence-20261017/verified-http-log.txt`, outside the repo. Full screen-recorded Swagger walkthrough and screenshots still remain outstanding.
 - Original Visual Studio project is not merged, production email confirmation and a real payments gateway are unimplemented; the latter is not an explicit Part 2 functional requirement.
-- There is no GitHub push, merge, deployment, YouTube URL, ARC submission or grade calculation.
+- The recovery branch was pushed to GitHub. There is **no merge into main**, production deployment, YouTube URL, ARC submission or defensible grade prediction.
 
 ## Submission route
 
 1. Review legacy schema mismatch with lecturer, or carry out a separate migration redesign against an **isolated** database only.
-2. Confirm permission to push this recovery branch, verify GitHub Actions and capture the actual green run.
+2. [x] Push the authorised recovery branch, verify GitHub Actions, and capture a genuine green run; [ ] confirm any remaining screenshot/README requirements with the lecturer.
 3. Create the student-led real video; make it Unlisted and paste the link into README.
 4. Record a Swagger demonstration, collect database/commit evidence, ensure the 20 meaningful commits are authentic.
 5. Check the resulting repo link and submit it yourself on ARC.
