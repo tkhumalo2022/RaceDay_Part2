@@ -13,6 +13,7 @@ public class UsersApiController(UserManager<ApplicationUser> users, SignInManage
     private static UserProfileDto ViewUser(ApplicationUser u) =>
         new(u.Id, u.Email, u.FirstName, u.LastName, u.Gender, u.PhoneNumber);
 
+    /// <summary>Get the signed-in user profile.</summary>
     [HttpGet("me")]
     public async Task<ActionResult<UserProfileDto>> Me()
     {
@@ -20,6 +21,7 @@ public class UsersApiController(UserManager<ApplicationUser> users, SignInManage
         return user is null ? Unauthorized() : Ok(ViewUser(user));
     }
 
+    /// <summary>Edit only the current user profile fields, preserving roles and email.</summary>
     [HttpPut("me")]
     public async Task<ActionResult<UserProfileDto>> Update(ProfileViewModel input)
     {

@@ -32,10 +32,12 @@ public class AuthApiController(
     UserManager<ApplicationUser> users,
     SignInManager<ApplicationUser> signIn) : ControllerBase
 {
+    /// <summary>Get a CSRF request token before registering, logging in, or writing via the API.</summary>
     [HttpGet("antiforgery"), AllowAnonymous]
     public IActionResult Antiforgery([FromServices] IAntiforgery antiforgery) =>
         Ok(new { requestToken = antiforgery.GetAndStoreTokens(HttpContext).RequestToken });
 
+    /// <summary>Register as Organiser or Participant; public Admin registration is forbidden.</summary>
     [HttpPost("register"), AllowAnonymous]
     [ProducesResponseType(201)]
     public async Task<IActionResult> Register(ApiRegisterInput input)
@@ -72,6 +74,7 @@ public class AuthApiController(
         });
     }
 
+    /// <summary>Log in using the secure Identity cookie session, not a JWT.</summary>
     [HttpPost("login"), AllowAnonymous]
     public async Task<IActionResult> Login(ApiLoginInput input)
     {
@@ -87,6 +90,7 @@ public class AuthApiController(
         return Ok(new { userId = user.Id, roles = await users.GetRolesAsync(user) });
     }
 
+    /// <summary>Sign out and end the current cookie session.</summary>
     [HttpPost("logout"), Authorize]
     public async Task<IActionResult> Logout()
     {

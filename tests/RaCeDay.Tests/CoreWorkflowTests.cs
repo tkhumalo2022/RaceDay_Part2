@@ -169,5 +169,9 @@ public class CoreWorkflowTests(IdentityFixture fixture) : IClassFixture<Identity
         var doc = await client.GetFromJsonAsync<JsonElement>("/swagger/v1/swagger.json");
         Assert.True(doc.GetProperty("paths").TryGetProperty("/api/events/{eventId}/enrolments", out _));
         Assert.True(doc.GetProperty("paths").TryGetProperty("/api/enrolments/{enrolmentId}/results", out _));
+        var createEntry = doc.GetProperty("paths").GetProperty("/api/events/{eventId}/enrolments").GetProperty("post");
+        Assert.Contains("Enrol", createEntry.GetProperty("summary").GetString());
+        var login = doc.GetProperty("paths").GetProperty("/api/auth/login").GetProperty("post");
+        Assert.Contains("cookie", login.GetProperty("summary").GetString(), StringComparison.OrdinalIgnoreCase);
     }
 }
