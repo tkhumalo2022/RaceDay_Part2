@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -78,6 +80,46 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
         login["Input.Password"] = "Local-Test-123!";
         login["__RequestVerificationToken"] = await IdentityFixture.Token(fresh, "/Identity/Account/Login");
         Assert.Equal(HttpStatusCode.Redirect, (await fresh.PostAsync("/Identity/Account/Login", new FormUrlEncodedContent(login))).StatusCode);
+    }
+
+    [Fact]
+    public async Task ProfileApiOnlyUpdatesSignedInAllowlistedFieldsAndRequiresCsrf()
+    {
+        using var anonymous = fixture.Client();
+        Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync("/api/users/me")).StatusCode);
+        using var client = fixture.Client();
+        var email = $"profile-api-{Guid.NewGuid():N}@example.invalid";
+        var form = Registration(email);
+        form["__RequestVerificationToken"] = await IdentityFixture.Token(client, "/Identity/Account/Register");
+        Assert.Equal(HttpStatusCode.Redirect, (await client.PostAsync("/Identity/Account/Register",
+            new FormUrlEncodedContent(form))).StatusCode);
+
+        var before = await client.GetFromJsonAsync<JsonElement>("/api/users/me");
+        Assert.Equal(email, before.GetProperty("email").GetString());
+        client.DefaultRequestHeaders.Add("X-CSRF-TOKEN", await IdentityFixture.Token(client, "/Profile"));
+        var update = await client.PutAsJsonAsync("/api/users/me", new
+        {
+            firstName = "New", lastName = "Person", gender = "Other",
+            phoneNumber = "0715551001", role = "Admin", email = "forged@example.invalid", id = "forged-id"
+        });
+        Assert.Equal(HttpStatusCode.OK, update.StatusCode);
+        var after = await update.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("New", after.GetProperty("firstName").GetString());
+        Assert.Equal(email, after.GetProperty("email").GetString());
+        Assert.Equal(before.GetProperty("id").GetString(), after.GetProperty("id").GetString());
+
+        using (var scope = fixture.Factory.Services.CreateScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var user = await users.FindByEmailAsync(email);
+            Assert.NotNull(user);
+            Assert.Equal(new[] { "Participant" }, await users.GetRolesAsync(user));
+        }
+        var invalid = await client.PutAsJsonAsync("/api/users/me", new { firstName = "", lastName = "Valid" });
+        Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+        client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync("/api/users/me",
+            new { firstName = "Other", lastName = "Valid" })).StatusCode);
     }
 
     [Fact]

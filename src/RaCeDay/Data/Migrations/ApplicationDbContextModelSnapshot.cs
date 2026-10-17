@@ -242,6 +242,244 @@ namespace RaCeDay.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("RaCeDay.Models.Enrolment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EnrolmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ParticipantId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("RaceNumber")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("RaceNumber")
+                        .IsUnique();
+
+                    b.HasIndex("CategoryId", "EventId");
+
+                    b.HasIndex("ParticipantId", "CategoryId")
+                        .IsUnique();
+
+                    b.ToTable("Enrolment", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Enrolment_Status", "[Status] IN ('Registered','Completed','Withdrawn','Cancelled')");
+                        });
+                });
+
+            modelBuilder.Entity("RaCeDay.Models.PaymentAttempt", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("EnrolmentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("TransactionReference")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnrolmentId")
+                        .IsUnique()
+                        .HasFilter("[Status] = 'Paid'");
+
+                    b.HasIndex("TransactionReference")
+                        .IsUnique()
+                        .HasFilter("[TransactionReference] IS NOT NULL");
+
+                    b.ToTable("Payment", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Payment_Amount", "[Amount] >= 0");
+
+                            t.HasCheckConstraint("CK_Payment_Method", "[PaymentMethod] IN ('Card','EFT','Cash','Other')");
+
+                            t.HasCheckConstraint("CK_Payment_Status", "[Status] IN ('Pending','Paid','Failed','Refunded')");
+                        });
+                });
+
+            modelBuilder.Entity("RaCeDay.Models.RaceCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("DistanceKm")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
+
+                    b.Property<decimal>("EntryFee")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxParticipants")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId", "CategoryName")
+                        .IsUnique();
+
+                    b.ToTable("Race_Category", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Category_Values", "[DistanceKm] > 0 AND [EntryFee] >= 0 AND [MaxParticipants] > 0");
+                        });
+                });
+
+            modelBuilder.Entity("RaCeDay.Models.RaceEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("ClosingDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateOnly>("EventDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("EventName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("OrganiserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganiserId");
+
+                    b.ToTable("Event", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Event_Dates", "[ClosingDate] <= [EventDate]");
+
+                            t.HasCheckConstraint("CK_Event_Status", "[Status] IN ('Planned','Open','Closed','Completed','Cancelled')");
+
+                            t.HasCheckConstraint("CK_Event_Type", "[EventType] IN ('Run','Walk','Cycle')");
+                        });
+                });
+
+            modelBuilder.Entity("RaCeDay.Models.RaceResult", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("EnrolmentId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly?>("FinishTime")
+                        .HasColumnType("time");
+
+                    b.Property<int?>("OverallPosition")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ResultStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<TimeOnly?>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EnrolmentId")
+                        .IsUnique();
+
+                    b.ToTable("Race_Result", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Result_Position", "[OverallPosition] IS NULL OR [OverallPosition] > 0");
+
+                            t.HasCheckConstraint("CK_Result_Status", "[ResultStatus] IN ('Finished','DNS','DNF','DSQ')");
+
+                            t.HasCheckConstraint("CK_Result_Times", "[StartTime] IS NULL OR [FinishTime] IS NULL OR [FinishTime] >= [StartTime]");
+                        });
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -290,6 +528,64 @@ namespace RaCeDay.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RaCeDay.Models.Enrolment", b =>
+                {
+                    b.HasOne("RaCeDay.Models.RaceEvent", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RaCeDay.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RaCeDay.Models.RaceCategory", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId", "EventId")
+                        .HasPrincipalKey("Id", "EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RaCeDay.Models.PaymentAttempt", b =>
+                {
+                    b.HasOne("RaCeDay.Models.Enrolment", null)
+                        .WithMany()
+                        .HasForeignKey("EnrolmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RaCeDay.Models.RaceCategory", b =>
+                {
+                    b.HasOne("RaCeDay.Models.RaceEvent", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RaCeDay.Models.RaceEvent", b =>
+                {
+                    b.HasOne("RaCeDay.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("OrganiserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RaCeDay.Models.RaceResult", b =>
+                {
+                    b.HasOne("RaCeDay.Models.Enrolment", null)
+                        .WithMany()
+                        .HasForeignKey("EnrolmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

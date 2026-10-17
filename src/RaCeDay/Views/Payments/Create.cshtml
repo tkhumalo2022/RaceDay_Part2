@@ -1,0 +1,11 @@
+@model PaymentInput
+@{ ViewData["Title"] = "Record payment attempt"; var enrolmentId = (int)ViewData["EnrolmentId"]!; }
+<h1>Record a payment attempt</h1>
+<p>This does not charge a card or confirm payment. No payment gateway is connected.</p>
+<form asp-action="Create" asp-route-enrolmentId="@enrolmentId" method="post" asp-antiforgery="true">
+<div asp-validation-summary="All" class="text-danger"></div>
+<label asp-for="Amount"></label><input asp-for="Amount" type="number" step="0.01" min="0" readonly />
+<label asp-for="PaymentMethod"></label><select asp-for="PaymentMethod"><option>Card</option><option>EFT</option><option>Cash</option><option>Other</option></select>
+<label asp-for="TransactionReference"></label><input asp-for="TransactionReference" maxlength="80" />
+<button type="submit">Record pending attempt</button>
+</form>

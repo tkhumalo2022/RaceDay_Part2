@@ -2,6 +2,7 @@
 @{ ViewData["Title"] = Model + " dashboard"; }
 <h1>@Model dashboard</h1>
 <p>Welcome, @User.Identity?.Name.</p>
-<p><a asp-controller="Profile" asp-action="Index">Edit your profile</a></p>
-<p><a asp-area="Identity" asp-page="/Account/Manage/Index">Manage password and account security</a></p>
-<p>Event and race workflows are being prepared. No event statistics are available yet.</p>
+<p><a asp-controller="Profile" asp-action="Index">Edit your profile</a> | <a asp-area="Identity" asp-page="/Account/Manage/Index">Manage account security</a></p>
+@if(Model == "Organiser"){<p><a asp-controller="Events" asp-action="Mine">My races</a> | <a asp-controller="Events" asp-action="Create">Create race</a></p>}
+@if(Model == "Participant"){<p><a asp-controller="Events" asp-action="Index">Browse races</a> | <a asp-controller="Entries" asp-action="Index">My entries</a> | <a asp-controller="Entries" asp-action="Results">My results</a></p>}
+@if(Model == "Admin"){<p>Administrator access is enabled. Event administration is managed through organiser-owned workflows.</p>}

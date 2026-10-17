@@ -1,0 +1,6 @@
+@model IReadOnlyList<EntryDto>
+@{ ViewData["Title"] = "Entries"; var recording = ViewData["RecordResults"] is true; }
+<h1>@(recording ? "Event entries" : "My entries and results")</h1>
+<p><a asp-controller="Events" asp-action="Index">Browse races</a></p>
+@if (Model.Count == 0) { <p>No entries found.</p> }
+@foreach(var e in Model) { <section><h2>@e.EventName - @e.CategoryName</h2><p>Race number @e.RaceNumber | @e.Status | @(e.ResultStatus ?? "Pending") | @e.FinishTime</p><p><a asp-controller="Payments" asp-action="Index" asp-route-enrolmentId="@e.Id">Payment attempts</a></p>@if(recording && e.ResultStatus is null){<a asp-action="Result" asp-route-id="@e.Id">Record result</a>}</section>}
