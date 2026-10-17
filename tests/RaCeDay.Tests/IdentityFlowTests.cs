@@ -102,6 +102,9 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
         Assert.Equal("Organiser", confirmation.GetProperty("role").GetString());
         Assert.Equal("SignedIn", confirmation.GetProperty("status").GetString());
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/users/me")).StatusCode);
+        var initialSession = await client.GetFromJsonAsync<JsonElement>("/api/auth/session");
+        Assert.Equal("Organiser", initialSession.GetProperty("role").GetString());
+        Assert.Equal(confirmation.GetProperty("userId").GetString(), initialSession.GetProperty("userId").GetString());
 
         client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
         var signedInToken = await client.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
@@ -109,6 +112,7 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
         var loggedOut = await client.PostAsync("/api/auth/logout", null);
         Assert.Equal(HttpStatusCode.NoContent, loggedOut.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/users/me")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/auth/session")).StatusCode);
 
         client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
         var nextToken = await client.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
@@ -118,6 +122,8 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
         Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync(
             "/api/auth/login", new { email, password = "Local-Test-123!" })).StatusCode);
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/users/me")).StatusCode);
+        var restoredSession = await client.GetFromJsonAsync<JsonElement>("/api/auth/session");
+        Assert.Equal("Organiser", restoredSession.GetProperty("role").GetString());
 
         using var hostile = fixture.Client();
         var hostileCsrf = await hostile.GetFromJsonAsync<JsonElement>("/api/auth/antiforgery");
@@ -156,6 +162,8 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
             Assert.Null(user.DateOfBirth);
         }
         Assert.Equal(HttpStatusCode.OK, (await organiserClient.GetAsync("/Dashboard/Organiser")).StatusCode);
+        var serverSession = await organiserClient.GetFromJsonAsync<JsonElement>("/api/auth/session");
+        Assert.Equal("Organiser", serverSession.GetProperty("role").GetString());
         var blockedDashboard = await organiserClient.GetAsync("/Dashboard/Admin");
         Assert.Equal(HttpStatusCode.Redirect, blockedDashboard.StatusCode);
         Assert.Contains("AccessDenied", blockedDashboard.Headers.Location?.OriginalString);
@@ -172,6 +180,29 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
             var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             Assert.Null(await users.FindByEmailAsync(invalidEmail));
         }
+    }
+
+    [Fact]
+    public async Task MvcLogoutClearsServerSessionAndIdentityAuthentication()
+    {
+        using var client = fixture.Client();
+        var email = $"logout-{Guid.NewGuid():N}@example.invalid";
+        var form = Registration(email);
+        form["__RequestVerificationToken"] = await IdentityFixture.Token(client, "/Identity/Account/Register");
+        Assert.Equal(HttpStatusCode.Redirect, (await client.PostAsync(
+            "/Identity/Account/Register", new FormUrlEncodedContent(form))).StatusCode);
+        var session = await client.GetFromJsonAsync<JsonElement>("/api/auth/session");
+        Assert.Equal("Participant", session.GetProperty("role").GetString());
+
+        var token = await IdentityFixture.Token(client, "/Dashboard/Participant");
+        Assert.False(string.IsNullOrWhiteSpace(token));
+        var loggedOut = await client.PostAsync("/Identity/Account/Logout?returnUrl=%2F",
+            new FormUrlEncodedContent(new Dictionary<string, string> {
+                ["__RequestVerificationToken"] = token
+            }));
+        Assert.Equal(HttpStatusCode.Redirect, loggedOut.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/auth/session")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/users/me")).StatusCode);
     }
 
     [Fact]

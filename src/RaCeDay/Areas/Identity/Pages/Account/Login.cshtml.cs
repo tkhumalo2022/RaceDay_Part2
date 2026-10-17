@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RaCeDay.Models;
+using RaCeDay.Services;
 
 namespace RaCeDay.Areas.Identity.Pages.Account;
 
 [AllowAnonymous]
-public class LoginModel(SignInManager<ApplicationUser> signIn) : PageModel
+public class LoginModel(SignInManager<ApplicationUser> signIn, UserManager<ApplicationUser> users) : PageModel
 {
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -40,7 +41,12 @@ public class LoginModel(SignInManager<ApplicationUser> signIn) : PageModel
             Input.Email.Trim(), Input.Password, Input.RememberMe, lockoutOnFailure: true);
 
         if (result.Succeeded)
+        {
+            var user = await users.FindByEmailAsync(Input.Email.Trim())
+                ?? throw new InvalidOperationException("Signed-in user disappeared.");
+            await SessionIdentity.RememberAsync(HttpContext, users, user);
             return LocalRedirect(ReturnUrl!);
+        }
 
         if (result.RequiresTwoFactor)
             return RedirectToPage("./LoginWith2fa", new { ReturnUrl, Input.RememberMe });

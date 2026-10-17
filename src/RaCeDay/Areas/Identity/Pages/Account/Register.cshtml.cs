@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using RaCeDay.Models;
+using RaCeDay.Services;
 
 namespace RaCeDay.Areas.Identity.Pages.Account;
 
@@ -112,6 +113,7 @@ public class RegisterModel(
             return RedirectToPage("RegisterConfirmation", new { email = user.Email, returnUrl = ReturnUrl });
 
         await signIn.SignInAsync(user, isPersistent: false);
+        await SessionIdentity.RememberAsync(HttpContext, users, user);
         return LocalRedirect(ReturnUrl!);
     }
 }

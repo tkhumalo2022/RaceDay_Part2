@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RaCeDay.Models;
+using RaCeDay.Services;
 
 namespace RaCeDay.Controllers;
 
@@ -82,7 +83,10 @@ public class AuthApiController(
 
         var confirmationRequired = users.Options.SignIn.RequireConfirmedAccount;
         if (!confirmationRequired)
+        {
             await signIn.SignInAsync(user, isPersistent: false);
+            await SessionIdentity.RememberAsync(HttpContext, users, user);
+        }
         return Created("/api/users/me", new
         {
             userId = user.Id, role = input.Role,
@@ -103,13 +107,27 @@ public class AuthApiController(
         if (result.IsNotAllowed) return StatusCode(403, new { message = "Confirm your account before signing in." });
         if (!result.Succeeded) return Unauthorized(new { message = "Invalid login attempt." });
 
+        await SessionIdentity.RememberAsync(HttpContext, users, user);
         return Ok(new { userId = user.Id, roles = await users.GetRolesAsync(user) });
     }
 
     /// <summary>Sign out and end the current cookie session.</summary>
+    [HttpGet("session"), Authorize]
+    public IActionResult SessionStatus()
+    {
+        var snapshot = SessionIdentity.Read(HttpContext);
+        var identityUserId = users.GetUserId(User);
+        if (snapshot.UserId is null || snapshot.Role is null ||
+            snapshot.UserId != identityUserId || !User.IsInRole(snapshot.Role))
+            return Conflict(new { message = "Sign in again to establish a valid server-side session." });
+
+        return Ok(new { userId = snapshot.UserId, role = snapshot.Role });
+    }
+
     [HttpPost("logout"), Authorize]
     public async Task<IActionResult> Logout()
     {
+        SessionIdentity.Clear(HttpContext);
         await signIn.SignOutAsync();
         return NoContent();
     }
