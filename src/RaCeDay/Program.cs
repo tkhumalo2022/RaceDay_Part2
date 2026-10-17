@@ -24,19 +24,16 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// Schema changes are applied explicitly with EF tooling after review/backup.
+// This command seeds role names only; it never grants a user a privileged role.
+if (args.Contains("--seed-roles"))
 {
-    // After an InitialIdentity migration is added, migrate the separate
-    // RaCeDayPart2Identity database and create the roles on startup.
     using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if ((db.Database.GetMigrations()).Any())
-    {
-        await db.Database.MigrateAsync();
-        await IdentityRoleSeeder.SeedRolesAsync(scope.ServiceProvider);
-    }
+    await IdentityRoleSeeder.SeedRolesAsync(scope.ServiceProvider);
+    return;
 }
-else
+
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
