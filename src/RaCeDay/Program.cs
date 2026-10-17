@@ -30,7 +30,7 @@ if (app.Environment.IsDevelopment())
     // RaCeDayPart2Identity database and create the roles on startup.
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if ((await db.Database.GetMigrationsAsync()).Any())
+    if ((db.Database.GetMigrations()).Any())
     {
         await db.Database.MigrateAsync();
         await IdentityRoleSeeder.SeedRolesAsync(scope.ServiceProvider);
