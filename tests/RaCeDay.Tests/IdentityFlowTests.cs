@@ -205,6 +205,40 @@ public class IdentityFlowTests(IdentityFixture fixture) : IClassFixture<Identity
     }
 
     [Fact]
+    public async Task OrganiserCanEditOwnOrganisationButCannotSetParticipantBirthDate()
+    {
+        using var client = fixture.Client();
+        var email = $"organiser-profile-{Guid.NewGuid():N}@example.invalid";
+        var form = Registration(email);
+        form["Input.Role"] = "Organiser";
+        form["Input.OrganiserName"] = "Original Club";
+        form["__RequestVerificationToken"] =
+            await IdentityFixture.Token(client, "/Identity/Account/Register");
+        Assert.Equal(HttpStatusCode.Redirect,
+            (await client.PostAsync("/Identity/Account/Register",
+                new FormUrlEncodedContent(form))).StatusCode);
+
+        client.DefaultRequestHeaders.Add("X-CSRF-TOKEN",
+            await IdentityFixture.Token(client, "/Profile"));
+        var update = await client.PutAsJsonAsync("/api/users/me", new
+        {
+            firstName = "Test", lastName = "Organiser",
+            organiserName = "Durban Road Runners", dateOfBirth = "2001-01-02",
+            role = "Admin"
+        });
+        Assert.Equal(HttpStatusCode.OK, update.StatusCode);
+        var profile = await update.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("Durban Road Runners", profile.GetProperty("organiserName").GetString());
+        Assert.Equal(JsonValueKind.Null, profile.GetProperty("dateOfBirth").ValueKind);
+
+        using var scope = fixture.Factory.Services.CreateScope();
+        var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var user = await users.FindByEmailAsync(email);
+        Assert.NotNull(user);
+        Assert.Equal(new[] { "Organiser" }, await users.GetRolesAsync(user));
+    }
+
+    [Fact]
     public async Task ProfileApiOnlyUpdatesSignedInAllowlistedFieldsAndRequiresCsrf()
     {
         using var anonymous = fixture.Client();
