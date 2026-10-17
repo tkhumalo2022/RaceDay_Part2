@@ -9,10 +9,10 @@ The official IIE `PROG6212_POE.docx` was reviewed visually in the logged-in Shar
 ## Verified locally
 
 - Windows .NET 10 Release build: **0 errors, 0 warnings**, `--warnaserror`.
-- SQL Server LocalDB test suite: **31 passed, 0 failed, 0 skipped**, including API Identity role access, concurrency, event/category/enrolment/result workflow, profile updating, pending payment attempts, category-count SQL trigger, payment amount SQL trigger and role-specific registration.
-- Test report: `tests/RaCeDay.Tests/TestResults/Part2-AdditionalRegression.trx` (generated locally; ignored by Git).
+- SQL Server LocalDB test suite: **32 passed, 0 failed, 0 skipped**, including API Identity role access, concurrency, event/category/enrolment/result workflow, profile updating, pending payment attempts, category-count SQL trigger, payment amount SQL trigger and role-specific registration.
+- Test report: `tests/RaCeDay.Tests/TestResults/RaceDay-Session-20261017.trx` (generated locally; ignored by Git).
 - MVC and JSON API register Organiser or Participant, never Admin. Participant DOB and Organiser name required for new registrations; phone/details stored with Identity profile. Profile API and form allow role-appropriate edits.
-- ASP.NET Identity stores hashed passwords, issues secure authentication cookies and restricts endpoints by role. Request tokens protect API writes.
+- ASP.NET Identity stores hashed passwords and enforces role authorization with secure authentication cookies. The application also stores the current user ID and role in a memory-backed server-side session on login/registration; logout clears it. Request tokens protect API writes. This is single-instance session storage, not a distributed production session store.
 - Event/category management, capacity/date restrictions, private enrolments/results, pending-only payment attempt records, Swagger XML summaries.
 - Six forward EF migrations, including `Part1CategoryCountAndPaymentRules` and `RoleRegistrationProfileFields`; original database untouched. Tests create separate GUID-named SQL Server LocalDB databases.
 - `CurrentParticipants` is a database column maintained by a trigger; payments have a database-level amount-equality trigger and unique Paid safeguard.
@@ -23,7 +23,7 @@ The official IIE `PROG6212_POE.docx` was reviewed visually in the logged-in Shar
 - Exact Part 1 **physical** schema alignment is not complete. Part 1 defines separate integer-key `Organiser` and `Participant` tables; Identity uses shared `AspNetUsers` and string FKs. Added role-specific fields and SQL triggers improve parity, but a full redesign/lecturer approval is needed before claiming an exact match. See `PART1_SCHEMA_RECONCILIATION.md` and `SCHEMA_PARITY_ADDENDUM.md`.
 - No live GitHub Actions verification or green screenshot. The local history now reaches 20 commits including genuine feature, test, CI and documentation changes; only the assessor can judge whether all are meaningful. Recovery branch remains local pending approval to push. Never fabricate commits.
 - No real recorded and uploaded unlisted YouTube presentation. A student-led recording checklist exists at `SUBMISSION_VIDEO_SCRIPT.md`.
-- Full manual authenticated Swagger walkthrough after latest code change and rubric evidence screenshots not yet completed. Earlier browser screenshots are in `outputs/RaceDay-evidence-20261017` outside the repository.
+- A full role-based HTTP walkthrough has been performed against a separate demonstration database: **21 expected status-code checks**, including server-side session reads for both roles, registration, owned events/categories, duplicate rejection, forbidden role action, pending-only payment, result recording and Swagger's **18 paths**. Evidence log: `outputs/RaceDay-Part2-LiveEvidence-20261017/verified-http-log.txt`, outside the repo. Full screen-recorded Swagger walkthrough and screenshots still remain outstanding.
 - Original Visual Studio project is not merged, production email confirmation and a real payments gateway are unimplemented; the latter is not an explicit Part 2 functional requirement.
 - There is no GitHub push, merge, deployment, YouTube URL, ARC submission or grade calculation.
 

@@ -12,7 +12,7 @@
 - Organiser event and category CRUD, including validation and ownership checks.
 - Participant enrolment with deadline, capacity, category-event consistency and **one entry per category per participant**. SQL Server locking prevents simultaneous overbooking. A SQL trigger now maintains stored `CurrentParticipants` exactly as the Part 1 `Registered`-only rule requires.
 - Organiser result recording; participants can view their own results.
-- Cookie-authenticated REST APIs including `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout` and `GET /api/auth/antiforgery`, plus Swagger UI, MVC pages and a generic production error page.
+- Cookie-authenticated REST APIs including `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/antiforgery` and `GET /api/auth/session`. A **server-side memory-backed session** also stores the signed-in user ID and role, as specified by the Part 2 marking rubric; ASP.NET Identity claims remain the source of authorization. Logout clears both. Swagger UI, MVC pages and the generic error page are available.
 - Pending-only payment-attempt records with both API and **SQL-trigger** entry-fee amount validation, ownership control, unique transaction references and at most one `Paid` record per enrolment. **No real payment processing or confirmation exists.**
 - Automated SQL Server LocalDB integration tests for roles, Identity, forms, routes, business rules, concurrency and payment records.
 
@@ -36,8 +36,8 @@ Use a distinct name, inspect migrations, and explicitly apply them. This example
 ```powershell
 $env:ASPNETCORE_ENVIRONMENT = 'Development'
 $env:ConnectionStrings__DefaultConnection = 'Server=(localdb)\MSSQLLocalDB;Database=RaCeDayRecoveryDemo_NEW;Trusted_Connection=True;TrustServerCertificate=True'
-dotnet ef migrations list --project src/RaCeDay/RaCeDay.csproj --startup-project src/RaCeDay/RaCeDay.csproj
-dotnet ef database update --project src/RaCeDay/RaCeDay.csproj --startup-project src/RaCeDay/RaCeDay.csproj
+dotnet ef migrations list --configuration Release --project src/RaCeDay/RaCeDay.csproj --startup-project src/RaCeDay/RaCeDay.csproj
+dotnet ef database update --configuration Release --project src/RaCeDay/RaCeDay.csproj --startup-project src/RaCeDay/RaCeDay.csproj
 dotnet run --project src/RaCeDay/RaCeDay.csproj -- --seed-roles
 dotnet run --project src/RaCeDay/RaCeDay.csproj
 ```
@@ -60,7 +60,7 @@ See `docs/PAYMENT_WORKFLOW.md`, `docs/SCHEMA_PARITY_ADDENDUM.md`, `docs/SUBMISSI
 
 **Blocking:** Reconcile the EF Core database with the approved Part 1 ERD/SQL and recover/compare any original project. Official rubric is now available visually; its 100-mark breakdown is in `docs/OFFICIAL_PART2_RUBRIC_AUDIT.md`. This is not a grade prediction.
 
-- Part 1 planned JWT-based authentication, while the official Part 2 brief explicitly requires user/role sessions. JSON register/login endpoints are implemented with ASP.NET Identity cookies; this contract difference must be documented and reviewed.
+- Part 1 planned JWT-based authentication, while Part 2 asks for user/role sessions. RaCeDay uses an Identity cookie plus a server-side memory-backed session carrying the user ID and role; no JWT is issued. The memory store is suitable for single-instance coursework and would require a distributed store for scaled production.
 - Real payment gateway and trusted settlement are not implemented. Payment records remain Pending.
 - Confirm the lecturer's role registration model, dashboard requirements and field names.
 - Verify that the **20 local commits represent meaningful Part 2 work**, push the branch only with approval, run the new GitHub Actions workflow and collect its genuine green CI screenshot. Local workflow is configured but has not run remotely.

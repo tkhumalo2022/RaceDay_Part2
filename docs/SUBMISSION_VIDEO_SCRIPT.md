@@ -8,7 +8,7 @@ Target: 8–12 minutes. Upload as **Unlisted** (not Private or Public unless you
 | --- | --- | --- |
 | Introduce project | 0:00–0:45 | Introduce RaCeDay, the Organiser/Participant roles, Part 2 API scope |
 | Explain solution | 0:45–1:45 | Show ASP.NET Core API, EF DbContext, migrations, Identity and role protection |
-| Register / sign in | 1:45–3:00 | Swagger: get CSRF token, register an Organiser, logout, login, show own profile; explain cookie session; Admin signup blocked |
+| Register / sign in | 1:45–3:00 | Swagger: get CSRF token, register an Organiser, logout, login, show own profile; demonstrate `GET /api/auth/session` with user ID/role stored server-side, explain Identity auth cookie; Admin signup blocked |
 | Event and category API | 3:00–4:30 | Organiser creates a future race and two distance categories, retrieves, edits and lists them in Swagger |
 | Participant workflows | 4:30–6:00 | Register a Participant with date of birth; enrol once, demonstrate duplicate entry/capacity error; check own entry |
 | Privacy and results | 6:00–7:00 | Show forbidden Organiser-only request from Participant; owning Organiser closes event and records result; Participant views own result |

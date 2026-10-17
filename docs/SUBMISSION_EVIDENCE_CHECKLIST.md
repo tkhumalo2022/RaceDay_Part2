@@ -18,7 +18,8 @@ This is an evidence checklist mapped to the visually inspected official 100-mark
 
 ## Website and Swagger walkthrough
 
-- [ ] Organiser **and** Participant registration/login via MVC and JSON API (including invalid password and blocked Admin signup).
+- [x] Organiser **and** Participant registration/login verified by automated tests and a 21-check synthetic-account HTTP walkthrough (invalid password and blocked Admin signup covered in automated tests).
+- [x] Server-side user-ID/role session mirrors the Identity authentication and clears on logout, verified in tests. Production-grade distributed session infrastructure remains out of scope.
 - [ ] Protected Admin/Organiser/Participant dashboard and forbidden cross-role access.
 - [ ] GET/PUT `/api/users/me` reads and updates the current profile without changing roles, email or another account.
 - [ ] Organiser creates/edits race and 2 categories; another organiser cannot edit them.
