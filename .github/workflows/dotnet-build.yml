@@ -1,18 +1,59 @@
-name: Build RaceDay Part 2
+name: Build and test RaCeDay Part 2
+
 on:
   push:
-    branches: [main, feat/identity-foundation]
+    branches:
+      - main
+      - feat/identity-foundation
+      - 'recovery/**'
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-and-test:
+    runs-on: windows-2025
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-      - name: Restore
-        run: dotnet restore src/RaCeDay/RaCeDay.csproj
-      - name: Build
-        run: dotnet build src/RaCeDay/RaCeDay.csproj --no-restore -c Release --warnaserror
+
+      - name: Start SQL Server LocalDB
+        shell: pwsh
+        run: |
+          $exe = (Get-Command SqlLocalDB.exe -ErrorAction SilentlyContinue).Source
+          if (-not $exe) {
+            $exe = (Get-ChildItem 'C:\Program Files\Microsoft SQL Server' -Filter SqlLocalDB.exe -Recurse -ErrorAction SilentlyContinue |
+              Select-Object -First 1 -ExpandProperty FullName)
+          }
+          if (-not $exe) { throw 'SQL Server LocalDB is required by the integration tests.' }
+          & $exe info MSSQLLocalDB 2>$null | Out-Null
+          if ($LASTEXITCODE -ne 0) {
+            & $exe create MSSQLLocalDB
+            if ($LASTEXITCODE -ne 0) { throw 'Could not create a SQL Server LocalDB instance.' }
+          }
+          & $exe start MSSQLLocalDB
+          if ($LASTEXITCODE -ne 0) { throw 'Could not start SQL Server LocalDB.' }
+
+      - name: Restore solution
+        run: dotnet restore RaCeDay.slnx
+
+      - name: Build solution
+        run: dotnet build RaCeDay.slnx -c Release --no-restore --warnaserror
+
+      - name: Run unit and SQL Server integration tests
+        run: dotnet test RaCeDay.slnx -c Release --no-restore --no-build --logger "trx;LogFileName=github-ci.trx"
+
+      - name: Preserve test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: raced-day-tests
+          path: tests/RaCeDay.Tests/TestResults/**/*.trx
+          if-no-files-found: warn
