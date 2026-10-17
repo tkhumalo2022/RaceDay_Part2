@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RaCeDay.Models;
 
@@ -135,6 +136,33 @@ public class CoreWorkflowTests(IdentityFixture fixture) : IClassFixture<Identity
         var finished = await owner.GetFromJsonAsync<JsonElement>($"/api/events/{raceId}/categories");
         // The Part 1 SQL trigger counts Registered, not completed, entries.
         Assert.Equal(0, finished[0].GetProperty("currentParticipants").GetInt32());
+    }
+
+    [Fact]
+    public async Task Part1CategoryTriggerRecountsWhenAnEntryIsDeleted()
+    {
+        using var owner = await Actor("Organiser");
+        using var participant = await Actor("Participant");
+        var eventId = await NewEvent(owner);
+        var categoryId = await NewCategory(owner, eventId);
+        var entryId = await Created(await participant.PostAsJsonAsync(
+            $"/api/events/{eventId}/enrolments", new { categoryId }));
+
+        using (var scope = fixture.Factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<RaCeDay.Data.ApplicationDbContext>();
+            var entry = await db.Enrolments.SingleAsync(e => e.Id == entryId);
+            db.Enrolments.Remove(entry);
+            await db.SaveChangesAsync();
+        }
+
+        using (var scope = fixture.Factory.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<RaCeDay.Data.ApplicationDbContext>();
+            Assert.Equal(0, await db.Categories.AsNoTracking()
+                .Where(c => c.Id == categoryId)
+                .Select(c => c.CurrentParticipants).SingleAsync());
+        }
     }
 
     [Fact]
