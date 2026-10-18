@@ -8,16 +8,16 @@ public class ProfileViewModel : IValidatableObject
     public string FirstName { get; set; } = string.Empty;
     [Required, StringLength(60), Display(Name = "Last name")]
     public string LastName { get; set; } = string.Empty;
-    [StringLength(30)]
-    public string? Gender { get; set; }
+    [StringLength(30)] public string? Gender { get; set; }
     [Phone, StringLength(30), Display(Name = "Phone number")]
     public string? PhoneNumber { get; set; }
-
     [StringLength(100), Display(Name = "Organisation name")]
     public string? OrganiserName { get; set; }
-
     [DataType(DataType.Date), Display(Name = "Date of birth")]
     public DateOnly? DateOfBirth { get; set; }
+
+    // The public path is display-only and is never accepted from a posted profile form.
+    public string? ProfileImagePath { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext context)
     {

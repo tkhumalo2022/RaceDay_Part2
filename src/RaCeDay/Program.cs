@@ -32,6 +32,7 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 builder.Services.AddScoped<RaceWorkflow>();
+builder.Services.AddScoped<ProfileImageStorage>();
 builder.Services.AddControllersWithViews(options => options.Filters.Add<WorkflowExceptionFilter>());
 builder.Services.AddRazorPages();
 builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
@@ -75,6 +76,44 @@ if (args.Contains("--seed-roles"))
     return;
 }
 
+// Optional, local-only account setup for demonstrations. No passwords are stored in the source.
+if (args.Contains("--create-admin"))
+{
+    if (!app.Environment.IsDevelopment())
+        throw new InvalidOperationException("Admin account setup is available in Development only.");
+
+    var email = Environment.GetEnvironmentVariable("RACEDAY_ADMIN_EMAIL")?.Trim();
+    var password = Environment.GetEnvironmentVariable("RACEDAY_ADMIN_PASSWORD");
+    if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        throw new InvalidOperationException("Set RACEDAY_ADMIN_EMAIL and RACEDAY_ADMIN_PASSWORD before using --create-admin.");
+
+    using var scope = app.Services.CreateScope();
+    await IdentityRoleSeeder.SeedRolesAsync(scope.ServiceProvider);
+    var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    if (await users.FindByEmailAsync(email) is not null)
+        throw new InvalidOperationException("That account already exists. No changes were made.");
+
+    var admin = new ApplicationUser
+    {
+        UserName = email,
+        Email = email,
+        FirstName = "RaceDay",
+        LastName = "Administrator",
+        EmailConfirmed = true
+    };
+    var created = await users.CreateAsync(admin, password);
+    if (!created.Succeeded)
+        throw new InvalidOperationException(
+            "Could not create the admin account: " + string.Join("; ", created.Errors.Select(e => e.Description)));
+    var assigned = await users.AddToRoleAsync(admin, "Admin");
+    if (!assigned.Succeeded)
+    {
+        await users.DeleteAsync(admin);
+        throw new InvalidOperationException("Could not assign the Admin role.");
+    }
+    Console.WriteLine("Admin account created. Sign in using the email and password you provided.");
+    return;
+}
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -82,6 +121,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

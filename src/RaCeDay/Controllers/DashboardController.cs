@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RaCeDay.Data;
+using RaCeDay.Models;
 
 namespace RaCeDay.Controllers;
 
 [Authorize]
-public class DashboardController : Controller
+public class DashboardController(ApplicationDbContext db) : Controller
 {
     public IActionResult Index()
     {
@@ -20,6 +23,20 @@ public class DashboardController : Controller
     [Authorize(Roles = "Organiser")]
     public IActionResult Organiser() => View("Index", "Organiser");
 
+    // The administrator gets totals, not private participant details or control over
+    // events owned by someone else.
     [Authorize(Roles = "Admin")]
-    public IActionResult Admin() => View("Index", "Admin");
+    public async Task<IActionResult> Admin(CancellationToken cancellationToken)
+    {
+        var summary = new AdminDashboardViewModel
+        {
+            Users = await db.Users.CountAsync(cancellationToken),
+            Events = await db.Events.CountAsync(cancellationToken),
+            Categories = await db.Categories.CountAsync(cancellationToken),
+            Enrolments = await db.Enrolments.CountAsync(cancellationToken),
+            Results = await db.Results.CountAsync(cancellationToken),
+            Payments = await db.Payments.CountAsync(cancellationToken)
+        };
+        return View("Admin", summary);
+    }
 }

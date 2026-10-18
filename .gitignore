@@ -426,3 +426,7 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+
+# Uploaded profile pictures: local, user-owned content
+/src/RaCeDay/wwwroot/profile-images/*
+!/src/RaCeDay/wwwroot/profile-images/.gitkeep

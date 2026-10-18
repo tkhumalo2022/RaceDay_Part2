@@ -1,0 +1,14 @@
+@model AdminDashboardViewModel
+@{ ViewData["Title"] = "Admin dashboard"; }
+<h1>Admin dashboard</h1>
+<p>Overview of the RaCeDay application.</p>
+<dl style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem">
+    <div><dt>Registered users</dt><dd><strong>@Model.Users</strong></dd></div>
+    <div><dt>Events</dt><dd><strong>@Model.Events</strong></dd></div>
+    <div><dt>Race categories</dt><dd><strong>@Model.Categories</strong></dd></div>
+    <div><dt>Enrolments</dt><dd><strong>@Model.Enrolments</strong></dd></div>
+    <div><dt>Results recorded</dt><dd><strong>@Model.Results</strong></dd></div>
+    <div><dt>Payment attempts</dt><dd><strong>@Model.Payments</strong></dd></div>
+</dl>
+<p>Only administrators can view this page. Organisers manage their own events through the organiser dashboard.</p>
+<p><a asp-controller="Profile" asp-action="Index">Your profile</a> | <a asp-area="Identity" asp-page="/Account/Manage/Index">Account security</a></p>

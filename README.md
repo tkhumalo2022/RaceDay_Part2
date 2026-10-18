@@ -1,14 +1,16 @@
-# RaCeDay — PROG6212 POE Part 2 (recovery working copy)
+# RaCeDay — PROG6212 Part 2
 
 **Student:** Thabiso Khumalo
 
-**Status:** Active, isolated recovery branch `recovery/part2-20261017`. The original student Visual Studio application has not been recovered. The official Part 2 rubric was visually reviewed in the protected SharePoint document (pages 9–11 and 17–18); see `docs/OFFICIAL_PART2_RUBRIC_AUDIT.md`. This working copy was built from the student's Part 2 Identity foundation and reconciled against the accessible Part 1 API/database plan. It must not be represented as the original recovered app or as a rubric-complete submission.
+RaCeDay is a race management application. An organiser can set up events and race categories, and a participant can register, enter a race and check results. I use ASP.NET Core, C#, Entity Framework Core and SQL Server. The application also includes a REST API with Swagger, login and role protection, and automated tests.
 
+**Project branch:** `recovery/part2-20261017`. This is a backed-up working version of Part 2, not the original Visual Studio project. The original project has not been located, and this branch has not been merged or submitted. See `docs/OFFICIAL_PART2_RUBRIC_AUDIT.md` for the assessment checklist.
 ## What works
 
 - ASP.NET Core MVC / .NET 10 with SQL Server EF Core and ASP.NET Identity.
 - Register and sign in as either Organiser or Participant (MVC or JSON API); role-specific details (date of birth for Participants, organisation name for Organisers), password hashing, Identity session cookies, CSRF protection and guarded dashboards. Public registration **rejects Admin**.
-- Profile editing through both MVC and GET/PUT `/api/users/me`, restricted to the signed-in user with allowlisted fields and anti-forgery protection.
+- Profile editing through MVC and GET/PUT `/api/users/me`. Only the account owner can change their details. The profile page also supports JPG/PNG picture uploads (maximum 2 MB) and removal.
+- Admin-only dashboard showing the numbers of users, events, race categories, enrolments, results and payment attempts. Admin accounts cannot be created through public registration.
 - Organiser event and category CRUD, including validation and ownership checks.
 - Participant enrolment with deadline, capacity, category-event consistency and **one entry per category per participant**. Organiser-owned entry views now show participant names. SQL Server locking prevents simultaneous overbooking. A SQL trigger maintains stored `CurrentParticipants` using the Part 1 `Registered`-only rule.
 - Organiser result recording; participants can view their own results.
@@ -64,7 +66,27 @@ sqlcmd -S localhost -E -C -d RaCeDayPart2_SQLServer_Demo_20261018 -Q "SELECT nam
 
 See [SQL Server 2022 verification](docs/MSSQLSERVER_20261018.md) for checked evidence and the remaining mismatch with Part 1.
 
-Migrations are never applied automatically when the website starts. The explicit seed command creates role names and does **not** create any accounts or grant Admin. Users select Organiser or Participant at public registration; **Admin cannot be self-selected**.
+Migrations are never applied automatically. Seeding creates the role names only, and users cannot choose Admin at registration.
+
+### Create a local Admin account for the demo (optional)
+
+The Admin dashboard is protected. To create an account on the **separate Part 2 database**, use a password you choose yourself. The password is not saved in this repository. This setup command only runs in Development and refuses to promote an existing user.
+
+```powershell
+$env:ASPNETCORE_ENVIRONMENT = 'Development'
+$env:RACEDAY_ADMIN_EMAIL = 'your-own-address@example.com'
+$secure = Read-Host 'Set a local admin password' -AsSecureString
+$env:RACEDAY_ADMIN_PASSWORD = [System.Net.NetworkCredential]::new('', $secure).Password
+try {
+    dotnet run --project src/RaCeDay/RaCeDay.csproj -- --create-admin
+}
+finally {
+    Remove-Item Env:RACEDAY_ADMIN_PASSWORD -ErrorAction SilentlyContinue
+    Remove-Item Env:RACEDAY_ADMIN_EMAIL -ErrorAction SilentlyContinue
+}
+```
+
+You can then sign in as Admin to see the summary counts. The organiser and participant screens remain restricted to their own roles. Profile pictures are served from `wwwroot/profile-images` and are publicly accessible to anyone who knows the image URL. Uploaded picture files are kept out of Git.
 
 ### Demo walkthrough
 
@@ -76,7 +98,7 @@ Migrations are never applied automatically when the website starts. The explicit
 6. As Participant, view My results and confirm unrelated users cannot see them.
 7. In Development open `/swagger`. For API register/login obtain a token from anonymous `GET /api/auth/antiforgery`, then set `X-CSRF-TOKEN` in Swagger's Authorize field. After signing in, refresh this token via `GET /api/auth/antiforgery` or `GET /api/antiforgery` before authenticated writes. The Identity cookie must be in the same browser session.
 
-See the [Part 2 rubric evidence index](docs/PART2_EVIDENCE_INDEX.md), `docs/PAYMENT_WORKFLOW.md`, `docs/SCHEMA_PARITY_ADDENDUM.md`, `docs/SUBMISSION_VIDEO_SCRIPT.md` and `docs/DEVELOPMENT-STATUS.md` for requirements and evidence. This is an unsubmitted recovery copy for **Thabiso Khumalo**.
+See the [tutorial fixes](docs/TUTORIAL_FIXES_20261018.md), the [Part 2 rubric evidence index](docs/PART2_EVIDENCE_INDEX.md), `docs/PAYMENT_WORKFLOW.md`, `docs/SCHEMA_PARITY_ADDENDUM.md`, `docs/SUBMISSION_VIDEO_SCRIPT.md` and `docs/DEVELOPMENT-STATUS.md` for requirements and evidence. This is an unsubmitted recovery copy for **Thabiso Khumalo**.
 
 ## Outstanding before submission
 
