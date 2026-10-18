@@ -53,6 +53,18 @@ sqlcmd -S localhost -E -C -d RaCeDayPart2_SQLServer_Demo_20261018 -Q "SELECT nam
 sqlcmd -S localhost -E -C -d RaCeDayPart2_SQLServer_Demo_20261018 -Q "SELECT name, OBJECT_NAME(parent_id) AS ParentTable FROM sys.triggers WHERE name IN ('trg_Enrolment_UpdateCategoryCount','trg_Payment_ValidateAmount')"
 ```
 
+## Fresh build and live development-server checks
+
+After switching the checked-in `appsettings.json` to the full SQL Server instance and fast-forwarding the local working copy:
+
+- `dotnet build RaCeDay.slnx -c Release --warnaserror` — **succeeded: 0 warnings, 0 errors**.
+- `dotnet test RaCeDay.slnx -c Release --no-build` — **32 passed, 0 failed, 0 skipped**. These tests still use GUID-named **LocalDB** fixtures; this is not a claim that the full race workflow was integration-tested against the separate full-instance demonstration database.
+- Test results saved locally to `tests/RaCeDay.Tests/TestResults/RaceDay-SQLServer-config-20261018.trx` (ignored by Git).
+- Started the application in Development on `http://127.0.0.1:5236` using the newly checked-in connection string, without an environment connection override.
+- HTTP GET `/`: **200**; GET `/Identity/Account/Register`: **200**; GET `/swagger/v1/swagger.json`: **200**, with **18 API paths**.
+- Anonymous GET `/api/events`: **401**, as required by authentication.
+- Registration and the full CRUD workflow were **not** executed against this full-instance demonstration database in this check.
+
 ## Remaining assessment issue
 
 The two databases are **not physically equivalent**: Part 1 uses independent integer-key `Organiser` and `Participant` entities linked to other domain tables; Part 2 uses Identity `AspNetUsers` and string FKs. The app is functional with EF Core, but this does **not** fulfil a strict interpretation of 'exactly match the Part 1 ERD'. See [the reconciliation](PART1_SCHEMA_RECONCILIATION.md). Any structural redesign or migration of existing `RaceDayDB` needs a reviewed plan and backup. A lecturer may accept an Identity-based evolution, but that acceptance has **not** been obtained or claimed.
