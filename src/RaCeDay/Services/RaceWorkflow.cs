@@ -133,11 +133,13 @@ public class RaceWorkflow(ApplicationDbContext db)
         from e in entries
         join race in db.Events on e.EventId equals race.Id
         join category in db.Categories on e.CategoryId equals category.Id
+        join participant in db.Users on e.ParticipantId equals participant.Id
         join result in db.Results on e.Id equals result.EnrolmentId into results
         from r in results.DefaultIfEmpty()
         orderby e.Id descending
         select new EntryDto(e.Id, e.EventId, e.CategoryId, race.EventName, category.CategoryName, e.RaceNumber, e.Status,
-            r == null ? null : r.ResultStatus, r == null ? null : r.StartTime, r == null ? null : r.FinishTime, r == null ? null : r.OverallPosition);
+            r == null ? null : r.ResultStatus, r == null ? null : r.StartTime, r == null ? null : r.FinishTime, r == null ? null : r.OverallPosition,
+            participant.FirstName + " " + participant.LastName);
     public async Task<IReadOnlyList<EntryDto>> MyEntries(ClaimsPrincipal actor, bool resultsOnly = false)
     {
         var id = Role(actor, "Participant");
