@@ -87,5 +87,5 @@ public class ResultInput : IValidatableObject
 
 public record EventDto(int Id, string EventName, string? Description, DateOnly EventDate, string Location, string EventType, string Status, DateOnly ClosingDate, bool IsOwner);
 public record CategoryDto(int Id, int EventId, string CategoryName, decimal DistanceKm, decimal EntryFee, int MaxParticipants, int CurrentParticipants);
-public record EntryDto(int Id, int EventId, int CategoryId, string EventName, string CategoryName, string RaceNumber, string Status, string? ResultStatus, TimeOnly? StartTime, TimeOnly? FinishTime, int? OverallPosition);
+public record EntryDto(int Id, int EventId, int CategoryId, string EventName, string CategoryName, string RaceNumber, string Status, string? ResultStatus, TimeOnly? StartTime, TimeOnly? FinishTime, int? OverallPosition, string ParticipantName);
 public record EventDetails(EventDto Event, IReadOnlyList<CategoryDto> Categories);
