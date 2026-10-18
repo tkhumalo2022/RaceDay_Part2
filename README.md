@@ -27,7 +27,7 @@
 
 ## Requirements
 
-Windows with .NET SDK 10, SQL Server LocalDB, and the `dotnet-ef` CLI (10.x). All commands below run in this repository root. Open `RaCeDay.slnx` in Visual Studio or a shell.
+Windows with .NET SDK 10, **Microsoft SQL Server 2022** (default instance for the demonstration), SQL Server LocalDB (for the automated integration tests), and the local `dotnet-ef` CLI (10.x). All commands below run in this repository root. Open `RaCeDay.slnx` in Visual Studio or a shell.
 
 ```powershell
 dotnet tool restore
@@ -38,18 +38,31 @@ dotnet test RaCeDay.slnx -c Release
 
 Tests create isolated `RaCeDayTests_<GUID>` databases with synthetic data and retain them for inspection. They must **never** run against the original RaceDay database.
 
-### Demonstration database (do not use an existing database)
+### Microsoft SQL Server 2022 demonstration database (separate from Part 1)
 
-Use a distinct name, inspect migrations, and explicitly apply them. This example must not be reused to overwrite student work.
+**Verified on the student's Windows SQL Server instance on 18 October 2026:** `localhost` (the default `MSSQLSERVER` instance), Windows Authentication, `RaCeDayPart2_SQLServer_Demo_20261018`. All six forward EF Core migrations have been applied to that newly created database; `Admin`, `Organiser`, and `Participant` role names were seeded, and both SQL triggers were verified. The original `RaceDayDB` was inspected **read-only** and must not be overwritten.
+
+The checked-in `appsettings.json` points the application to this separate full SQL Server database, rather than LocalDB. If running on another computer, change the server/database safely or override with `ConnectionStrings__DefaultConnection`. **Never point EF migrations at the original `RaceDayDB` without a separately reviewed migration and backup.**
 
 ```powershell
+# From the repository root on Windows; use your own NEW database name if needed.
+dotnet tool restore
 $env:ASPNETCORE_ENVIRONMENT = 'Development'
-$env:ConnectionStrings__DefaultConnection = 'Server=(localdb)\MSSQLLocalDB;Database=RaCeDayRecoveryDemo_NEW;Trusted_Connection=True;TrustServerCertificate=True'
-dotnet ef migrations list --configuration Release --project src/RaCeDay/RaCeDay.csproj --startup-project src/RaCeDay/RaCeDay.csproj
-dotnet ef database update --configuration Release --project src/RaCeDay/RaCeDay.csproj --startup-project src/RaCeDay/RaCeDay.csproj
+$env:ConnectionStrings__DefaultConnection = 'Server=localhost;Database=RaCeDayPart2_SQLServer_Demo_20261018;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True'
+dotnet tool run dotnet-ef migrations list --configuration Release --project src/RaCeDay/RaCeDay.csproj --startup-project src/RaCeDay/RaCeDay.csproj
+# Already complete on Thabiso's machine; only apply after checking the target database:
+dotnet tool run dotnet-ef database update --configuration Release --project src/RaCeDay/RaCeDay.csproj --startup-project src/RaCeDay/RaCeDay.csproj
 dotnet run --project src/RaCeDay/RaCeDay.csproj -- --seed-roles
 dotnet run --project src/RaCeDay/RaCeDay.csproj
 ```
+
+SQL verification, read-only:
+
+```powershell
+sqlcmd -S localhost -E -C -d RaCeDayPart2_SQLServer_Demo_20261018 -Q "SELECT name FROM sys.tables ORDER BY name; SELECT MigrationId FROM dbo.__EFMigrationsHistory ORDER BY MigrationId; SELECT Name FROM dbo.AspNetRoles ORDER BY Name"
+```
+
+See [SQL Server 2022 verification](docs/MSSQLSERVER_20261018.md) for checked evidence and the remaining mismatch with Part 1.
 
 Migrations are never applied automatically when the website starts. The explicit seed command creates role names and does **not** create any accounts or grant Admin. Users select Organiser or Participant at public registration; **Admin cannot be self-selected**.
 
@@ -73,6 +86,6 @@ See the [Part 2 rubric evidence index](docs/PART2_EVIDENCE_INDEX.md), `docs/PAYM
 - Real payment gateway and trusted settlement are not implemented. Payment records remain Pending.
 - Confirm the lecturer's role registration model, dashboard requirements and field names.
 - The Part 2 branch was pushed with permission and its GitHub Actions workflow has passed remotely (32/32 tests on run #39068333340); verify that the commit history meets the lecturer's qualitative definition of 20 meaningful Part 2 commits.
-- Produce genuine browser, Swagger, LocalDB/SSMS and Git history evidence screenshots and an **unlisted YouTube walkthrough**, then add the video link to README.
+- Produce genuine browser, Swagger, SQL Server/SSMS and Git history evidence screenshots and an **unlisted YouTube walkthrough**, then add the video link to README.
 - Test deployment/release environment and production email confirmation if required.
 - Only the approved Part 2 recovery branch has been pushed. It has **not** been merged into `main` and nothing has been submitted to ARC.
