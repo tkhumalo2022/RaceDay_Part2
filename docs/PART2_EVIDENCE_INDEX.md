@@ -9,11 +9,11 @@ This index maps the visually inspected official Part 2 rubric to **real code and
 | Part 2 rubric criterion | Max | Evidence in this branch | Limitation |
 | --- | ---: | --- | --- |
 | Submission | 5 | This README; setup, branch and CI links | ARC GitHub link not submitted; unlisted presentation URL not yet added |
-| GitHub / CI | 10 | `.github/workflows/dotnet-build.yml`; GitHub commits and real green [run #39137366482](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39137366482); [earlier authentic screenshot](evidence/GitHub-CI-Green-20261017.png) | Only assessor can judge which commits qualify as meaningful |
+| GitHub / CI | 10 | `.github/workflows/dotnet-build.yml`; GitHub commits and real green [run #39146836041](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39146836041); [earlier authentic screenshot](evidence/GitHub-CI-Green-20261017.png) | Only assessor can judge which commits qualify as meaningful |
 | Authentication and role access | 20 | `AuthApiController.cs`, Identity pages, `SessionIdentity.cs`, `DashboardController.cs`; security tests in `IdentityFlowTests.cs` | Uses Identity cookie + in-memory server-side user/role session, not Part 1's proposed JWT |
 | API and database | 25 | `RaceApiController.cs`, `UsersApiController.cs`, `RaceWorkflow.cs`, `ApplicationDbContext.cs`, forward migrations, SQL triggers, `CoreWorkflowTests.cs` and `DatabaseTests.cs`; organiser-owned entries now include participant names | **Strict Part 1 physical schema parity remains unresolved**: separate integer-key Organiser/Participant tables versus Identity string FKs. See [schema reconciliation](PART1_SCHEMA_RECONCILIATION.md) |
 | Swagger | 10 | `Program.cs` with XML comments, Swagger UI and CSRF Authorize instructions; `SwaggerDescribesTheWorkflowEndpoints` integration test | Screen-recorded browser demonstration still needed |
-| Tests | 15 | Fresh local Release suite: 32 passed, 0 failed on 18 October before participant-name improvement; newest [green CI](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39137366482) includes updated code and enrolment-name assertion | Store/show genuine test output and CI in presentation |
+| Tests | 15 | Fresh local Release suite: 35 passed, 0 failed on 18 October after the tutorial fixes; latest [green CI](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39146836041) includes the profile picture and Admin dashboard fixes | Store/show genuine test output and CI in presentation |
 | Video | 15 | [student-led video plan](SUBMISSION_VIDEO_SCRIPT.md) | **No video recorded or uploaded, and no URL is present.** |
 
 ## Reviewer quick path

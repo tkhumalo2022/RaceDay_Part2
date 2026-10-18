@@ -22,9 +22,9 @@ RaCeDay is a race management application. An organiser can set up events and rac
 
 - **Student:** Thabiso Khumalo
 - **Part 2 source branch:** [recovery/part2-20261017](https://github.com/tkhumalo2022/RaceDay_Part2/tree/recovery/part2-20261017). The default `main` branch is deliberately unchanged.
-- **Verified GitHub Actions build and test:** [Successful run #39137366482 (18 October 2026)](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39137366482) on Windows, including the updated organiser-entry view and its test. The earlier [run #39068333340](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39068333340) separately recorded 32 passing tests.
+- **GitHub Actions:** [Successful run #39146836041 (18 October 2026)](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39146836041) built and tested the latest feature commit on Windows. The local Release run passed **35 tests with zero failures**.
 - **Genuine screenshot:** [GitHub Actions success evidence](docs/evidence/GitHub-CI-Green-20261017.png). The GitHub run also retains the `raceday-test-results` artifact.
-- This branch contained **23 real commits** at the green CI run. Their individual relevance must be judged by the assessor; no filler commits have been added.
+- This branch has more than 20 commits. The lecturer must decide whether each commit meets the rubric's requirement for meaningful development work.
 - **Presentation video:** Not recorded/uploaded yet. Add Thabiso Khumalo's actual **unlisted YouTube video URL** here before submitting on ARC.
 
 ## Requirements
