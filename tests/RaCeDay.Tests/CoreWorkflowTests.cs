@@ -58,6 +58,10 @@ public class CoreWorkflowTests(IdentityFixture fixture) : IClassFixture<Identity
         Assert.Equal(HttpStatusCode.Forbidden, (await stranger.DeleteAsync($"/api/events/{eventId}")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await stranger.PostAsJsonAsync($"/api/events/{eventId}/categories", Category())).StatusCode);
         var entry = await Created(await participant.PostAsJsonAsync($"/api/events/{eventId}/enrolments", new { categoryId }));
+        var organiserEntries = await owner.GetFromJsonAsync<JsonElement>($"/api/events/{eventId}/enrolments");
+        Assert.Single(organiserEntries.EnumerateArray());
+        Assert.Equal("Core Participant", organiserEntries[0].GetProperty("participantName").GetString());
+        Assert.Contains("Participant: Core Participant", await owner.GetStringAsync($"/Entries/Event/{eventId}"));
         var secondCategory = await NewCategory(owner, eventId, "10 km");
         await Created(await participant.PostAsJsonAsync($"/api/events/{eventId}/enrolments", new { categoryId = secondCategory }));
         Assert.Equal(HttpStatusCode.Conflict, (await participant.PostAsJsonAsync($"/api/events/{eventId}/enrolments", new { categoryId })).StatusCode);
