@@ -22,8 +22,8 @@ RaCeDay is a race management application. An organiser can set up events and rac
 
 - **Student:** Thabiso Khumalo
 - **Part 2 source branch:** [recovery/part2-20261017](https://github.com/tkhumalo2022/RaceDay_Part2/tree/recovery/part2-20261017). The default `main` branch is deliberately unchanged.
-- **GitHub Actions:** [Successful run #39146836041 (18 October 2026)](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39146836041) built and tested the latest feature commit on Windows. The local Release run passed **35 tests with zero failures**.
-- **Genuine screenshot:** [GitHub Actions success evidence](docs/evidence/GitHub-CI-Green-20261017.png). The GitHub run also retains the `raceday-test-results` artifact.
+- **GitHub Actions:** [Successful run #39146836041 (18 October 2026)](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39147081224) built and tested the latest feature commit on Windows. The local Release run passed **35 tests with zero failures**.
+- **Genuine screenshot:** [GitHub Actions success evidence](docs/evidence/GitHub-CI-Green-20261018.png). The GitHub run also retains the `raceday-test-results` artifact.
 - This branch has more than 20 commits. The lecturer must decide whether each commit meets the rubric's requirement for meaningful development work.
 - **Presentation video:** Not recorded/uploaded yet. Add Thabiso Khumalo's actual **unlisted YouTube video URL** here before submitting on ARC.
 
@@ -99,6 +99,10 @@ You can then sign in as Admin to see the summary counts. The organiser and parti
 7. In Development open `/swagger`. For API register/login obtain a token from anonymous `GET /api/auth/antiforgery`, then set `X-CSRF-TOKEN` in Swagger's Authorize field. After signing in, refresh this token via `GET /api/auth/antiforgery` or `GET /api/antiforgery` before authenticated writes. The Identity cookie must be in the same browser session.
 
 See the [tutorial fixes](docs/TUTORIAL_FIXES_20261018.md), the [Part 2 rubric evidence index](docs/PART2_EVIDENCE_INDEX.md), `docs/PAYMENT_WORKFLOW.md`, `docs/SCHEMA_PARITY_ADDENDUM.md`, `docs/SUBMISSION_VIDEO_SCRIPT.md` and `docs/DEVELOPMENT-STATUS.md` for requirements and evidence. This is an unsubmitted recovery copy for **Thabiso Khumalo**.
+
+## Final rubric check
+
+Before submitting, go through [my Part 2 checklist](docs/PART2_FINAL_REVIEW.md). I can run `scripts/part2-preflight.ps1` from the repository root to check the branch, SQL Server, Swagger, test report and missing evidence. It does not modify the original Part 1 database.
 
 ## Outstanding before submission
 
