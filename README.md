@@ -10,7 +10,7 @@
 - Register and sign in as either Organiser or Participant (MVC or JSON API); role-specific details (date of birth for Participants, organisation name for Organisers), password hashing, Identity session cookies, CSRF protection and guarded dashboards. Public registration **rejects Admin**.
 - Profile editing through both MVC and GET/PUT `/api/users/me`, restricted to the signed-in user with allowlisted fields and anti-forgery protection.
 - Organiser event and category CRUD, including validation and ownership checks.
-- Participant enrolment with deadline, capacity, category-event consistency and **one entry per category per participant**. SQL Server locking prevents simultaneous overbooking. A SQL trigger now maintains stored `CurrentParticipants` exactly as the Part 1 `Registered`-only rule requires.
+- Participant enrolment with deadline, capacity, category-event consistency and **one entry per category per participant**. Organiser-owned entry views now show participant names. SQL Server locking prevents simultaneous overbooking. A SQL trigger maintains stored `CurrentParticipants` using the Part 1 `Registered`-only rule.
 - Organiser result recording; participants can view their own results.
 - Cookie-authenticated REST APIs including `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/antiforgery` and `GET /api/auth/session`. A **server-side memory-backed session** also stores the signed-in user ID and role, as specified by the Part 2 marking rubric; ASP.NET Identity claims remain the source of authorization. Logout clears both. Swagger UI, MVC pages and the generic error page are available.
 - Pending-only payment-attempt records with both API and **SQL-trigger** entry-fee amount validation, ownership control, unique transaction references and at most one `Paid` record per enrolment. **No real payment processing or confirmation exists.**
@@ -20,7 +20,7 @@
 
 - **Student:** Thabiso Khumalo
 - **Part 2 source branch:** [recovery/part2-20261017](https://github.com/tkhumalo2022/RaceDay_Part2/tree/recovery/part2-20261017). The default `main` branch is deliberately unchanged.
-- **Verified GitHub Actions build and test:** [Successful run #39068333340](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39068333340) on Windows (32 passed, 0 failed; Release build completed without compiler errors or warnings).
+- **Verified GitHub Actions build and test:** [Successful run #39137366482 (18 October 2026)](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39137366482) on Windows, including the updated organiser-entry view and its test. The earlier [run #39068333340](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39068333340) separately recorded 32 passing tests.
 - **Genuine screenshot:** [GitHub Actions success evidence](docs/evidence/GitHub-CI-Green-20261017.png). The GitHub run also retains the `raceday-test-results` artifact.
 - This branch contained **23 real commits** at the green CI run. Their individual relevance must be judged by the assessor; no filler commits have been added.
 - **Presentation video:** Not recorded/uploaded yet. Add Thabiso Khumalo's actual **unlisted YouTube video URL** here before submitting on ARC.
@@ -63,7 +63,7 @@ Migrations are never applied automatically when the website starts. The explicit
 6. As Participant, view My results and confirm unrelated users cannot see them.
 7. In Development open `/swagger`. For API register/login obtain a token from anonymous `GET /api/auth/antiforgery`, then set `X-CSRF-TOKEN` in Swagger's Authorize field. After signing in, refresh this token via `GET /api/auth/antiforgery` or `GET /api/antiforgery` before authenticated writes. The Identity cookie must be in the same browser session.
 
-See `docs/PAYMENT_WORKFLOW.md`, `docs/SCHEMA_PARITY_ADDENDUM.md`, `docs/SUBMISSION_VIDEO_SCRIPT.md` and `docs/DEVELOPMENT-STATUS.md` for requirements and evidence. This is an unsubmitted recovery copy for **Thabiso Khumalo**.
+See the [Part 2 rubric evidence index](docs/PART2_EVIDENCE_INDEX.md), `docs/PAYMENT_WORKFLOW.md`, `docs/SCHEMA_PARITY_ADDENDUM.md`, `docs/SUBMISSION_VIDEO_SCRIPT.md` and `docs/DEVELOPMENT-STATUS.md` for requirements and evidence. This is an unsubmitted recovery copy for **Thabiso Khumalo**.
 
 ## Outstanding before submission
 
