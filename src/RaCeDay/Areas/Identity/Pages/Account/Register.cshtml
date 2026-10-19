@@ -4,7 +4,7 @@
     ViewData["Title"] = "Register";
 }
 <h1>Register</h1>
-<p>Choose whether to join races as a Participant or organise races as an Organiser. Administrator access is not available through registration.</p>
+<p>Taking part in a race? Choose Participant. Running an event? Choose Organiser. Admin accounts are managed separately.</p>
 <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
     <label asp-for="Input.FirstName"></label>

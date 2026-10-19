@@ -5,6 +5,7 @@
 RaCeDay is a race management application. An organiser can set up events and race categories, and a participant can register, enter a race and check results. I use ASP.NET Core, C#, Entity Framework Core and SQL Server. The application also includes a REST API with Swagger, login and role protection, and automated tests.
 
 **Project branch:** `recovery/part2-20261017`. This is a backed-up working version of Part 2, not the original Visual Studio project. The original project has not been located, and this branch has not been merged or submitted. See `docs/OFFICIAL_PART2_RUBRIC_AUDIT.md` for the assessment checklist.
+
 ## What works
 
 - ASP.NET Core MVC / .NET 10 with SQL Server EF Core and ASP.NET Identity.
@@ -22,7 +23,7 @@ RaCeDay is a race management application. An organiser can set up events and rac
 
 - **Student:** Thabiso Khumalo
 - **Part 2 source branch:** [recovery/part2-20261017](https://github.com/tkhumalo2022/RaceDay_Part2/tree/recovery/part2-20261017). The default `main` branch is deliberately unchanged.
-- **GitHub Actions:** [Successful run #39146836041 (18 October 2026)](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39147081224) built and tested the latest feature commit on Windows. The local Release run passed **35 tests with zero failures**.
+- **GitHub Actions:** [Successful run #39147081224 (18 October 2026)](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39147081224) built and tested the latest feature commit on Windows. The local Release run passed **35 tests with zero failures**.
 - **Genuine screenshot:** [GitHub Actions success evidence](docs/evidence/GitHub-CI-Green-20261018.png). The GitHub run also retains the `raceday-test-results` artifact.
 - This branch has more than 20 commits. The lecturer must decide whether each commit meets the rubric's requirement for meaningful development work.
 - **Presentation video:** Not recorded/uploaded yet. Add Thabiso Khumalo's actual **unlisted YouTube video URL** here before submitting on ARC.
