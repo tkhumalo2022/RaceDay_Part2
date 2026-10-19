@@ -89,6 +89,11 @@ finally {
 
 You can then sign in as Admin to see the summary counts. The organiser and participant screens remain restricted to their own roles. Profile pictures are served from `wwwroot/profile-images` and are publicly accessible to anyone who knows the image URL. Uploaded picture files are kept out of Git.
 
+### Quick-fill buttons for the recording (Development only)
+
+The registration, event, category and result forms have **Fill demo details** buttons when the app is running in Development. These buttons fill example values only. They **do not register an account, create a race, record a result or process a payment** until you click the form's normal Save/Create button.
+
+On Register choose Organiser or Participant, then enter and confirm a password yourself. On Create event click **Fill demo race details**; on Add category select the **5 km** or **10 km** button. On Edit event use **Set status to Closed (demo)** before recording a result. On Record result click **Fill sample result**. Always check the dates, amounts and status before saving. No passwords or API credentials are stored in the shortcut script.
 ### Demo walkthrough
 
 1. Register and sign in as a Participant.

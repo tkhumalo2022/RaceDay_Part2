@@ -6,6 +6,7 @@
 
 Use the project as you speak. Don't read the file names out one by one. Show the work on screen and explain why each part matters.
 
+**To save typing during the recording:** On the relevant form, click **Fill Organiser demo details**, **Fill Participant demo details**, **Fill demo race details**, **Fill 5 km category**, **Fill 10 km category**, or **Fill sample result**. Review the fields and click the normal submit button yourself. Password fields never fill automatically. These shortcuts are available in Development mode only.
 ## 1. Start with the homepage
 
 "Hi, I'm Thabiso Khumalo, and this is my PROG6212 Part 2 project, RaCeDay.

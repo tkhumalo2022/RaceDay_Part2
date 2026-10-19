@@ -1,3 +1,24 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
 @model EventInput
 <h1>Race event</h1>
-<form method="post" asp-antiforgery="true"><div asp-validation-summary="All" class="text-danger"></div><label asp-for="EventName"></label><input asp-for="EventName"/><label asp-for="Description"></label><textarea asp-for="Description"></textarea><label asp-for="Location"></label><input asp-for="Location"/><label asp-for="EventType"></label><select asp-for="EventType"><option>Run</option><option>Walk</option><option>Cycle</option></select><label asp-for="Status"></label><select asp-for="Status"><option>Planned</option><option>Open</option><option>Closed</option><option>Completed</option><option>Cancelled</option></select><label asp-for="EventDate"></label><input asp-for="EventDate" type="date"/><label asp-for="ClosingDate"></label><input asp-for="ClosingDate" type="date"/><button>Save event</button></form>
+<form method="post" asp-antiforgery="true"><div asp-validation-summary="All" class="text-danger"></div>
+@if (HostEnvironment.EnvironmentName == "Development")
+{
+    <div class="demo-fill-actions">
+        @if (ViewContext.RouteData.Values["action"]?.ToString() == "Create")
+        {
+            <button type="button" data-demo-preset="event">Fill demo race details</button>
+        }
+        else
+        {
+            <button type="button" data-demo-preset="event-close">Set status to Closed (demo)</button>
+        }
+        <p data-demo-feedback role="status" aria-live="polite"></p>
+    </div>
+}<label asp-for="EventName"></label><input asp-for="EventName"/><label asp-for="Description"></label><textarea asp-for="Description"></textarea><label asp-for="Location"></label><input asp-for="Location"/><label asp-for="EventType"></label><select asp-for="EventType"><option>Run</option><option>Walk</option><option>Cycle</option></select><label asp-for="Status"></label><select asp-for="Status"><option>Planned</option><option>Open</option><option>Closed</option><option>Completed</option><option>Cancelled</option></select><label asp-for="EventDate"></label><input asp-for="EventDate" type="date"/><label asp-for="ClosingDate"></label><input asp-for="ClosingDate" type="date"/><button>Save event</button></form>
+@section Scripts {
+    @if (HostEnvironment.EnvironmentName == "Development")
+    {
+        <script src="~/js/demo-prefill.js" asp-append-version="true" defer></script>
+    }
+}
