@@ -40,5 +40,12 @@
     <label asp-for="Input.ConfirmPassword"></label>
     <input asp-for="Input.ConfirmPassword" autocomplete="new-password" />
     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+    <label class="password-visibility-control">
+        <input type="checkbox" data-password-targets="Input_Password Input_ConfirmPassword" />
+        Show passwords
+    </label>
     <button type="submit">Create account</button>
 </form>
+@section Scripts {
+    <script src="~/js/password-visibility.js" asp-append-version="true" defer></script>
+}
