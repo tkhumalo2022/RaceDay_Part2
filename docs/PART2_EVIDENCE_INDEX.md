@@ -1,33 +1,49 @@
-# PROG6212 Part 2 — evidence index (18 October 2026)
+# PROG6212 Part 2 — Marking evidence
 
 **Student:** Thabiso Khumalo (ST10477675)  
+**Project:** RaCeDay  
 **Repository:** https://github.com/tkhumalo2022/RaceDay_Part2  
-**Working branch:** `recovery/part2-20261017` (NOT merged into `main` and NOT submitted on ARC).
+**Source branch:** [recovery/part2-20261017](https://github.com/tkhumalo2022/RaceDay_Part2/tree/recovery/part2-20261017)
 
-This index maps the visually inspected official Part 2 rubric to **real code and checks**. It is not a grade claim. The original student Visual Studio solution remains unrecovered; the work here is a backed-up recovery project.
+The table below links the Part 2 assessment areas to source code and test evidence. The marks shown are the rubric's maximum marks, not marks awarded.
 
-| Part 2 rubric criterion | Max | Evidence in this branch | Limitation |
-| --- | ---: | --- | --- |
-| Submission | 5 | This README; setup, branch and CI links | ARC GitHub link not submitted; unlisted presentation URL not yet added |
-| GitHub / CI | 10 | `.github/workflows/dotnet-build.yml`; GitHub commits and real green [run #39146836041](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39147081224); [earlier authentic screenshot](evidence/GitHub-CI-Green-20261018.png) | Only assessor can judge which commits qualify as meaningful |
-| Authentication and role access | 20 | `AuthApiController.cs`, Identity pages, `SessionIdentity.cs`, `DashboardController.cs`; security tests in `IdentityFlowTests.cs` | Uses Identity cookie + in-memory server-side user/role session, not Part 1's proposed JWT |
-| API and database | 25 | `RaceApiController.cs`, `UsersApiController.cs`, `RaceWorkflow.cs`, `ApplicationDbContext.cs`, forward migrations, SQL triggers, `CoreWorkflowTests.cs` and `DatabaseTests.cs`; organiser-owned entries now include participant names | **Strict Part 1 physical schema parity remains unresolved**: separate integer-key Organiser/Participant tables versus Identity string FKs. See [schema reconciliation](PART1_SCHEMA_RECONCILIATION.md) |
-| Swagger | 10 | `Program.cs` with XML comments, Swagger UI and CSRF Authorize instructions; `SwaggerDescribesTheWorkflowEndpoints` integration test | Screen-recorded browser demonstration still needed |
-| Tests | 15 | Fresh local Release suite: 35 passed, 0 failed on 18 October after the tutorial fixes; latest [green CI](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39147081224) includes the profile picture and Admin dashboard fixes | Store/show genuine test output and CI in presentation |
-| Video | 15 | [student-led video plan](SUBMISSION_VIDEO_SCRIPT.md) | **No video recorded or uploaded, and no URL is present.** |
+| Assessment area | Max | Where to find evidence |
+| --- | ---: | --- |
+| Submission | 5 | [README](../README.md), [presentation video](https://youtu.be/jytTUheNxYw), source branch |
+| GitHub and CI/CD | 10 | [GitHub Actions workflow](../.github/workflows/dotnet-build.yml), commit history, [latest successful run](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39265809171) |
+| Authentication and role access | 20 | `src/RaCeDay/Areas/Identity`, `AuthApiController.cs`, `SessionIdentity.cs`, `DashboardController.cs`, `IdentityFlowTests.cs` |
+| REST API and database | 25 | `RaceApiController.cs`, `UsersApiController.cs`, `RaceWorkflow.cs`, `ApplicationDbContext.cs`, EF migrations and database tests |
+| Swagger | 10 | `Program.cs`, XML API documentation and Swagger-related tests |
+| Automated testing | 15 | `tests/RaCeDay.Tests`; CI log dated 19 October 2026: **39 passed, 0 failed, 0 skipped** |
+| Video presentation | 15 | [RaCeDay Part 2 presentation](https://youtu.be/jytTUheNxYw) (accessibility and contents to be checked by the student) |
 
-## Reviewer quick path
+## Verified build and test result
 
-1. Review [README](../README.md), then inspect `src/RaCeDay/Controllers` for API actions and `src/RaCeDay/Services/RaceWorkflow.cs` for shared owner, capacity and validation rules.
-2. Inspect `src/RaCeDay/Data/Migrations` for Code-First EF schema and database triggers, and `docs/part1/RaceDay_Database.sql` for the original Part 1 schema. **Do not execute** the Part 1 SQL file on valuable data: it drops `RaceDayDB`.
-3. On a Windows computer with SQL Server LocalDB and .NET 10, run `dotnet restore`, `dotnet build RaCeDay.slnx -c Release --warnaserror`, then `dotnet test RaCeDay.slnx -c Release`. Integration tests use new GUID-named databases, not the original database.
-4. Run the app using the isolated demonstration-database instructions in README, sign in and open Development `/swagger`. Obtain `/api/auth/antiforgery` CSRF tokens for Swagger writes.
-5. Follow the [recording script](SUBMISSION_VIDEO_SCRIPT.md), showing a real Organiser creating an event/category, a Participant enrolling, organiser seeing the participant name, a cross-role 403, results, LocalDB, and CI.
+- **Workflow:** Build and test RaCeDay Part 2
+- **Run:** [#39265809171](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39265809171)
+- **Date:** 19 October 2026
+- **Job:** `build-and-test` — successful
+- **Tests:** 39 passed, 0 failed, 0 skipped
+- **Test report:** `raceday-test-results` artifact in GitHub Actions
+- **Source commit tested:** `41b1651a96e9062d82a1c0abf8f08af920c7334e`
+- **Earlier genuine screenshot:** [GitHub Actions evidence](evidence/GitHub-CI-Green-20261018.png)
 
-## Required before final submission
+Additional documentation-only changes should have their own passing workflow run before final marking.
 
-- Resolve/document with lecturer whether the **Part 1 ERD/physical SQL schema difference** is acceptable; do not call it identical. Do not perform destructive migration of an existing database.
-- Record and upload Thabiso's actual demonstration to YouTube as **Unlisted**, then place the URL in README.
-- Capture genuine Swagger/database/screenshots as required by the rubric.
-- Review the correct branch and confirm all personal details and assessment instructions; submit the GitHub URL through ARC personally. Do not claim ARC submission until it has been confirmed.
-- The desktop may have a local copy at `C:\Users\tkhum\Documents\Codex\2026-10-17\referenced-chatgpt-conversation-this-is-an\outputs\RaceDay-recovery`. Pull from the correct branch when remote access resumes; never overwrite uncommitted local changes.
+## Code review path
+
+1. Open [README](../README.md) for requirements and setup instructions.
+2. Inspect `src/RaCeDay/Controllers`, `src/RaCeDay/Services/RaceWorkflow.cs` and `src/RaCeDay/Data/ApplicationDbContext.cs`.
+3. Review `src/RaCeDay/Data/Migrations` and the tests under `tests/RaCeDay.Tests`.
+4. Run `dotnet build RaCeDay.slnx -c Release --warnaserror` and `dotnet test RaCeDay.slnx -c Release` on Windows with .NET 10 and SQL Server LocalDB.
+5. In Development, open `/swagger` and test the documented endpoints. A CSRF token is required for write requests.
+
+## Important technical limitations
+
+- **Part 1 database schema:** The current Part 2 database uses ASP.NET Identity users and roles instead of the separate integer-key Organiser and Participant tables used in Part 1. This is a physical schema difference and has not been approved by the lecturer. See [database comparison](PART1_PART2_DB_COMPARISON_20261019.md).
+- **Login protocol:** The application uses Identity cookies and server-side session state, rather than the JWT approach outlined in the Part 1 API plan.
+- **Payments:** Payment-attempt records do not represent completed gateway transactions.
+- **Project origin:** The uploaded work is a separate Part 2 implementation. It has not been established as an exact copy of the original local Visual Studio solution.
+- **Submission:** An accessible GitHub repository or YouTube link does not confirm submission to ARC.
+
+The final mark and acceptance of the Part 1 schema change are the lecturer's decisions.
