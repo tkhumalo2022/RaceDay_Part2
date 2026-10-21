@@ -13,9 +13,9 @@ Use this sheet before recording and again before uploading to ARC. Tick a step o
 - [x] GitHub repository exists: https://github.com/tkhumalo2022/RaceDay_Part2
 - [x] README explains the application, requirements and how to build it.
 - [x] Genuine CI screenshot is in `docs/evidence/GitHub-CI-Green-20261018.png`.
-- [ ] Add the real Unlisted YouTube presentation URL to README.
+- [x] The supplied YouTube presentation URL is linked in README: https://youtu.be/jytTUheNxYw. Check that the video opens for the lecturer.
 - [ ] Check what ARC asks you to submit, submit the **correct** GitHub link and verify the confirmation screen.
-- [ ] Decide whether to merge the tested recovery branch to `main`. **Nothing has been merged or submitted**.
+- [ ] Confirm the full source is visible from the submitted GitHub URL. Submission to ARC is not verified.
 
 ## 2. GitHub and CI/CD — 10 marks
 
@@ -60,17 +60,17 @@ Use this sheet before recording and again before uploading to ARC. Tick a step o
 ## 6. Automated tests — 15 marks
 
 - [x] Release build completed with **0 warnings and 0 errors**.
-- [x] Latest local test run: **35 passed, 0 failed** (including safe profile picture and Admin dashboard tests).
-- [x] Windows GitHub CI run succeeded on the updated code.
+- [x] Verified local Release run: **35 passed, 0 failed** (18 October). Verified GitHub Actions run: **39 passed, 0 failed, 0 skipped** (19 October).
+- [x] Windows GitHub CI run succeeded: https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39265809171. Check newer runs before submission.
 - [ ] Capture a real terminal run of `dotnet build RaCeDay.slnx -c Release --warnaserror` and `dotnet test RaCeDay.slnx -c Release` for your presentation.
 - [ ] Briefly explain a valid test and an invalid test for login, event management, enrolments and access permissions.
 
 ## 7. Video presentation — 15 marks
 
-- [ ] Record the actual running application with your voice: explain the C# controllers, DbContext, migration, Identity, roles, Swagger, SQL Server, one full race workflow, tests and GitHub Actions.
+- [ ] Check that the linked presentation actually shows the running application, controllers, DbContext, migrations, Identity, roles, Swagger, SQL Server, a race workflow, tests and GitHub Actions.
 - [ ] Use `docs/SUBMISSION_VIDEO_SCRIPT.md` as a guide. Keep the language clear and your own; speak while demonstrating the screen.
-- [ ] Upload as **Unlisted** on YouTube and test the link in a signed-out browser.
-- [ ] Add that genuine URL to README. Don't claim the video is submitted until ARC confirms.
+- [ ] Confirm the YouTube video is **Unlisted** and opens in a signed-out browser.
+- [x] Include the supplied video URL in README. ARC submission still needs confirmation.
 
 ## Suggested recording order
 
@@ -112,4 +112,4 @@ Thabiso Khumalo
 
 ## What is still in your hands
 
-You need to confirm the permitted Part 1 schema change with your lecturer, complete the real video, upload it as Unlisted, approve the final code/branch and submit it on ARC. All of those matter to the mark. I cannot honestly guarantee 100%.
+The remaining student checks are lecturer acceptance of the Part 1 schema changes, video content/access settings, the final repository link and confirmed ARC submission. The mark remains the lecturer's decision.
