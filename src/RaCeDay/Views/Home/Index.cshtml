@@ -1,0 +1,6 @@
+@{ ViewData["Title"] = "RaceDay"; }
+<h1>RaceDay</h1>
+<p>Find a race, pick a distance and enter. Organisers can add events and record results.</p>
+<p><a asp-controller="Events" asp-action="Index">Browse race events</a></p>
+@if(User.IsInRole("Organiser")){<p><a asp-controller="Events" asp-action="Mine">Manage my events</a> | <a asp-controller="Events" asp-action="Create">Create an event</a></p>}
+@if(User.IsInRole("Participant")){<p><a asp-controller="Entries" asp-action="Index">My entries</a> | <a asp-controller="Entries" asp-action="Results">My results</a></p>}

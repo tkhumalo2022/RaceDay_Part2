@@ -1,0 +1,7 @@
+@model EventDetails
+<h1>@Model.Event.EventName</h1><p>@Model.Event.Description</p><p>@Model.Event.EventDate | @Model.Event.Location | @Model.Event.Status</p>
+@if(Model.Event.IsOwner){<p><a asp-action="Edit" asp-route-id="@Model.Event.Id">Edit event</a> | <a asp-controller="Categories" asp-action="Create" asp-route-eventId="@Model.Event.Id">Add category</a> | <a asp-controller="Entries" asp-action="Event" asp-route-id="@Model.Event.Id">View entries</a></p><form asp-action="Delete" asp-route-id="@Model.Event.Id" method="post" asp-antiforgery="true"><button>Delete event</button></form>}
+<h2>Categories</h2>
+@foreach(var c in Model.Categories){<section><h3>@c.CategoryName - @c.DistanceKm km</h3><p>R @c.EntryFee | @c.CurrentParticipants of @c.MaxParticipants places filled</p>
+@if(Model.Event.IsOwner){<a asp-controller="Categories" asp-action="Edit" asp-route-id="@c.Id">Edit</a><form asp-controller="Categories" asp-action="Delete" asp-route-id="@c.Id" method="post" asp-antiforgery="true"><button>Delete category</button></form>}
+@if(User.IsInRole("Participant") && Model.Event.Status=="Open"){<form asp-controller="Entries" asp-action="Enrol" asp-route-eventId="@Model.Event.Id" method="post" asp-antiforgery="true"><input type="hidden" name="CategoryId" value="@c.Id"/><button>Enrol</button></form>}</section>}

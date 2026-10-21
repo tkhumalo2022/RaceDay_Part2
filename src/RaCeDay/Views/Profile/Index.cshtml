@@ -1,0 +1,51 @@
+@model ProfileViewModel
+@{ ViewData["Title"] = "Your profile"; }
+<h1>Your profile</h1>
+@if (TempData["StatusMessage"] is string message)
+{
+    <p role="status">@message</p>
+}
+<div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+<section aria-label="Profile picture">
+    <h2>Profile picture</h2>
+    @if (!string.IsNullOrWhiteSpace(Model.ProfileImagePath))
+    {
+        <img src="@Model.ProfileImagePath" alt="Your profile picture" width="160" height="160"
+             style="display:block;object-fit:cover;border-radius:8px;margin-bottom:12px" />
+        <form asp-action="RemoveImage" method="post">
+            <button type="submit">Remove picture</button>
+        </form>
+    }
+    <form asp-action="UploadImage" method="post" enctype="multipart/form-data">
+        <label for="image">Choose a JPG or PNG (maximum 2 MB)</label>
+        <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required />
+        <button type="submit">Upload picture</button>
+    </form>
+</section>
+
+<section aria-label="Profile details">
+    <h2>Your details</h2>
+    <form asp-action="Index" method="post">
+        <label asp-for="FirstName"></label>
+        <input asp-for="FirstName" autocomplete="given-name" />
+        <label asp-for="LastName"></label>
+        <input asp-for="LastName" autocomplete="family-name" />
+        <label asp-for="Gender"></label>
+        <input asp-for="Gender" />
+        <label asp-for="PhoneNumber"></label>
+        <input asp-for="PhoneNumber" autocomplete="tel" />
+        @if (User.IsInRole("Organiser"))
+        {
+            <label asp-for="OrganiserName"></label>
+            <input asp-for="OrganiserName" autocomplete="organization" />
+        }
+        @if (User.IsInRole("Participant"))
+        {
+            <label asp-for="DateOfBirth"></label>
+            <input asp-for="DateOfBirth" type="date" />
+        }
+        <button type="submit">Save profile</button>
+    </form>
+</section>
+<p><a asp-controller="Dashboard" asp-action="Index">Back to dashboard</a></p>

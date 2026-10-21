@@ -1,0 +1,17 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
+@model ResultInput
+<h1>Record result</h1>
+<form method="post" asp-antiforgery="true"><div asp-validation-summary="All" class="text-danger"></div>
+@if (HostEnvironment.EnvironmentName == "Development")
+{
+    <div class="demo-fill-actions">
+        <button type="button" data-demo-preset="result">Fill sample result</button>
+        <p data-demo-feedback role="status" aria-live="polite"></p>
+    </div>
+}<label asp-for="ResultStatus"></label><select asp-for="ResultStatus"><option>Finished</option><option>DNS</option><option>DNF</option><option>DSQ</option></select><label asp-for="StartTime"></label><input asp-for="StartTime" type="time"/><label asp-for="FinishTime"></label><input asp-for="FinishTime" type="time"/><label asp-for="OverallPosition"></label><input asp-for="OverallPosition" type="number" min="1"/><button>Save result</button></form>
+@section Scripts {
+    @if (HostEnvironment.EnvironmentName == "Development")
+    {
+        <script src="~/js/demo-prefill.js" asp-append-version="true" defer></script>
+    }
+}

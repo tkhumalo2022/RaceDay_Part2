@@ -1,0 +1,4 @@
+@model IReadOnlyList<EventDto>
+<h1>Race events</h1>
+@if(User.IsInRole("Organiser")){<p><a asp-action="Create">Create event</a> | <a asp-action="Mine">My events</a></p>}
+@foreach(var e in Model){<section><h2>@e.EventName</h2><p>@e.EventDate | @e.Location | @e.Status</p><a asp-action="Details" asp-route-id="@e.Id">View event</a></section>}

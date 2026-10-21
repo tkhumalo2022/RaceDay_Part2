@@ -1,0 +1,64 @@
+@page
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
+@model RaCeDay.Areas.Identity.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+<h1>Register</h1>
+<p>Taking part in a race? Choose Participant. Running an event? Choose Organiser. Admin accounts are managed separately.</p>
+<form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    @if (HostEnvironment.EnvironmentName == "Development")
+    {
+        <div class="demo-fill-actions" aria-label="Example registration details">
+            <button type="button" data-demo-preset="organiser">Fill Organiser demo details</button>
+            <button type="button" data-demo-preset="participant">Fill Participant demo details</button>
+            <p data-demo-feedback role="status" aria-live="polite"></p>
+        </div>
+    }
+    <label asp-for="Input.FirstName"></label>
+    <input asp-for="Input.FirstName" autocomplete="given-name" />
+    <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+    <label asp-for="Input.LastName"></label>
+    <input asp-for="Input.LastName" autocomplete="family-name" />
+    <span asp-validation-for="Input.LastName" class="text-danger"></span>
+    <label asp-for="Input.Gender"></label>
+    <input asp-for="Input.Gender" />
+    <p>Participants must give their date of birth. Organisers must give their organisation name.</p>
+    <label asp-for="Input.OrganiserName"></label>
+    <input asp-for="Input.OrganiserName" autocomplete="organization" />
+    <span asp-validation-for="Input.OrganiserName" class="text-danger"></span>
+    <label asp-for="Input.DateOfBirth"></label>
+    <input asp-for="Input.DateOfBirth" type="date" />
+    <span asp-validation-for="Input.DateOfBirth" class="text-danger"></span>
+    <label asp-for="Input.PhoneNumber"></label>
+    <input asp-for="Input.PhoneNumber" type="tel" autocomplete="tel" />
+    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+    <label asp-for="Input.Role"></label>
+    <select asp-for="Input.Role">
+        <option value="Participant">Participant</option>
+        <option value="Organiser">Organiser</option>
+    </select>
+    <span asp-validation-for="Input.Role" class="text-danger"></span>
+    <label asp-for="Input.Email"></label>
+    <input asp-for="Input.Email" autocomplete="email" />
+    <span asp-validation-for="Input.Email" class="text-danger"></span>
+    <label asp-for="Input.Password"></label>
+    <input asp-for="Input.Password" autocomplete="new-password" />
+    <span asp-validation-for="Input.Password" class="text-danger"></span>
+    <label asp-for="Input.ConfirmPassword"></label>
+    <input asp-for="Input.ConfirmPassword" autocomplete="new-password" />
+    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+    <label class="password-visibility-control">
+        <input type="checkbox" data-password-targets="Input_Password Input_ConfirmPassword" />
+        Show passwords
+    </label>
+    <button type="submit">Create account</button>
+</form>
+@section Scripts {
+    <script src="~/js/password-visibility.js" asp-append-version="true" defer></script>
+    @if (HostEnvironment.EnvironmentName == "Development")
+    {
+        <script src="~/js/demo-prefill.js" asp-append-version="true" defer></script>
+    }
+}

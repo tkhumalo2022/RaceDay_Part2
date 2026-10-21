@@ -1,0 +1,18 @@
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
+@model CategoryInput
+<h1>Race category</h1>
+<form method="post" asp-antiforgery="true"><div asp-validation-summary="All" class="text-danger"></div>
+@if (HostEnvironment.EnvironmentName == "Development" && ViewContext.RouteData.Values["action"]?.ToString() == "Create")
+{
+    <div class="demo-fill-actions">
+        <button type="button" data-demo-preset="category-5">Fill 5 km category</button>
+        <button type="button" data-demo-preset="category-10">Fill 10 km category</button>
+        <p data-demo-feedback role="status" aria-live="polite"></p>
+    </div>
+}<label asp-for="CategoryName"></label><input asp-for="CategoryName"/><label asp-for="DistanceKm"></label><input asp-for="DistanceKm" type="number" step="0.01" min="0.01"/><label asp-for="EntryFee"></label><input asp-for="EntryFee" type="number" step="0.01" min="0"/><label asp-for="MaxParticipants"></label><input asp-for="MaxParticipants" type="number" min="1"/><button>Save category</button></form>
+@section Scripts {
+    @if (HostEnvironment.EnvironmentName == "Development")
+    {
+        <script src="~/js/demo-prefill.js" asp-append-version="true" defer></script>
+    }
+}
