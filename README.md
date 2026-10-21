@@ -9,7 +9,7 @@ RaCeDay is an ASP.NET Core race management application for organisers and partic
 ## Submission links
 
 - **Repository:** https://github.com/tkhumalo2022/RaceDay_Part2
-- **Part 2 source code:** [recovery/part2-20261017](https://github.com/tkhumalo2022/RaceDay_Part2/tree/recovery/part2-20261017)
+- **Source code:** [ASP.NET Core project](src/RaCeDay) · [automated tests](tests/RaCeDay.Tests) · [commit history](https://github.com/tkhumalo2022/RaceDay_Part2/commits/main)
 - **Presentation:** [RaCeDay Part 2 video](https://youtu.be/jytTUheNxYw)
 - **Build and tests:** [Successful GitHub Actions run — 19 October 2026](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39265809171) (39 passed, 0 failed, 0 skipped)
 - **Assessment evidence:** [Part 2 evidence index](docs/PART2_EVIDENCE_INDEX.md)
