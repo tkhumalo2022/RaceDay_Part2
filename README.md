@@ -94,3 +94,17 @@ Authentication uses **Identity cookies**, not JWT. For Swagger requests that cha
 Part 1 used separate `Organiser` and `Participant` tables with integer keys. Part 2 uses ASP.NET Core Identity's `AspNetUsers` and role tables with string keys. The physical schemas are therefore **not identical**, although the race-management functions are implemented. The difference is documented in [Part 1 / Part 2 database comparison](docs/PART1_PART2_DB_COMPARISON_20261019.md); lecturer acceptance of this change has not been confirmed.
 
 This repository contains a separately developed Part 2 working implementation; it should not be represented as an exact recovery of the original local Visual Studio solution. GitHub content and passing CI do not by themselves confirm submission on ARC.
+
+---
+
+## PROG6212 Part 3: Separate MVC RaceDay Portal
+
+Part 3 extends the Part 2 API with a separate ASP.NET Core MVC frontend under `src/RaCeDay.Portal`. The MVC site does **not** access SQL Server or use EF Core; event, participant, result, profile and image operations call the Part 2 API.
+
+**Features:** organiser and participant registration/login/logout, role-aware navigation, event discovery, event and category management, enrolment, organiser results entry, participant history and profile, Azure Blob Storage event banners/profile pictures (through API only), Dockerfile, and CI checks.
+
+**Quick start:** See [Part 3 release and QA checklist](docs/PART3_RELEASE_CHECKLIST.md) for SQL Server setup, both app launch commands, Azure Storage configuration, Docker build/run instructions, tests and disclosure notes. Start the API at `http://localhost:5001`, start the portal at `http://localhost:5250`, then open the portal in a browser. Both apps must use the **same hostname** in local development to relay session cookies.
+
+**QA:** `dotnet build RaCeDay.slnx -c Release --warnaserror` and `dotnet test RaCeDay.slnx -c Release`. The opt-in PowerShell E2E test script uses an isolated QA database and Azurite; do not run it against your normal database. Latest local automated and live checks are documented in the checklist. GitHub Actions builds and tests on Windows and performs a Linux Docker smoke build.
+
+**Submission status:** This branch is still a learner review draft, not an ARC submission. The genuine student-recorded unlisted YouTube walkthrough, 20 meaningful Part 3 commits, production Azure setup and actual phone/accessibility checks remain for final sign-off. Do not fabricate video links, screenshots, passing test claims or evidence. AI assistance was used and should be disclosed as required by the assessment brief.
