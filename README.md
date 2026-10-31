@@ -107,4 +107,6 @@ Part 3 extends the Part 2 API with a separate ASP.NET Core MVC frontend under `s
 
 **QA:** `dotnet build RaCeDay.slnx -c Release --warnaserror` and `dotnet test RaCeDay.slnx -c Release`. The opt-in PowerShell E2E test script uses an isolated QA database and Azurite; do not run it against your normal database. Latest local automated and live checks are documented in the checklist. GitHub Actions builds and tests on Windows and performs a Linux Docker smoke build.
 
+**Visual evidence:** [Desktop home screenshot](docs/evidence/Part3-Desktop-RaceDay-20261031.png) · [Mobile home screenshot](docs/evidence/Part3-Mobile-RaceDay-20261031.png). These are genuine QA renders, not a live hosted demo.
+
 **Submission status:** This branch is still a learner review draft, not an ARC submission. The genuine student-recorded unlisted YouTube walkthrough, 20 meaningful Part 3 commits, production Azure setup and actual phone/accessibility checks remain for final sign-off. Do not fabricate video links, screenshots, passing test claims or evidence. AI assistance was used and should be disclosed as required by the assessment brief.

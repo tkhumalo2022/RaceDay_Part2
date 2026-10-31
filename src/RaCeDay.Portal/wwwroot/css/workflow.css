@@ -55,3 +55,5 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 }
 
 @media(max-width:600px){.navigation .nav-links{justify-content:flex-start;gap:13px;flex-wrap:wrap}.navigation .nav-links a{flex:0 0 auto}.navigation .nav-links .join{padding:9px 11px}}
+
+@media(max-width:600px){.hero-meta{display:block}.hero-meta span:last-child{display:block;text-align:left;margin-top:8px}}

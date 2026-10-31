@@ -14,10 +14,12 @@
 
 ## Verified locally on 31 October 2026
 - Release solution build: zero warnings, zero errors.
-- Previous automated suite: 45/45 passed; added Azure emulator round-trip test for a total of 46 tests.
+- Final local automated suite: **46 passed, 0 failed, 0 skipped** including a real Azure SDK round trip against Azurite configured with `--skipApiVersionCheck`.
 - Integrated browser-level test script: organiser and participant registration, account sessions, event creation/update, categories, enrolment, profile edit, organiser results, participant result history, and role restriction.
 - Local Azurite storage emulator accepts event banner and profile image uploads **via the MVC -> API -> Blob chain**; both images can be fetched through authenticated MVC proxy endpoints.
 - Isolated SQL Server QA database `RaceDayPart3QA_20261031_v2`. Original Part 2 demo DB is not changed.
+- Desktop and narrow-screen Chrome screenshots were captured from the running QA portal and saved to `docs/evidence/Part3-Desktop-RaceDay-20261031.png` and `docs/evidence/Part3-Mobile-RaceDay-20261031.png`; visual review identified and corrected a narrow-screen headline and navigation overflow.
+- GitHub Actions Linux Docker image build and login/register smoke checks passed on run #41239761962. Windows CI integration tests were still running when this note was written.
 - No production Azure account, storage credential, cloud URL or external deployment was used in these checks.
 
 ## Remaining real-world sign-off
