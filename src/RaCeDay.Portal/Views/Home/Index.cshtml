@@ -1,0 +1,56 @@
+﻿@model EventListModel
+@{
+    ViewData["Title"] = "Discover your next challenge";
+}
+<section class="hero">
+    <div class="wrap">
+        <p class="eyebrow">● COMMUNITY RACING / SOUTH AFRICA</p>
+        <h1>EVERY FINISH<br /><em>STARTS HERE.</em></h1>
+        <p class="hero-text">Run the streets. Ride the distance. Walk for a cause. Find the next race worth showing up for.</p>
+        <a class="button lime" href="#events">EXPLORE EVENTS <span aria-hidden="true">↗</span></a>
+        <div class="hero-meta"><span>01 / THE START LINE</span><span>RUN · WALK · CYCLE</span></div>
+    </div>
+</section>
+<section class="wrap events" id="events">
+    <p class="eyebrow muted">YOUR NEXT CHALLENGE</p>
+    <div class="section-heading">
+        <h2>What's coming up<span class="dot">.</span></h2>
+        <div class="filters" aria-label="Activity filters">
+            <a class="@(Model.Filter == null ? "selected" : "")" asp-action="Index" asp-fragment="events">All</a>
+            @foreach (var activity in new[] { "Run", "Walk", "Cycle" })
+            {
+                <a class="@(Model.Filter == activity ? "selected" : "")" asp-action="Index" asp-route-type="@activity" asp-fragment="events">@activity</a>
+            }
+        </div>
+    </div>
+    @if (TempData["Error"] is string error) { <p class="notice" role="alert">@error</p> }
+    @if (Model.Error is not null)
+    {
+        <div class="empty" role="alert"><h3>Not connected yet.</h3><p>@Model.Error</p></div>
+    }
+    else if (Model.SignInRequired)
+    {
+        <div class="empty"><p class="eyebrow muted">READY WHEN YOU ARE</p><h3>Sign in to see upcoming events.</h3>
+        <p>RaceDay protects event data until you sign in with your Participant or Organiser account.</p>
+        <a class="button" asp-controller="Account" asp-action="Login">SIGN IN ↗</a>
+        <a class="secondary" asp-controller="Account" asp-action="Register">CREATE ACCOUNT</a></div>
+    }
+    else if (Model.Events.Count == 0)
+    {
+        <div class="empty"><h3>Nothing on the calendar yet.</h3><p>Try another filter or check back when organisers publish new races.</p></div>
+    }
+    else
+    {
+        <div class="event-list">
+        @foreach (var race in Model.Events.OrderBy(x => x.EventDate))
+        {
+            <article class="event-item">
+                <div class="date"><strong>@race.EventDate.ToString("dd")</strong><span>@race.EventDate.ToString("MMM yyyy").ToUpperInvariant()</span></div>
+                <div class="event-info"><span class="eyebrow muted">@race.EventType.ToUpperInvariant() / @race.Status.ToUpperInvariant()</span><h3>@race.EventName</h3><p>@race.Location</p></div>
+                <a class="arrow" asp-action="Details" asp-route-id="@race.Id" aria-label="Details for @race.EventName">↗</a>
+            </article>
+        }
+        </div>
+    }
+</section>
+<section class="endcap"><div class="wrap"><p class="eyebrow">YOUR NEXT MILE IS WAITING</p><h2>THE ROAD IS<br />YOURS TO TAKE.</h2></div></section>

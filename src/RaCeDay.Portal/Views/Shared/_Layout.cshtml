@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] | RaceDay</title>
+    <link rel="stylesheet" asp-append-version="true" href="~/css/site.css" />
+</head>
+<body>
+<header class="site-header">
+    <nav class="wrap navigation" aria-label="Main navigation">
+        <a class="brand" asp-controller="Home" asp-action="Index"><span>R/</span> RACEDAY</a>
+        <div class="nav-links">
+            <a asp-controller="Home" asp-action="Index">Events</a>
+            @if (ViewData["Role"] is string role)
+            {
+                <a asp-controller="Dashboard" asp-action="Index">Dashboard</a><span class="role-label">@role</span>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="nav-link-button">Sign out</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login">Sign in</a>
+                <a class="join" asp-controller="Account" asp-action="Register">Join RaceDay</a>
+            }
+        </div>
+    </nav>
+</header>
+<main id="main">@RenderBody()</main>
+<footer class="site-footer"><div class="wrap">RACEDAY <span>Built for everyone who shows up.</span></div></footer>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

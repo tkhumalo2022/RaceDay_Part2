@@ -1,0 +1,48 @@
+﻿@model DashboardPage
+@{
+    ViewData["Title"] = Model.Role + " dashboard";
+}
+<section class="detail-top"><div class="wrap">
+<p class="eyebrow">YOUR RACEDAY / @Model.Role.ToUpperInvariant()</p>
+<h1>@Model.Role<br />DASHBOARD.</h1>
+<p>Your activity, directly from the RaceDay API.</p>
+</div></section>
+<section class="wrap events">
+@if (Model.Error is not null) { <p class="notice" role="alert">@Model.Error</p> }
+@if (Model.Role == "Organiser")
+{
+    <p class="eyebrow muted">ORGANISER SPACE</p>
+    <div class="section-heading"><h2>Your events<span class="dot">.</span></h2><p>@Model.Events.Count created</p></div>
+    @if (Model.Events.Count == 0) { <div class="empty"><h3>No events yet.</h3><p>Events will appear here after you create them in the Part 2 app.</p></div> }
+    <div class="event-list">
+    @foreach (var race in Model.Events.OrderBy(x => x.EventDate))
+    {
+        <article class="event-item"><div class="date"><strong>@race.EventDate.ToString("dd")</strong><span>@race.EventDate.ToString("MMM yyyy").ToUpperInvariant()</span></div>
+        <div class="event-info"><span class="eyebrow muted">@race.Status.ToUpperInvariant()</span><h3>@race.EventName</h3><p>@race.Location</p></div>
+        <a class="arrow" asp-controller="Home" asp-action="Details" asp-route-id="@race.Id" aria-label="View @race.EventName">↗</a></article>
+    }
+    </div>
+    <p class="notice">Creating/editing events and publishing results in this portal are planned next.</p>
+}
+else
+{
+    <p class="eyebrow muted">PARTICIPANT SPACE</p>
+    <h2>Your enrolments<span class="dot">.</span></h2>
+    @if (Model.Entries.Count == 0) { <p class="notice">You have not enrolled in a race yet.</p> }
+    <div class="event-list">
+    @foreach (var entry in Model.Entries)
+    {
+        <article class="event-item"><div class="event-info"><span class="eyebrow muted">@entry.CategoryName.ToUpperInvariant()</span><h3>@entry.EventName</h3><p>Race number: @entry.RaceNumber</p></div><span class="status @entry.Status.ToLowerInvariant()">@entry.Status</span></article>
+    }
+    </div>
+    <h2 class="second-heading">Your race results<span class="dot">.</span></h2>
+    @if (Model.Results.Count == 0) { <p class="notice">No completed race results are available yet.</p> }
+    <div class="event-list">
+    @foreach (var race in Model.Results)
+    {
+        <article class="event-item"><div class="event-info"><span class="eyebrow muted">@race.CategoryName.ToUpperInvariant()</span><h3>@race.EventName</h3><p>@race.ResultStatus · Position: @(race.OverallPosition?.ToString() ?? "Not recorded") · Finish: @(race.FinishTime?.ToString("HH:mm:ss") ?? "Not recorded")</p></div></article>
+    }
+    </div>
+    <p class="notice">Self-service enrolment and profile editing in the new portal are coming next.</p>
+}
+</section>

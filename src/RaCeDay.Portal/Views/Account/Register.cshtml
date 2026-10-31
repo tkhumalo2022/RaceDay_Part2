@@ -1,0 +1,19 @@
+﻿@model RegisterInput
+@{ ViewData["Title"] = "Join RaceDay"; }
+<section class="wrap form-screen">
+<div class="form-intro"><p class="eyebrow muted">BECOME PART OF THE MOVEMENT</p><h1>Find your<br /><em>start line.</em></h1><p>Choose a Participant or Organiser account. Admin accounts cannot be self-created.</p></div>
+<form class="auth-form" asp-controller="Account" asp-action="Register" method="post">
+<h2>Join RaceDay</h2><div asp-validation-summary="All" class="validation" role="alert"></div>
+<label asp-for="FirstName">First name</label><input asp-for="FirstName" autocomplete="given-name" />
+<label asp-for="LastName">Last name</label><input asp-for="LastName" autocomplete="family-name" />
+<label asp-for="Email">Email address</label><input asp-for="Email" autocomplete="email" />
+<label asp-for="Role">Account type</label><select asp-for="Role"><option value="Participant">Participant</option><option value="Organiser">Organiser</option></select>
+<label asp-for="DateOfBirth">Date of birth (participants)</label><input asp-for="DateOfBirth" type="date" />
+<label asp-for="OrganiserName">Organisation name (organisers)</label><input asp-for="OrganiserName" />
+<label asp-for="PhoneNumber">Phone number (optional)</label><input asp-for="PhoneNumber" type="tel" />
+<label asp-for="Password">Password</label><input asp-for="Password" type="password" autocomplete="new-password" />
+<label asp-for="ConfirmPassword">Confirm password</label><input asp-for="ConfirmPassword" type="password" autocomplete="new-password" />
+<button class="button" type="submit">CREATE ACCOUNT <span aria-hidden="true">↗</span></button>
+<p>Already a member? <a asp-action="Login">Sign in</a></p>
+</form>
+</section>
