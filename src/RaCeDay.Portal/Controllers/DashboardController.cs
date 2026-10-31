@@ -19,8 +19,11 @@ public sealed class DashboardController(RaceDayApiClient api) : Controller
             {
                 var (owned, result) = await api.GetAsync<List<RaceEvent>>(
                     "api/organiser/events", Request, ct);
+                var (summary, summaryStatus) = await api.GetAsync<List<OrganiserStat>>(
+                    "api/organiser/event-summary", Request, ct);
                 return View(new DashboardPage("Organiser", owned ?? [], [], [],
-                    result == HttpStatusCode.OK ? null : "Could not load your events."));
+                    result == HttpStatusCode.OK && summaryStatus == HttpStatusCode.OK
+                        ? null : "Some event information could not be loaded.") { Summary = summary ?? [] });
             }
             if (session.Role == "Participant")
             {
@@ -32,7 +35,7 @@ public sealed class DashboardController(RaceDayApiClient api) : Controller
                     result == HttpStatusCode.OK && historyStatus == HttpStatusCode.OK
                         ? null : "Some account information is unavailable."));
             }
-            return Forbid();
+            return StatusCode(403, "Unknown account role.");
         }
         catch (HttpRequestException) { return StatusCode(503, "RaceDay API is unavailable."); }
         catch (TaskCanceledException) when (!ct.IsCancellationRequested)

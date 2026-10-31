@@ -1,0 +1,57 @@
+/* RaceDay Part 3 functional screens. Lightweight, responsive and keyboard-accessible. */
+.skip-link{position:absolute;top:-100px;left:16px;background:#d3fe4f;color:#141a16;z-index:100;padding:12px;font-weight:800}
+.skip-link:focus{top:12px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #78a700;outline-offset:4px}
+.form-shell{padding-top:70px;padding-bottom:100px;max-width:980px}
+.workflow-form{margin:0 auto;width:100%;max-width:720px}
+.auth-form textarea{font:inherit;width:100%;border:1px solid #cbd3c5;background:#fff;min-height:125px;padding:14px;resize:vertical}
+.auth-form .field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.field-grid>div{display:flex;flex-direction:column;gap:10px}
+.workflow-form .button{margin-top:22px}
+.muted-copy{font-size:14px;color:#60675e;line-height:1.5}
+.inline-actions{display:flex;flex-wrap:wrap;gap:15px;margin-top:15px}
+.inline-actions a{font-size:13px;text-decoration:underline;text-underline-offset:3px;font-weight:700}
+.row-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.row-actions>a{font-size:14px;font-weight:700}
+.row-actions form,.delete-form{margin:0}
+.danger-button{border:1px solid #b34a40;color:#912d24;font:inherit;font-weight:700;font-size:12px;background:transparent;padding:12px;cursor:pointer}
+.danger-button:hover{background:#fde9e6}
+.upload-form{margin-top:20px;display:flex;flex-direction:column;gap:12px}
+.upload-form label{font-size:13px;font-weight:700}
+.upload-form input[type=file]{max-width:100%;font:inherit;padding:9px;border:1px solid #c9d2c3;background:white}
+.upload-form button{align-self:flex-start}
+.event-banner{display:block;width:100%;max-height:300px;object-fit:cover;aspect-ratio:16/9;background:#dae7c2;margin-bottom:36px}
+.event-banner[hidden]{display:none}
+.enrol-form{margin-top:14px}
+.enrol-form .button{padding:12px 16px;min-height:44px;min-width:135px;justify-content:center}
+.category{align-items:flex-start}
+.category>div{min-width:0}
+.admin-actions{border-top:2px solid #141a16;margin-top:38px;padding-top:25px}
+.profile-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:65px;padding-top:85px;padding-bottom:120px}
+.profile-avatar{width:min(230px,100%);aspect-ratio:1;background:#dee6d2;border:2px solid #141a16;overflow:hidden;position:relative}
+.profile-avatar:before{content:"YOUR PHOTO";display:grid;place-items:center;position:absolute;inset:0;font-size:13px;font-weight:900;letter-spacing:.1em}
+.profile-avatar img{display:block;width:100%;height:100%;object-fit:cover;position:relative;z-index:1}
+.profile-avatar img[hidden]{display:none}
+.readonly-value{padding:12px;background:#f4f5ef;border:1px solid #d8dfd1;overflow-wrap:anywhere}
+.dashboard-stats{font-weight:700;color:#42573a!important;font-size:13px;margin:10px 0!important}
+.nav-links a,.nav-link-button{min-height:36px;display:inline-flex;align-items:center}
+.nav-link-button{cursor:pointer}
+@media(max-width:920px){.navigation{flex-wrap:wrap;padding-top:14px;padding-bottom:14px}.nav-links{flex-wrap:wrap;gap:12px}.nav-links a:first-child{display:inline-flex}.profile-grid{grid-template-columns:1fr;gap:25px}.workflow-form .field-grid{grid-template-columns:1fr}.event-item{flex-wrap:wrap}.delete-form{margin-left:auto}}
+@media(max-width:520px){.form-shell,.profile-grid{padding-top:42px;padding-bottom:70px}.workflow-form{padding:22px}.row-actions{width:100%}.event-item .delete-form{width:100%;margin-left:0}.date strong{font-size:34px}.hero h1{overflow-wrap:break-word;word-break:normal}.nav-links{gap:10px}.category{flex-wrap:wrap}.section-heading .button{width:100%}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+/* Verified 390px viewport fit: keep complete headline and navigation visible. */
+@media (max-width: 600px) {
+  .navigation{display:flex;flex-direction:column;align-items:stretch;gap:13px;padding-top:13px;padding-bottom:14px}
+  .nav-links{width:100%;display:flex;justify-content:space-between;flex-wrap:wrap;gap:7px;font-size:12px}
+  .nav-links a,.nav-link-button{min-height:33px}
+  .nav-links a:first-child{display:inline-flex}
+  .nav-links .join{padding:8px 10px}
+  .hero h1{font-size:clamp(1.95rem,9.5vw,3.25rem);letter-spacing:-.072em;line-height:1.03;max-width:100%;overflow-wrap:normal}
+  .hero{padding-top:65px}
+  .hero-meta{gap:12px;font-size:10px}
+  .hero-meta span:last-child{text-align:right}
+  .detail-top h1{font-size:clamp(2.45rem,10.2vw,4rem);overflow-wrap:anywhere}
+}
+
+@media(max-width:600px){.navigation .nav-links{justify-content:flex-start;gap:13px;flex-wrap:wrap}.navigation .nav-links a{flex:0 0 auto}.navigation .nav-links .join{padding:9px 11px}}

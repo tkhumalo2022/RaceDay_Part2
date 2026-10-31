@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using RaCeDay.Portal.Models;
@@ -6,7 +6,7 @@ using RaCeDay.Portal.Models;
 namespace RaCeDay.Portal.Services;
 
 // The MVC frontend has no SQL connection, EF Core models or data-writing logic.
-public sealed class RaceDayApiClient(HttpClient client)
+public sealed partial class RaceDayApiClient(HttpClient client)
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     private static void ForwardCookies(HttpRequest browser, HttpRequestMessage request)

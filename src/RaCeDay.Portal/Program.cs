@@ -1,7 +1,7 @@
 using RaCeDay.Portal.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => options.Filters.Add<ApiUnavailableFilter>());
 builder.Services.AddHttpClient<RaceDayApiClient>((provider, client) =>
 {
     var value = provider.GetRequiredService<IConfiguration>()["RaCeDayApi:BaseUrl"];

@@ -1,0 +1,26 @@
+@model RaceProfile
+@{ViewData["Title"]="Your RaceDay profile";}
+<section class="detail-top"><div class="wrap"><a class="back-link" asp-controller="Dashboard" asp-action="Index">← Dashboard</a><p class="eyebrow">YOUR RACEDAY / PROFILE</p><h1>YOUR PROFILE.</h1><p>Keep your details and race identity up to date.</p></div></section>
+<section class="wrap profile-grid">
+<div>
+<div class="profile-avatar" aria-label="Profile picture"><img src="@Url.Action("Profile","Images")" alt="Your profile photo, if uploaded" onerror="this.hidden=true" /></div>
+<form asp-controller="Participant" asp-action="Picture" method="post" enctype="multipart/form-data" class="upload-form">
+<label for="photo">Upload profile photo (JPG or PNG, up to 3 MB)</label><input id="photo" type="file" name="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required />
+<button class="button" type="submit">UPDATE PHOTO ↗</button>
+</form>
+</div>
+<form class="auth-form workflow-form" asp-controller="Participant" asp-action="Profile" method="post">
+<h2>Your details</h2>
+@if(TempData["Notice"] is string notice){<div class="notice" role="status">@notice</div>}
+<div asp-validation-summary="All" class="validation" role="alert"></div>
+<input asp-for="Id" type="hidden" /><input asp-for="Email" type="hidden" />
+<label>Email address</label><p class="readonly-value">@Model.Email</p>
+<label asp-for="FirstName">First name</label><input asp-for="FirstName" autocomplete="given-name" />
+<label asp-for="LastName">Last name</label><input asp-for="LastName" autocomplete="family-name" />
+<label asp-for="PhoneNumber">Phone number</label><input asp-for="PhoneNumber" type="tel" autocomplete="tel" />
+<label asp-for="Gender">Gender (optional)</label><input asp-for="Gender" />
+<label asp-for="OrganiserName">Organisation name (organisers)</label><input asp-for="OrganiserName" />
+<label asp-for="DateOfBirth">Date of birth (participants)</label><input asp-for="DateOfBirth" type="date" />
+<button class="button" type="submit">SAVE PROFILE ↗</button>
+<p class="muted-copy">Your email address and account role cannot be changed here.</p>
+</form></section>

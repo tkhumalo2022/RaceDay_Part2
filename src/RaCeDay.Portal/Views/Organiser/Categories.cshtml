@@ -1,0 +1,7 @@
+@model CategoriesPage
+@{ViewData["Title"]="Manage categories";}
+<section class="detail-top"><div class="wrap"><a class="back-link" asp-controller="Dashboard" asp-action="Index">← Dashboard</a><p class="eyebrow">ORGANISER / DISTANCES</p><h1>CATEGORIES.</h1><p>@Model.Event.EventName</p></div></section>
+<section class="wrap events"><div class="section-heading"><h2>Distances and fees<span class="dot">.</span></h2><a class="button" asp-action="Category" asp-route-eventId="@Model.Event.Id">ADD CATEGORY ↗</a></div>
+@if (TempData["Notice"] is string notice){<p class="notice" role="status">@notice</p>}
+@if (Model.Categories.Count==0){<div class="empty"><h3>No categories added.</h3><p>Create a distance and capacity for your race.</p></div>}
+<div class="event-list">@foreach(var item in Model.Categories){<article class="event-item"><div class="event-info"><h3>@item.CategoryName</h3><p>@item.DistanceKm km · R @item.EntryFee.ToString("N2") · @item.CurrentParticipants / @item.MaxParticipants enrolled</p></div><div class="row-actions"><a asp-action="Category" asp-route-eventId="@Model.Event.Id" asp-route-id="@item.Id">Edit</a><form asp-action="DeleteCategory" method="post"><input name="id" value="@item.Id" type="hidden" /><input name="eventId" value="@Model.Event.Id" type="hidden" /><button class="danger-button" type="submit">Delete</button></form></div></article>}</div></section>

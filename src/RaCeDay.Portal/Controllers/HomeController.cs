@@ -15,7 +15,9 @@ public class HomeController(RaceDayApiClient api) : Controller
             var (events, status) = await api.GetAsync<List<RaceEvent>>("api/events", Request, ct);
             var filter = new[] { "Run", "Walk", "Cycle" }
                 .FirstOrDefault(x => x.Equals(type, StringComparison.OrdinalIgnoreCase));
-            var list = events ?? [];
+            var list = (events ?? []).Where(x =>
+                x.EventDate >= DateOnly.FromDateTime(DateTime.UtcNow.AddHours(2)) &&
+                (x.Status == "Open" || x.Status == "Planned")).ToList();
             if (filter is not null) list = list.Where(x => x.EventType == filter).ToList();
             ViewData["Role"] = session?.Role;
             return View(new EventListModel(list, session?.Role,

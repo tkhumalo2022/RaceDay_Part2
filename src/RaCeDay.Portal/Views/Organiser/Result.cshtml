@@ -1,0 +1,11 @@
+@model ResultForm
+@{ViewData["Title"]="Record race result";}
+<section class="detail-top"><div class="wrap"><a class="back-link" asp-action="Entries" asp-route-id="@Model.EventId">← Start list</a><p class="eyebrow">ORGANISER / RESULTS</p><h1>THE FINISH LINE.</h1><p>@Model.ParticipantName · @Model.EventName</p></div></section>
+<section class="wrap form-shell"><form class="auth-form workflow-form" asp-action="Record" method="post">
+<input asp-for="EventId" type="hidden" /><input asp-for="EnrolmentId" type="hidden" /><input asp-for="EventName" type="hidden" /><input asp-for="ParticipantName" type="hidden" />
+<div asp-validation-summary="All" class="validation" role="alert"></div>
+<label asp-for="ResultStatus">Result status</label><select asp-for="ResultStatus"><option value="Finished">Finished</option><option value="DNS">Did not start</option><option value="DNF">Did not finish</option><option value="DSQ">Disqualified</option></select>
+<label asp-for="StartTime">Start time</label><input asp-for="StartTime" type="time" step="1" />
+<label asp-for="FinishTime">Finish time</label><input asp-for="FinishTime" type="time" step="1" />
+<label asp-for="OverallPosition">Overall finishing position</label><input asp-for="OverallPosition" type="number" min="1" />
+<button class="button" type="submit">PUBLISH RESULT ↗</button></form></section>

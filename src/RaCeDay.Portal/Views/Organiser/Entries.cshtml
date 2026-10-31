@@ -1,0 +1,8 @@
+@model OrganiserEntriesPage
+@{ViewData["Title"]="Event enrolments";}
+<section class="detail-top"><div class="wrap"><a class="back-link" asp-controller="Dashboard" asp-action="Index">← Dashboard</a><p class="eyebrow">ORGANISER / START LIST</p><h1>THE START LIST.</h1><p>@Model.Event.EventName</p></div></section>
+<section class="wrap events"><h2>Participants<span class="dot">.</span></h2>
+@if (TempData["Notice"] is string notice){<p class="notice" role="status">@notice</p>}
+@if (Model.Entries.Count==0){<div class="empty"><h3>No enrolments yet.</h3><p>Participants appear here after enrolling.</p></div>}
+<div class="event-list">@foreach(var item in Model.Entries){<article class="event-item"><div class="event-info"><p class="eyebrow muted">@item.CategoryName</p><h3>@item.ParticipantName</h3><p>Race no. @item.RaceNumber · @item.Status · @(item.ResultStatus??"Awaiting result")</p></div>
+@if(item.ResultStatus is null){<a class="button" asp-action="Result" asp-route-eventId="@Model.Event.Id" asp-route-enrolmentId="@item.Id">RECORD RESULT</a>}</article>}</div></section>

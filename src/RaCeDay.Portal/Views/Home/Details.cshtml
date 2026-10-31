@@ -1,28 +1,39 @@
-﻿@model EventPageModel
-@{
-    ViewData["Title"] = Model.Event.EventName;
-}
-<section class="detail-top"><div class="wrap">
-<a class="back-link" asp-action="Index">← Explore events</a>
+@model EventPageModel
+@{ViewData["Title"]=Model.Event.EventName; var role=ViewData["Role"]?.ToString();}
+<section class="detail-top"><div class="wrap"><a class="back-link" asp-action="Index">← Explore events</a>
 <p class="eyebrow">@Model.Event.EventType.ToUpperInvariant() / @Model.Event.Status.ToUpperInvariant()</p>
-<h1>@Model.Event.EventName</h1>
-<p>@Model.Event.Location · @Model.Event.EventDate.ToString("dd MMMM yyyy")</p>
+<h1>@Model.Event.EventName</h1><p>@Model.Event.Location | @Model.Event.EventDate.ToString("dd MMM yyyy")</p>
 </div></section>
 <section class="wrap details">
 <div>
-    <p class="eyebrow muted">THE EVENT</p><h2>The details<span class="dot">.</span></h2>
-    <p>@(Model.Event.Description ?? "More details will follow from the organiser.")</p>
-    <div class="fact"><span>Date</span><strong>@Model.Event.EventDate.ToString("D")</strong></div>
-    <div class="fact"><span>Location</span><strong>@Model.Event.Location</strong></div>
-    <div class="fact"><span>Registration closes</span><strong>@Model.Event.ClosingDate.ToString("D")</strong></div>
+<img class="event-banner" src="@Url.Action("Event","Images",new{id=Model.Event.Id})" alt="Race banner for @Model.Event.EventName" loading="lazy" onerror="this.hidden=true" />
+<p class="eyebrow muted">THE EVENT</p><h2>What to expect<span class="dot">.</span></h2><p>@(Model.Event.Description??"The organiser will publish event details soon.")</p>
+<div class="fact"><span>Race date</span><strong>@Model.Event.EventDate.ToString("D")</strong></div>
+<div class="fact"><span>Location</span><strong>@Model.Event.Location</strong></div>
+<div class="fact"><span>Registration closes</span><strong>@Model.Event.ClosingDate.ToString("D")</strong></div>
+@if(Model.Event.IsOwner){
+<div class="admin-actions"><p class="eyebrow muted">ORGANISER TOOLS</p>
+<div class="inline-actions"><a asp-controller="Organiser" asp-action="Edit" asp-route-id="@Model.Event.Id">Edit event</a>
+<a asp-controller="Organiser" asp-action="Categories" asp-route-id="@Model.Event.Id">Manage categories</a>
+<a asp-controller="Organiser" asp-action="Entries" asp-route-id="@Model.Event.Id">View start list</a></div>
+<form asp-controller="Organiser" asp-action="Banner" method="post" enctype="multipart/form-data" class="upload-form">
+<label for="banner">Update event banner (JPG or PNG, max 3 MB)</label>
+<input id="banner" type="file" name="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required />
+<button class="button" type="submit">UPLOAD TO AZURE</button></form></div>}
 </div>
 <div>
-    <p class="eyebrow muted">FIND YOUR PACE</p><h2>Categories<span class="dot">.</span></h2>
-    @if (Model.Categories.Count == 0) { <p>No categories have been published yet.</p> }
-    @foreach (var item in Model.Categories)
-    {
-        <div class="category"><div><strong>@item.CategoryName</strong><p>@item.DistanceKm km · @item.CurrentParticipants/@item.MaxParticipants entered</p></div><b>R @item.EntryFee.ToString("N0")</b></div>
-    }
-    <p class="notice">Online enrolment will be connected in the next Part 3 milestone.</p>
-</div>
-</section>
+<p class="eyebrow muted">FIND YOUR PACE</p><h2>Categories<span class="dot">.</span></h2>
+@if(TempData["Notice"] is string notice){<p class="notice" role="status">@notice</p>}
+@if(Model.Categories.Count==0){<p>No categories have been published.</p>}
+@foreach(var item in Model.Categories){
+<div class="category"><div><strong>@item.CategoryName</strong><p>@item.DistanceKm km | @item.CurrentParticipants / @item.MaxParticipants entered</p>
+@if(role=="Participant"){
+@if(Model.Event.Status=="Open" && Model.Event.ClosingDate>=DateOnly.FromDateTime(DateTime.UtcNow) && item.CurrentParticipants<item.MaxParticipants){
+<form asp-controller="Participant" asp-action="Enrol" method="post" class="enrol-form">
+<input type="hidden" name="eventId" value="@Model.Event.Id" /><input type="hidden" name="categoryId" value="@item.Id" />
+<button class="button lime" type="submit">ENROL NOW</button></form>
+}else{<p class="muted-copy">Enrolment is closed or the category is full.</p>}
+}</div><b>R @item.EntryFee.ToString("N2")</b></div>
+}
+@if(role is null){<p class="notice"><a asp-controller="Account" asp-action="Login">Sign in</a> as a participant to enrol.</p>}
+</div></section>

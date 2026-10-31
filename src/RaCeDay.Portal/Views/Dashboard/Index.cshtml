@@ -1,48 +1,31 @@
-﻿@model DashboardPage
-@{
-    ViewData["Title"] = Model.Role + " dashboard";
-}
-<section class="detail-top"><div class="wrap">
-<p class="eyebrow">YOUR RACEDAY / @Model.Role.ToUpperInvariant()</p>
-<h1>@Model.Role<br />DASHBOARD.</h1>
-<p>Your activity, directly from the RaceDay API.</p>
-</div></section>
+@model DashboardPage
+@{ ViewData["Title"]=Model.Role+" dashboard"; }
+<section class="detail-top"><div class="wrap"><p class="eyebrow">YOUR RACEDAY / @Model.Role.ToUpperInvariant()</p><h1>@Model.Role<br />DASHBOARD.</h1><p>Manage your races and results in one place.</p></div></section>
 <section class="wrap events">
-@if (Model.Error is not null) { <p class="notice" role="alert">@Model.Error</p> }
-@if (Model.Role == "Organiser")
-{
-    <p class="eyebrow muted">ORGANISER SPACE</p>
-    <div class="section-heading"><h2>Your events<span class="dot">.</span></h2><p>@Model.Events.Count created</p></div>
-    @if (Model.Events.Count == 0) { <div class="empty"><h3>No events yet.</h3><p>Events will appear here after you create them in the Part 2 app.</p></div> }
-    <div class="event-list">
-    @foreach (var race in Model.Events.OrderBy(x => x.EventDate))
-    {
-        <article class="event-item"><div class="date"><strong>@race.EventDate.ToString("dd")</strong><span>@race.EventDate.ToString("MMM yyyy").ToUpperInvariant()</span></div>
-        <div class="event-info"><span class="eyebrow muted">@race.Status.ToUpperInvariant()</span><h3>@race.EventName</h3><p>@race.Location</p></div>
-        <a class="arrow" asp-controller="Home" asp-action="Details" asp-route-id="@race.Id" aria-label="View @race.EventName">↗</a></article>
-    }
-    </div>
-    <p class="notice">Creating/editing events and publishing results in this portal are planned next.</p>
-}
-else
-{
-    <p class="eyebrow muted">PARTICIPANT SPACE</p>
-    <h2>Your enrolments<span class="dot">.</span></h2>
-    @if (Model.Entries.Count == 0) { <p class="notice">You have not enrolled in a race yet.</p> }
-    <div class="event-list">
-    @foreach (var entry in Model.Entries)
-    {
-        <article class="event-item"><div class="event-info"><span class="eyebrow muted">@entry.CategoryName.ToUpperInvariant()</span><h3>@entry.EventName</h3><p>Race number: @entry.RaceNumber</p></div><span class="status @entry.Status.ToLowerInvariant()">@entry.Status</span></article>
-    }
-    </div>
-    <h2 class="second-heading">Your race results<span class="dot">.</span></h2>
-    @if (Model.Results.Count == 0) { <p class="notice">No completed race results are available yet.</p> }
-    <div class="event-list">
-    @foreach (var race in Model.Results)
-    {
-        <article class="event-item"><div class="event-info"><span class="eyebrow muted">@race.CategoryName.ToUpperInvariant()</span><h3>@race.EventName</h3><p>@race.ResultStatus · Position: @(race.OverallPosition?.ToString() ?? "Not recorded") · Finish: @(race.FinishTime?.ToString("HH:mm:ss") ?? "Not recorded")</p></div></article>
-    }
-    </div>
-    <p class="notice">Self-service enrolment and profile editing in the new portal are coming next.</p>
+@if(TempData["Notice"] is string notice){<p role="status" class="notice">@notice</p>}
+@if(Model.Error is not null){<p role="alert" class="notice">@Model.Error</p>}
+@if(Model.Role=="Organiser"){
+<div class="section-heading"><h2>Your events<span class="dot">.</span></h2><a class="button" asp-controller="Organiser" asp-action="Create">CREATE EVENT +</a></div>
+<p class="muted-copy">@Model.Events.Count total event(s)</p>
+@if(Model.Events.Count==0){<div class="empty"><h3>No events yet.</h3><p>Create a new event to get started.</p></div>}
+<div class="event-list">@foreach(var race in Model.Events.OrderBy(x=>x.EventDate)){
+<article class="event-item"><div class="date"><strong>@race.EventDate.ToString("dd")</strong><span>@race.EventDate.ToString("MMM yyyy").ToUpperInvariant()</span></div>
+<div class="event-info"><span class="eyebrow muted">@race.Status.ToUpperInvariant()</span><h3>@race.EventName</h3><p>@race.Location | @race.EventDate.ToString("dd MMM yyyy")</p>
+<p class="dashboard-stats">@((Model.Summary.FirstOrDefault(s => s.EventId == race.Id)?.TotalEnrolments ?? 0)) enrolments | @((Model.Summary.FirstOrDefault(s => s.EventId == race.Id)?.Finishers ?? 0)) finishers</p>
+<div class="inline-actions"><a asp-controller="Home" asp-action="Details" asp-route-id="@race.Id">Details</a>
+<a asp-controller="Organiser" asp-action="Edit" asp-route-id="@race.Id">Edit</a>
+<a asp-controller="Organiser" asp-action="Categories" asp-route-id="@race.Id">Categories</a>
+<a asp-controller="Organiser" asp-action="Entries" asp-route-id="@race.Id">Enrolments + Results</a></div></div>
+<form asp-controller="Organiser" asp-action="Delete" method="post" class="delete-form"><input type="hidden" name="id" value="@race.Id" /><button class="danger-button" type="submit">Delete</button></form></article>
+}</div>
+}else{
+<div class="section-heading"><h2>Your enrolments<span class="dot">.</span></h2><a class="button" asp-controller="Participant" asp-action="Profile">EDIT PROFILE</a></div>
+@if(Model.Entries.Count==0){<div class="empty"><h3>No enrolments yet.</h3><p><a asp-controller="Home" asp-action="Index">Find a race to enter.</a></p></div>}
+<div class="event-list">@foreach(var item in Model.Entries){<article class="event-item"><div class="event-info"><span class="eyebrow muted">@item.CategoryName.ToUpperInvariant()</span><h3>@item.EventName</h3><p>Race no. @item.RaceNumber</p></div><span class="status @item.Status.ToLowerInvariant()">@item.Status</span></article>}</div>
+<h2 class="second-heading">Your race results<span class="dot">.</span></h2>
+@if(Model.Results.Count==0){<p class="notice">No completed results have been published yet.</p>}
+<div class="event-list">@foreach(var race in Model.Results){<article class="event-item"><div class="event-info"><span class="eyebrow muted">@race.CategoryName.ToUpperInvariant()</span><h3>@race.EventName</h3><p>Race date: @(race.EventDate?.ToString("dd MMM yyyy") ?? "Not available") | @race.ResultStatus</p>
+<p>Position: @(race.OverallPosition?.ToString()??"Not recorded") @if(race.TotalFinishers.HasValue){<text>out of @race.TotalFinishers.Value finishers</text>} | Finish: @(race.FinishTime?.ToString("HH:mm:ss")??"Not recorded")</p>
+@if(race.StartTime.HasValue && race.FinishTime.HasValue){<p>Elapsed: @((race.FinishTime.Value.ToTimeSpan()-race.StartTime.Value.ToTimeSpan()).ToString())</p>}</div></article>}</div>
 }
 </section>
