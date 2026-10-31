@@ -33,6 +33,7 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddScoped<RaceWorkflow>();
 builder.Services.AddScoped<ProfileImageStorage>();
+builder.Services.AddScoped<AzureRaceImageStore>();
 builder.Services.AddControllersWithViews(options => options.Filters.Add<WorkflowExceptionFilter>());
 builder.Services.AddRazorPages();
 builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
