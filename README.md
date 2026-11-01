@@ -1,3 +1,23 @@
+# RaceDay — PROG6212 Part 3 (MVC Portal + Part 2 API)
+
+**Part 3 review branch:** [feature/part3-mvc-review](https://github.com/tkhumalo2022/RaceDay_Part2/tree/feature/part3-mvc-review)
+**Status:** Assessment review draft. The video and ARC submission are **not** complete.
+
+## Part 3: assessor quick navigation
+
+- **Separate MVC app:** [src/RaCeDay.Portal](src/RaCeDay.Portal), calling the Part 2 API through `RaceDayApiClient` (no direct EF/database access).
+- **Existing API/backend:** [src/RaCeDay](src/RaCeDay), including role-protected operations and private Azure Blob Storage integration.
+- **Dockerfile:** [src/RaCeDay.Portal/Dockerfile](src/RaCeDay.Portal/Dockerfile) and Docker build/start smoke checks in GitHub Actions.
+- **Tests:** [tests/RaCeDay.Tests](tests/RaCeDay.Tests), [actual QA E2E evidence](docs/evidence/Part3-E2E-20261101.txt), and [current Part 3 review PR](https://github.com/tkhumalo2022/RaceDay_Part2/pull/3).
+- **Setup, remaining sign-offs and student demo checklist:** [Part 3 release checklist](docs/PART3_RELEASE_CHECKLIST.md) and [demonstration handover](docs/PART3_DEMO_AND_HANDOVER.md).
+- **Progress verification:** Run `powershell -ExecutionPolicy Bypass -File scripts/part3-preflight.ps1` from the repository root.
+
+**Important:** Azure SDK tests run against the Azurite emulator. A live Azure account is not yet verified. This code was developed with AI assistance and must be reviewed and attributed according to the lecturer's rules. The unlisted Part 3 YouTube presentation must be the student's authentic recording.
+
+---
+
+## Original Part 2 documentation (kept for traceability)
+
 # RaCeDay â€” PROG6212 Part 2
 
 **Student:** Thabiso Khumalo (ST10477675)
