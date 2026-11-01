@@ -160,9 +160,6 @@ public sealed class OrganiserController(RaceDayApiClient api) : Controller
     public async Task<IActionResult> Record(ResultForm model, CancellationToken ct)
     {
         if (!await IsOrganiser(ct)) return SignIn();
-        if (model.ResultStatus == "Finished" &&
-            (model.StartTime is null || model.FinishTime is null || model.OverallPosition is null))
-            ModelState.AddModelError("", "A finisher needs start/finish times and overall position.");
         if (!ModelState.IsValid) return View("Result", model);
         var result = await api.MutateAsync(HttpContext, HttpMethod.Post,
             $"api/enrolments/{model.EnrolmentId}/results", model, ct);

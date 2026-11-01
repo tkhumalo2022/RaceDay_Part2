@@ -34,7 +34,7 @@ public sealed class CategoryForm
     [Range(0, 99999999.99)] public decimal EntryFee { get; set; }
     [Range(1, 1000000)] public int MaxParticipants { get; set; } = 100;
 }
-public sealed class ResultForm
+public sealed class ResultForm : IValidatableObject
 {
     public int EventId { get; set; }
     public int EnrolmentId { get; set; }
@@ -45,6 +45,16 @@ public sealed class ResultForm
     [Range(1, int.MaxValue)] public int? OverallPosition { get; set; }
     [Required, RegularExpression("^(Finished|DNS|DNF|DSQ)$")]
     public string ResultStatus { get; set; } = "Finished";
+
+    // Mirror the API rules so organisers see useful errors before an HTTP request.
+    public IEnumerable<ValidationResult> Validate(ValidationContext context)
+    {
+        if (ResultStatus == "Finished" &&
+            (StartTime is null || FinishTime is null || OverallPosition is null))
+            yield return new("A finisher needs start time, finish time and overall position.");
+        if (StartTime is not null && FinishTime is not null && FinishTime < StartTime)
+            yield return new("Finish time cannot precede start time.", [nameof(FinishTime)]);
+    }
 }
 public sealed class RaceProfile
 {

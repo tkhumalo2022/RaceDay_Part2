@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\RaCeDay\RaCeDay.csproj" />
+    <ProjectReference Include="..\..\src\RaCeDay.Portal\RaCeDay.Portal.csproj" />
   </ItemGroup>
 
 </Project>
