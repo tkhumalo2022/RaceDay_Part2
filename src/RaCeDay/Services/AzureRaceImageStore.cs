@@ -71,11 +71,27 @@ public sealed class AzureRaceImageStore(IConfiguration configuration)
         try
         {
             var blob = container.GetBlobClient(key);
-            var response = await blob.DownloadContentAsync(ct);
-            var bytes = response.Value.Content.ToArray();
-            var type = bytes.Length >= 8 && bytes.AsSpan(0, 8)
-                .SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }) ? "image/png" : "image/jpeg";
-            return (bytes, type);
+            // Stream and bound reads. DownloadContentAsync would buffer an arbitrarily
+            // large blob before the MVC/API size checks could reject it.
+            var download = await blob.DownloadStreamingAsync(cancellationToken: ct);
+            await using var source = download.Value.Content;
+            using var output = new MemoryStream();
+            var buffer = new byte[64 * 1024];
+            int count;
+            while ((count = await source.ReadAsync(buffer.AsMemory(), ct)) > 0)
+            {
+                if (output.Length + count > MaxImageSize)
+                    throw new ImageStorageUnavailableException();
+                await output.WriteAsync(buffer.AsMemory(0, count), ct);
+            }
+            var bytes = output.ToArray();
+            var png = bytes.Length >= 8 && bytes.AsSpan(0, 8)
+                .SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 });
+            var jpeg = bytes.Length >= 3 && bytes[0] == 0xff &&
+                bytes[1] == 0xd8 && bytes[2] == 0xff;
+            if (!png && !jpeg)
+                throw new ImageStorageUnavailableException();
+            return (bytes, png ? "image/png" : "image/jpeg");
         }
         catch (RequestFailedException e) when (e.Status == 404) { return null; }
         catch (RequestFailedException) { throw new ImageStorageUnavailableException(); }
