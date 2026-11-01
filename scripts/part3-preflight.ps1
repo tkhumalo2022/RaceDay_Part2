@@ -15,6 +15,7 @@ try {
         'src/RaCeDay/Dockerfile',
         'compose.yaml',
         'docs/PART3_DOCKER_COMPOSE.md',
+        'scripts/ci-compose-smoke.sh',
         'src/RaCeDay.Portal/Services/RaceDayApiClient.cs',
         'src/RaCeDay/Services/AzureRaceImageStore.cs',
         '.github/workflows/dotnet-build.yml',

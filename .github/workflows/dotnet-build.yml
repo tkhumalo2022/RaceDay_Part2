@@ -111,3 +111,24 @@ jobs:
       - name: Stop emulator
         if: always()
         run: docker logs raceday-azurite || true; docker rm -f raceday-azurite || true
+
+  compose-integration:
+    # This checks the real four-service Compose startup, not public hosting or Azure cloud.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RACEDAY_SA_PASSWORD: CI-local-only-N0tARealSecret!
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Build and start SQL Server, Azurite, API and MVC portal
+        run: docker compose -f compose.yaml up --build -d
+      - name: Verify database initialization and both HTTP applications
+        run: bash scripts/ci-compose-smoke.sh
+      - name: Preserve container diagnostic output and tear down test stack
+        if: always()
+        run: |
+          docker compose -f compose.yaml ps || true
+          docker compose -f compose.yaml logs --no-color --tail 60 api portal || true
+          docker compose -f compose.yaml down --remove-orphans || true

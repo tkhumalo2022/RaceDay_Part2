@@ -55,7 +55,7 @@ docker compose -f compose.yaml down -v
 
 ## QA and limitations
 
-- GitHub Actions builds both Dockerfiles, validates the Compose YAML and verifies MVC sign-in/register HTML. Docker CI is evidence of image build and startup; live SQL + API + Blob functionality in the stack must be demonstrated separately.
+- GitHub Actions builds both Dockerfiles, validates the Compose YAML and verifies MVC sign-in/register HTML. The additional PR-only `compose-integration` check starts the isolated four-service stack and checks SQL migrations, API Swagger and the portal login route (`scripts/ci-compose-smoke.sh`). This is a real container-stack **startup** check, not an authenticated end-to-end workflow or live Azure cloud proof. Check the latest Actions result before citing a pass.
 - Identity cookies are proxied through MVC for same-host local development. This stack is **not hardened for production**: a real deployment must use HTTPS, a reverse proxy, consistent cookie/data-protection key strategy, trusted origin/routing and storage secrets.
 - The local Azure emulator does not establish that an actual Azure Storage account is provisioned.
 - This configuration is for assessed local development, not for hosting real students, user accounts, or public data.
