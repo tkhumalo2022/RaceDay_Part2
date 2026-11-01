@@ -1,7 +1,7 @@
 /* RaceDay Part 3 functional screens. Lightweight, responsive and keyboard-accessible. */
 .skip-link{position:absolute;top:-100px;left:16px;background:#d3fe4f;color:#141a16;z-index:100;padding:12px;font-weight:800}
 .skip-link:focus{top:12px}
-a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #78a700;outline-offset:4px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #4d6b00;outline-offset:4px}
 .form-shell{padding-top:70px;padding-bottom:100px;max-width:980px}
 .workflow-form{margin:0 auto;width:100%;max-width:720px}
 .auth-form textarea{font:inherit;width:100%;border:1px solid #cbd3c5;background:#fff;min-height:125px;padding:14px;resize:vertical}
@@ -43,20 +43,17 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 /* Verified 390px viewport fit: keep complete headline and navigation visible. */
 @media (max-width: 600px) {
   .navigation{display:flex;flex-direction:column;align-items:stretch;gap:13px;padding-top:13px;padding-bottom:14px}
-  .nav-links{width:100%;display:flex;justify-content:space-between;flex-wrap:wrap;gap:7px;font-size:12px}
-  .nav-links a,.nav-link-button{min-height:33px}
+  .nav-links{width:100%;display:flex;justify-content:flex-start;flex-wrap:wrap;gap:13px;font-size:12px}
+  .nav-links a,.nav-link-button{min-height:44px}
   .nav-links a:first-child{display:inline-flex}
-  .nav-links .join{padding:8px 10px}
+  .nav-links .join{padding:9px 11px}
   .hero h1{font-size:clamp(1.95rem,9.5vw,3.25rem);letter-spacing:-.072em;line-height:1.03;max-width:100%;overflow-wrap:normal}
   .hero{padding-top:65px}
-  .hero-meta{gap:12px;font-size:10px}
-  .hero-meta span:last-child{text-align:right}
+  .hero-meta{display:block;gap:12px;font-size:10px}
+  .hero-meta span:last-child{display:block;text-align:left;margin-top:8px}
   .detail-top h1{font-size:clamp(2.45rem,10.2vw,4rem);overflow-wrap:anywhere}
 }
 
-@media(max-width:600px){.navigation .nav-links{justify-content:flex-start;gap:13px;flex-wrap:wrap}.navigation .nav-links a{flex:0 0 auto}.navigation .nav-links .join{padding:9px 11px}}
-
-@media(max-width:600px){.hero-meta{display:block}.hero-meta span:last-child{display:block;text-align:left;margin-top:8px}}
 
 /* Readable, keyboard-friendly search with no JavaScript dependency. */
 .event-search{margin-top:26px;max-width:560px}
