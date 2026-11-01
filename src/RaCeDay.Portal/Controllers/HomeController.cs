@@ -7,7 +7,7 @@ namespace RaCeDay.Portal.Controllers;
 public class HomeController(RaceDayApiClient api) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index(string? type, CancellationToken ct)
+    public async Task<IActionResult> Index(string? type, string? query, CancellationToken ct)
     {
         try
         {
@@ -19,19 +19,24 @@ public class HomeController(RaceDayApiClient api) : Controller
                 x.EventDate >= DateOnly.FromDateTime(DateTime.UtcNow.AddHours(2)) &&
                 (x.Status == "Open" || x.Status == "Planned")).ToList();
             if (filter is not null) list = list.Where(x => x.EventType == filter).ToList();
+            var search = string.IsNullOrWhiteSpace(query) ? null : query.Trim();
+            if (search?.Length > 100) search = search[..100];
+            if (search is not null) list = list.Where(x =>
+                x.EventName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                x.Location.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
             ViewData["Role"] = session?.Role;
             return View(new EventListModel(list, session?.Role,
                 status == HttpStatusCode.Unauthorized,
                 status is HttpStatusCode.OK or HttpStatusCode.Unauthorized ? null : "Events are temporarily unavailable.",
-                filter));
+                filter, search));
         }
         catch (HttpRequestException)
         {
-            return View(new EventListModel([], null, false, "Start the Part 2 API to load events.", null));
+            return View(new EventListModel([], null, false, "Start the Part 2 API to load events.", null, null));
         }
         catch (TaskCanceledException) when (!ct.IsCancellationRequested)
         {
-            return View(new EventListModel([], null, false, "The RaceDay API timed out.", null));
+            return View(new EventListModel([], null, false, "The RaceDay API timed out.", null, null));
         }
     }
 

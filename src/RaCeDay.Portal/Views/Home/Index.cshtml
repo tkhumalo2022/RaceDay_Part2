@@ -16,13 +16,21 @@
     <div class="section-heading">
         <h2>What's coming up<span class="dot">.</span></h2>
         <div class="filters" aria-label="Activity filters">
-            <a class="@(Model.Filter == null ? "selected" : "")" asp-action="Index" asp-fragment="events">All</a>
+            <a class="@(Model.Filter == null ? "selected" : "")" asp-action="Index" asp-route-query="@Model.Query" asp-fragment="events">All</a>
             @foreach (var activity in new[] { "Run", "Walk", "Cycle" })
             {
-                <a class="@(Model.Filter == activity ? "selected" : "")" asp-action="Index" asp-route-type="@activity" asp-fragment="events">@activity</a>
+                <a class="@(Model.Filter == activity ? "selected" : "")" asp-action="Index" asp-route-type="@activity" asp-route-query="@Model.Query" asp-fragment="events">@activity</a>
             }
         </div>
     </div>
+    <form asp-controller="Home" asp-action="Index" method="get" class="event-search" role="search">
+        <label for="race-query">Search by race name or location</label>
+        <div class="event-search-controls">
+            <input id="race-query" name="query" type="search" maxlength="100" value="@Model.Query" placeholder="e.g. Durban 10K" />
+            @if (Model.Filter is not null) { <input type="hidden" name="type" value="@Model.Filter" /> }
+            <button type="submit">SEARCH <span aria-hidden="true">↗</span></button>
+        </div>
+    </form>
     @if (TempData["Error"] is string error) { <p class="notice" role="alert">@error</p> }
     @if (Model.Error is not null)
     {

@@ -30,6 +30,7 @@
 - An end-to-end PowerShell QA run passed **28 real workflow assertions**, including the organiser-banner form's event ID, reverse-role HTTP 403, and PNG upload/retrieval. Evidence is saved in [Part3-E2E-20261101.txt](evidence/Part3-E2E-20261101.txt).
 - Fixed incorrect Azure-cloud language in local upload confirmation. Emulator checks are described as storage tests, not as proof of a real Azure subscription.
 - Real Azure cloud credentials and public hosting have **not** been configured or claimed.
+- Added race-name/location search with preserved Run/Walk/Cycle filters and responsive controls. A new isolated full-workflow QA run passed **31 assertions**; [Part3-E2E-Search-20261101.txt](evidence/Part3-E2E-Search-20261101.txt) is the genuine console transcript.
 
 
 ## Remaining real-world sign-off

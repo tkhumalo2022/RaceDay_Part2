@@ -61,6 +61,12 @@ $registered=Send '/Account/Register' $participant @{
     Role='Participant';DateOfBirth='2002-01-01';Password=$pass;ConfirmPassword=$pass
 }
 CheckBody $registered 'Sign out|Your enrolments' 'Participant authentication established'
+$searched = Page ('/Home/Index?query=' + [uri]::EscapeDataString($eventName)) $participant
+CheckBody $searched ([regex]::Escape($eventName)) 'Event-name search finds a published race'
+$searchedByPlace = Page '/Home/Index?query=Durban%20QA%20Circuit' $participant
+CheckBody $searchedByPlace ([regex]::Escape($eventName)) 'Location search finds the correct event'
+$noMatch = Page ('/Home/Index?query=absent-' + $suffix) $participant
+Ensure ($noMatch.Content -notmatch [regex]::Escape($eventName)) 'Unmatched search excludes other events'
 $detail = Page ("/Home/Details/$eventId") $participant
 CheckBody $detail 'ENROL NOW' 'Participant sees eligible category'
 $cats = Invoke-RestMethod -Uri ('http://127.0.0.1:5001/api/events/' + $eventId + '/categories') -WebSession $participant -TimeoutSec 10
