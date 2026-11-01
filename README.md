@@ -1,17 +1,17 @@
-# RaCeDay — PROG6212 Part 2
+# RaCeDay â€” PROG6212 Part 2
 
-**Student:** Thabiso Khumalo (ST10477675)  
-**Module:** PROG6212 Programming 2B  
-**Assessment:** Portfolio of Evidence, Part 2 — RESTful API Development
+**Student:** Thabiso Khumalo (ST10477675)
+**Module:** PROG6212 Programming 2B
+**Assessment:** Portfolio of Evidence, Part 2 â€” RESTful API Development
 
 RaCeDay is an ASP.NET Core race management application for organisers and participants. Organisers manage events, categories, entries and results. Participants register, enter races and view their results.
 
 ## Submission links
 
 - **Repository:** https://github.com/tkhumalo2022/RaceDay_Part2
-- **Source code:** [ASP.NET Core project](src/RaCeDay) · [automated tests](tests/RaCeDay.Tests) · [commit history](https://github.com/tkhumalo2022/RaceDay_Part2/commits/main)
+- **Source code:** [ASP.NET Core project](src/RaCeDay) Â· [automated tests](tests/RaCeDay.Tests) Â· [commit history](https://github.com/tkhumalo2022/RaceDay_Part2/commits/main)
 - **Presentation:** [RaCeDay Part 2 video](https://youtu.be/jytTUheNxYw)
-- **Build and tests:** [Successful GitHub Actions run — 19 October 2026](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39265809171) (39 passed, 0 failed, 0 skipped)
+- **Build and tests:** [Successful GitHub Actions run â€” 19 October 2026](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39265809171) (39 passed, 0 failed, 0 skipped)
 - **Assessment evidence:** [Part 2 evidence index](docs/PART2_EVIDENCE_INDEX.md)
 
 ## Features
@@ -107,6 +107,8 @@ Part 3 extends the Part 2 API with a separate ASP.NET Core MVC frontend under `s
 
 **QA:** `dotnet build RaCeDay.slnx -c Release --warnaserror` and `dotnet test RaCeDay.slnx -c Release`. The opt-in PowerShell E2E test script uses an isolated QA database and Azurite; do not run it against your normal database. Latest local automated and live checks are documented in the checklist. GitHub Actions builds and tests on Windows and performs a Linux Docker smoke build.
 
-**Visual evidence:** [Desktop home screenshot](docs/evidence/Part3-Desktop-RaceDay-20261031.png) · [Mobile home screenshot](docs/evidence/Part3-Mobile-RaceDay-20261031.png). These are genuine QA renders, not a live hosted demo.
+**Visual evidence:** [Desktop home screenshot](docs/evidence/Part3-Desktop-RaceDay-20261031.png) Â· [Mobile home screenshot](docs/evidence/Part3-Mobile-RaceDay-20261031.png). These are genuine QA renders, not a live hosted demo.
+
+**Part 3 demo and student handover:** [Full walkthrough and assessment checklist](docs/PART3_DEMO_AND_HANDOVER.md) · [Local submission preflight](scripts/part3-preflight.ps1). These are preparation materials, not proof of an unrecorded video.
 
 **Submission status:** This branch is still a learner review draft, not an ARC submission. The genuine student-recorded unlisted YouTube walkthrough, 20 meaningful Part 3 commits, production Azure setup and actual phone/accessibility checks remain for final sign-off. Do not fabricate video links, screenshots, passing test claims or evidence. AI assistance was used and should be disclosed as required by the assessment brief.
