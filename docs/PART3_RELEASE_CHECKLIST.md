@@ -22,6 +22,16 @@
 - GitHub Actions Linux Docker image build and login/register smoke checks passed on run #41239761962. Windows CI integration tests were still running when this note was written.
 - No production Azure account, storage credential, cloud URL or external deployment was used in these checks.
 
+## Additional verified checks — 1 November 2026
+- Updated Debug solution build: **0 errors, 0 warnings**.
+- Updated local automated tests: **47 passed, 0 failed, 0 skipped** (an added corrupted/oversized-blob test is exercised in the dedicated Azurite CI job).
+- GitHub Actions run [41323346941](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41323346941) passed **Windows build/tests, Docker route smoke and Azure SDK/Azurite integration**.
+- Created a fresh isolated database `RaceDayPart3QA_20261101` and launched separate QA API/portal processes at loopback ports 5003/5350 with Azurite.
+- An end-to-end PowerShell QA run passed **28 real workflow assertions**, including the organiser-banner form's event ID, reverse-role HTTP 403, and PNG upload/retrieval. Evidence is saved in [Part3-E2E-20261101.txt](evidence/Part3-E2E-20261101.txt).
+- Fixed incorrect Azure-cloud language in local upload confirmation. Emulator checks are described as storage tests, not as proof of a real Azure subscription.
+- Real Azure cloud credentials and public hosting have **not** been configured or claimed.
+
+
 ## Remaining real-world sign-off
 - Configure an authorised **real** Azure Storage account securely (env var `AzureBlob__ConnectionString`) and verify cloud round-trip; local Azurite is not proof of cloud account setup.
 - Review UI on actual phone, keyboard and screen reader; optional improvements after feedback.

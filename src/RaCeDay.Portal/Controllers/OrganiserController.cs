@@ -186,7 +186,7 @@ public sealed class OrganiserController(RaceDayApiClient api) : Controller
         }
         var result = await api.MutateAsync<object>(HttpContext, HttpMethod.Post,
             $"api/events/{id}/banner", null, ct, image:file);
-        TempData["Notice"] = result.Successful ? "Banner uploaded to Azure." :
+        TempData["Notice"] = result.Successful ? "Banner saved to private image storage." :
             result.Error ?? "Could not upload banner. Check Azure configuration.";
         return RedirectToAction("Details", "Home", new { id });
     }

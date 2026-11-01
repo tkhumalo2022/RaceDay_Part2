@@ -110,13 +110,14 @@ catch [System.Net.WebException] { $restrictedStatus=[int]$_.Exception.Response.S
 Ensure ($restrictedStatus -eq 403) 'Participant receives HTTP 403 for Organiser-only create screen'
 # Image upload smoke runs against local Azurite (never production Storage).
 Add-Type -AssemblyName System.Net.Http
-function UploadImage($path, $session, $csrf) {
+function UploadImage($path, $session, $csrf, $eventId = $null) {
     $handler = New-Object System.Net.Http.HttpClientHandler
     $handler.CookieContainer = $session.Cookies
     $handler.AllowAutoRedirect = $false
     $client = New-Object System.Net.Http.HttpClient($handler)
     $form = New-Object System.Net.Http.MultipartFormDataContent
     $form.Add([System.Net.Http.StringContent]::new($csrf), '__RequestVerificationToken')
+    if ($null -ne $eventId) { $form.Add([System.Net.Http.StringContent]::new([string]$eventId), 'id') }
     $png = [Convert]::FromBase64String('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9YNwUxwAAAAASUVORK5CYII=')
     $file = [System.Net.Http.ByteArrayContent]::new($png)
     $file.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::new('image/png')
@@ -129,15 +130,26 @@ function UploadImage($path, $session, $csrf) {
     } finally { $client.Dispose(); $handler.Dispose(); $form.Dispose() }
 }
 $orgEvent = Page ("/Home/Details/$eventId") $org
-$bannerRedirect = UploadImage ("/Organiser/Banner?id=$eventId") $org (Token $orgEvent.Content)
+$deniedEnrolStatus=0
+try {
+    Send '/Participant/Enrol' $org @{
+        __RequestVerificationToken=(Token $orgEvent.Content)
+        eventId=$eventId;categoryId=$categoryId
+    } | Out-Null
+    $deniedEnrolStatus=200
+}
+catch [System.Net.WebException] { $deniedEnrolStatus=[int]$_.Exception.Response.StatusCode }
+Ensure ($deniedEnrolStatus -eq 403) 'Organiser receives HTTP 403 for Participant enrolment action'
+Ensure ($orgEvent.Content -match ('name="id"\s+value="' + $eventId + '"')) 'Banner form includes event id hidden input'
+$bannerRedirect = UploadImage '/Organiser/Banner' $org (Token $orgEvent.Content) $eventId
 $bannerResult = (Page ("/Home/Details/$eventId") $org).Content
-Ensure ($bannerResult -match 'Banner uploaded to Azure') 'Organiser banner stored through API in Azurite'
+Ensure ($bannerResult -match 'Banner saved to private image storage.') 'Organiser banner stored through API in Azurite'
 $bannerBytes = Invoke-WebRequest -Uri ($portal+"/Images/Event/$eventId") -WebSession $org -UseBasicParsing -TimeoutSec 15
 Ensure ($bannerBytes.StatusCode -eq 200 -and $bannerBytes.Headers['Content-Type'] -match 'image/png') 'Event banner retrieved from private Azure container'
 $profileImagePage = Page '/Participant/Profile' $participant
 $pictureRedirect = UploadImage '/Participant/Picture' $participant (Token $profileImagePage.Content)
 $pictureResult = (Page '/Participant/Profile' $participant).Content
-Ensure ($pictureResult -match 'Profile picture saved to Azure') 'Participant picture stored through API in Azurite'
+Ensure ($pictureResult -match 'Profile picture saved to private image storage.') 'Participant picture stored through API in Azurite'
 $pictureBytes = Invoke-WebRequest -Uri ($portal+'/Images/Profile') -WebSession $participant -UseBasicParsing -TimeoutSec 15
 Ensure ($pictureBytes.StatusCode -eq 200 -and $pictureBytes.Headers['Content-Type'] -match 'image/png') 'Profile picture retrieved by authenticated owner'
 Write-Output "QA COMPLETE: event=$eventId; suffix=$suffix (isolated QA database and Azurite)"

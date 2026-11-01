@@ -16,8 +16,9 @@ public sealed class ParticipantController(RaceDayApiClient api) : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Enrol(int eventId, int categoryId, CancellationToken ct)
     {
-        if ((await Session(ct))?.Role != "Participant")
-            return RedirectToAction("Login", "Account");
+        var session = await Session(ct);
+        if (session is null) return RedirectToAction("Login", "Account");
+        if (session.Role != "Participant") return StatusCode(403, "Participant access required.");
         if (eventId <= 0 || categoryId <= 0) return BadRequest();
         var result = await api.MutateAsync(HttpContext, HttpMethod.Post,
             $"api/events/{eventId}/enrolments", new { categoryId }, ct);
@@ -63,7 +64,7 @@ public sealed class ParticipantController(RaceDayApiClient api) : Controller
         }
         var result = await api.MutateAsync<object>(
             HttpContext, HttpMethod.Post, "api/users/me/picture", null, ct, image:file);
-        TempData["Notice"] = result.Successful ? "Profile picture saved to Azure." :
+        TempData["Notice"] = result.Successful ? "Profile picture saved to private image storage." :
             result.Error ?? "Profile picture upload failed. Check Azure configuration.";
         return RedirectToAction(nameof(Profile));
     }
