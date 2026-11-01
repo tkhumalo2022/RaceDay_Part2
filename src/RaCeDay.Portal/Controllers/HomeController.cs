@@ -13,22 +13,13 @@ public class HomeController(RaceDayApiClient api) : Controller
         {
             var (session, _) = await api.SessionAsync(Request, ct);
             var (events, status) = await api.GetAsync<List<RaceEvent>>("api/events", Request, ct);
-            var filter = new[] { "Run", "Walk", "Cycle" }
-                .FirstOrDefault(x => x.Equals(type, StringComparison.OrdinalIgnoreCase));
-            var list = (events ?? []).Where(x =>
-                x.EventDate >= DateOnly.FromDateTime(DateTime.UtcNow.AddHours(2)) &&
-                (x.Status == "Open" || x.Status == "Planned")).ToList();
-            if (filter is not null) list = list.Where(x => x.EventType == filter).ToList();
-            var search = string.IsNullOrWhiteSpace(query) ? null : query.Trim();
-            if (search?.Length > 100) search = search[..100];
-            if (search is not null) list = list.Where(x =>
-                x.EventName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                x.Location.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+            var matching = EventDiscovery.Find(
+                events ?? [], type, query, DateOnly.FromDateTime(DateTime.UtcNow.AddHours(2)));
             ViewData["Role"] = session?.Role;
-            return View(new EventListModel(list, session?.Role,
+            return View(new EventListModel(matching.Events, session?.Role,
                 status == HttpStatusCode.Unauthorized,
                 status is HttpStatusCode.OK or HttpStatusCode.Unauthorized ? null : "Events are temporarily unavailable.",
-                filter, search));
+                matching.Filter, matching.Query));
         }
         catch (HttpRequestException)
         {
