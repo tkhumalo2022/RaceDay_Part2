@@ -7,7 +7,7 @@
 
 - **Separate MVC app:** [src/RaCeDay.Portal](src/RaCeDay.Portal), calling the Part 2 API through `RaceDayApiClient` (no direct EF/database access).
 - **Existing API/backend:** [src/RaCeDay](src/RaCeDay), including role-protected operations and private Azure Blob Storage integration.
-- **Dockerfile:** [src/RaCeDay.Portal/Dockerfile](src/RaCeDay.Portal/Dockerfile) and Docker build/start smoke checks in GitHub Actions.
+- **Docker:** [MVC Dockerfile](src/RaCeDay.Portal/Dockerfile), [API Dockerfile](src/RaCeDay/Dockerfile), [local four-service Compose](compose.yaml) and [single-command launch guide](docs/PART3_DOCKER_COMPOSE.md). CI checks the image build and Compose syntax; a complete container-stack run still requires Docker.
 - **Tests:** [tests/RaCeDay.Tests](tests/RaCeDay.Tests), [actual QA E2E evidence](docs/evidence/Part3-E2E-20261101.txt), and [current Part 3 review PR](https://github.com/tkhumalo2022/RaceDay_Part2/pull/3).
 - **Setup, remaining sign-offs and student demo checklist:** [Part 3 release checklist](docs/PART3_RELEASE_CHECKLIST.md) and [demonstration handover](docs/PART3_DEMO_AND_HANDOVER.md).
 - **Progress verification:** Run `powershell -ExecutionPolicy Bypass -File scripts/part3-preflight.ps1` from the repository root.

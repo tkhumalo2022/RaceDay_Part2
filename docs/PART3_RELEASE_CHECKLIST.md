@@ -30,6 +30,7 @@
 - An end-to-end PowerShell QA run passed **28 real workflow assertions**, including the organiser-banner form's event ID, reverse-role HTTP 403, and PNG upload/retrieval. Evidence is saved in [Part3-E2E-20261101.txt](evidence/Part3-E2E-20261101.txt).
 - Fixed incorrect Azure-cloud language in local upload confirmation. Emulator checks are described as storage tests, not as proof of a real Azure subscription.
 - Real Azure cloud credentials and public hosting have **not** been configured or claimed.
+- Added an opt-in [four-service Docker Compose demo](PART3_DOCKER_COMPOSE.md), isolated local database migrations and [API Dockerfile](../src/RaCeDay/Dockerfile). A local clean build and 47 tests passed; the demo database init command succeeded in Development and was explicitly rejected in Production. A complete container-stack run has not been executed on this laptop because Docker Desktop is unavailable.
 - Added race-name/location search with preserved Run/Walk/Cycle filters and responsive controls. A new isolated full-workflow QA run passed **31 assertions**; [Part3-E2E-Search-20261101.txt](evidence/Part3-E2E-Search-20261101.txt) is the genuine console transcript.
 
 

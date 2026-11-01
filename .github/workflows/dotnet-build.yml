@@ -50,6 +50,12 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+      - name: Validate complete local Docker Compose specification
+        env:
+          RACEDAY_SA_PASSWORD: CI-local-only-N0tARealSecret
+        run: docker compose -f compose.yaml config --quiet
+      - name: Build backend API container from Dockerfile
+        run: docker build -f src/RaCeDay/Dockerfile -t raceday-api:ci .
       - name: Build MVC container from Dockerfile
         run: docker build -f src/RaCeDay.Portal/Dockerfile -t raceday-portal:ci .
       - name: Start container without production credentials

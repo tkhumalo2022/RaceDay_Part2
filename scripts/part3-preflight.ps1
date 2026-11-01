@@ -12,6 +12,9 @@ try {
     $expected = @(
         'src/RaCeDay.Portal/RaCeDay.Portal.csproj',
         'src/RaCeDay.Portal/Dockerfile',
+        'src/RaCeDay/Dockerfile',
+        'compose.yaml',
+        'docs/PART3_DOCKER_COMPOSE.md',
         'src/RaCeDay.Portal/Services/RaceDayApiClient.cs',
         'src/RaCeDay/Services/AzureRaceImageStore.cs',
         '.github/workflows/dotnet-build.yml',
