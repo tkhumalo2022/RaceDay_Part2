@@ -15,11 +15,11 @@
     <p class="eyebrow muted">YOUR NEXT CHALLENGE</p>
     <div class="section-heading">
         <h2>What's coming up<span class="dot">.</span></h2>
-        <div class="filters" aria-label="Activity filters">
-            <a class="@(Model.Filter == null ? "selected" : "")" asp-action="Index" asp-route-query="@Model.Query" asp-fragment="events">All</a>
+        <div class="filters" role="group" aria-label="Activity filters">
+            <a class="@(Model.Filter == null ? "selected" : "")" aria-current="@(Model.Filter == null ? "page" : null)" asp-action="Index" asp-route-query="@Model.Query" asp-fragment="events">All</a>
             @foreach (var activity in new[] { "Run", "Walk", "Cycle" })
             {
-                <a class="@(Model.Filter == activity ? "selected" : "")" asp-action="Index" asp-route-type="@activity" asp-route-query="@Model.Query" asp-fragment="events">@activity</a>
+                <a class="@(Model.Filter == activity ? "selected" : "")" aria-current="@(Model.Filter == activity ? "page" : null)" asp-action="Index" asp-route-type="@activity" asp-route-query="@Model.Query" asp-fragment="events">@activity</a>
             }
         </div>
     </div>
@@ -31,6 +31,16 @@
             <button type="submit">SEARCH <span aria-hidden="true">↗</span></button>
         </div>
     </form>
+    @if (Model.Error is null && !Model.SignInRequired)
+    {
+        <p class="search-feedback" role="status">
+            @Model.Events.Count upcoming @(Model.Events.Count == 1 ? "race" : "races") found.
+            @if (Model.Query is not null || Model.Filter is not null)
+            {
+                <a asp-action="Index" asp-fragment="events">Clear filters</a>
+            }
+        </p>
+    }
     @if (TempData["Error"] is string error) { <p class="notice" role="alert">@error</p> }
     @if (Model.Error is not null)
     {
@@ -45,7 +55,7 @@
     }
     else if (Model.Events.Count == 0)
     {
-        <div class="empty"><h3>Nothing on the calendar yet.</h3><p>Try another filter or check back when organisers publish new races.</p></div>
+        <div class="empty"><h3>@(Model.Filter is not null || Model.Query is not null ? "No matching races." : "Nothing on the calendar yet.")</h3><p>Try another filter or check back when organisers publish new races.</p></div>
     }
     else
     {
