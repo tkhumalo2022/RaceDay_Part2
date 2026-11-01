@@ -20,7 +20,10 @@ try {
         'src/RaCeDay/Services/AzureRaceImageStore.cs',
         '.github/workflows/dotnet-build.yml',
         'docs/PART3_RELEASE_CHECKLIST.md',
-        'docs/PART3_DEMO_AND_HANDOVER.md'
+        'docs/PART3_DEMO_AND_HANDOVER.md',
+        'tests/RaCeDay.Tests/PortalResultFormTests.cs',
+        'tests/RaCeDay.Tests/PortalEventDiscoveryTests.cs',
+        'docs/evidence/Part3-E2E-Search-20261101.txt'
     )
     foreach ($file in $expected) {
         $ok = Test-Path $file
@@ -33,7 +36,7 @@ try {
     if ($count -lt 20) { Write-Warning 'Commit count is below 20. Only actual meaningful development commits qualify.' }
     if ((git status --porcelain)) { Write-Warning 'Working tree has uncommitted files; review changes before submission.' }
     if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-        Write-Warning 'Docker unavailable on this laptop. GitHub CI can smoke-test the Docker image, but a live API-connected container demo still requires validation.'
+        Write-Warning 'Docker is unavailable locally. Four-service startup passed CI at 018faf5, but the latest commit and authenticated container workflows still require independent verification.'
     }
     if (-not [Environment]::GetEnvironmentVariable('AzureBlob__ConnectionString')) {
         Write-Warning 'AzureBlob__ConnectionString is not configured for THIS process. Never commit it to Git.'

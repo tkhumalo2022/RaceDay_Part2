@@ -1,6 +1,13 @@
 # PROG6212 Part 3 — RaceDay quality and handover
 **Student:** Thabiso Khumalo | **Status:** Working draft for learner review, not final ARC submission.
 
+## Current verified development evidence — 1 November 2026
+- [GitHub Actions run #41327840762](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41327840762) **passed all four jobs** on commit `018faf5`: Windows solution build/tests, Azure Blob SDK against Azurite, Docker image/route smoke, and four-service SQL Server + Azurite + API + MVC startup/HTTP readiness. This does **not** prove an authenticated container user journey or live Azure cloud deployment.
+- After that CI run, local development added: MVC result-form time/position validation and four unit tests; accessible contrast/focus/mobile navigation adjustments; independently testable race discovery filters with four new tests; and search-result count/clear-filter/selected-state feedback.
+- Latest local Debug build: **0 warnings, 0 errors**. Latest local test run: **55 passed, 0 failed, 0 skipped**, up from 47 before these changes. The existing isolated 31-assertion live QA transcript remains [Part3-E2E-Search-20261101.txt](evidence/Part3-E2E-Search-20261101.txt); it has **not** been rerun after the new UI edits.
+- The newer branch commits need a **fresh green CI run**. Physical-phone, keyboard/screen-reader, live Azure, student video and ARC sign-offs remain separate and unverified.
+
+
 ## Implemented
 - Separate ASP.NET Core MVC frontend at `src/RaCeDay.Portal`, with `RaceDayApiClient`. It has no direct EF Core/database access.
 - Participant and Organiser registration/login/logout, API session validation, role-aware navigation.
@@ -37,10 +44,10 @@
 ## Remaining real-world sign-off
 - Configure an authorised **real** Azure Storage account securely (env var `AzureBlob__ConnectionString`) and verify cloud round-trip; local Azurite is not proof of cloud account setup.
 - Review UI on actual phone, keyboard and screen reader; optional improvements after feedback.
-- Confirm GitHub Actions Docker smoke job green for the latest branch commit. Docker command is not installed on the student's Windows laptop.
+- Confirm **all four** GitHub Actions jobs green for the latest branch commit. The preceding four-service integration passed on `018faf5`; Docker is not installed locally.
 - Verify production HTTPS, domain/routing, session cookie scope and secure deployment for two apps before making a public deployment; current cookie relay is for same-host local development only.
 - Create original video demo with student explanation and unlisted YouTube URL; do not invent video evidence or a screenshot.
-- Ensure **20 genuinely meaningful Part 3 commits** over the development history; do not manufacture meaningless commits.
+- Verify **at least 20 genuinely meaningful Part 3 commits** before ARC submission and explain their changes; commit count alone does not establish marking acceptance.
 - Reconcile remaining Part 1/2 schema mismatch with the lecturer if required.
 - Submit the correct GitHub repository URL to ARC personally. No ARC submission was performed.
 

@@ -7,8 +7,8 @@
 
 - **Separate MVC app:** [src/RaCeDay.Portal](src/RaCeDay.Portal), calling the Part 2 API through `RaceDayApiClient` (no direct EF/database access).
 - **Existing API/backend:** [src/RaCeDay](src/RaCeDay), including role-protected operations and private Azure Blob Storage integration.
-- **Docker:** [MVC Dockerfile](src/RaCeDay.Portal/Dockerfile), [API Dockerfile](src/RaCeDay/Dockerfile), [local four-service Compose](compose.yaml) and [single-command launch guide](docs/PART3_DOCKER_COMPOSE.md). CI checks the image build and Compose syntax; a complete container-stack run still requires Docker.
-- **Tests:** [tests/RaCeDay.Tests](tests/RaCeDay.Tests), [actual QA E2E evidence](docs/evidence/Part3-E2E-20261101.txt), and [current Part 3 review PR](https://github.com/tkhumalo2022/RaceDay_Part2/pull/3).
+- **Docker:** [MVC Dockerfile](src/RaCeDay.Portal/Dockerfile), [API Dockerfile](src/RaCeDay/Dockerfile), [local four-service Compose](compose.yaml) and [single-command launch guide](docs/PART3_DOCKER_COMPOSE.md). GitHub Actions run [#41327840762](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41327840762) passed a four-service SQL Server/Azurite/API/MVC startup integration on commit `018faf5`. This is CI evidence, not a local Docker installation or a completed authenticated container-user workflow.
+- **Tests:** [tests/RaCeDay.Tests](tests/RaCeDay.Tests), [actual QA E2E evidence](docs/evidence/Part3-E2E-20261101.txt), and [31-assertion search E2E transcript](docs/evidence/Part3-E2E-Search-20261101.txt). The [Part 3 review PR](https://github.com/tkhumalo2022/RaceDay_Part2/pull/3) remains draft.
 - **Setup, remaining sign-offs and student demo checklist:** [Part 3 release checklist](docs/PART3_RELEASE_CHECKLIST.md) and [demonstration handover](docs/PART3_DEMO_AND_HANDOVER.md).
 - **Progress verification:** Run `powershell -ExecutionPolicy Bypass -File scripts/part3-preflight.ps1` from the repository root.
 
@@ -131,4 +131,4 @@ Part 3 extends the Part 2 API with a separate ASP.NET Core MVC frontend under `s
 
 **Part 3 demo and student handover:** [Full walkthrough and assessment checklist](docs/PART3_DEMO_AND_HANDOVER.md) · [Local submission preflight](scripts/part3-preflight.ps1). These are preparation materials, not proof of an unrecorded video.
 
-**Submission status:** This branch is still a learner review draft, not an ARC submission. The genuine student-recorded unlisted YouTube walkthrough, 20 meaningful Part 3 commits, production Azure setup and actual phone/accessibility checks remain for final sign-off. Do not fabricate video links, screenshots, passing test claims or evidence. AI assistance was used and should be disclosed as required by the assessment brief.
+**Submission status:** This branch is still a learner review draft, not an ARC submission. The 20-commit requirement is reached through feature, testing and evidence changes, but commit quality remains subject to lecturer review. The genuine student-recorded unlisted YouTube walkthrough, real Azure account validation and actual-phone/accessibility sign-off remain incomplete. Re-check fresh CI for the latest commit before submitting. Do not fabricate video links, screenshots, passing test claims or evidence. AI assistance was used and should be disclosed as required by the assessment brief.

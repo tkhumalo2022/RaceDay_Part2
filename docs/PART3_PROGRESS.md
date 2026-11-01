@@ -1,4 +1,8 @@
-﻿# PROG6212: Part 3 work in progress
+﻿# PROG6212: Part 3 development history (initial 31 October snapshot)
+
+> This section is a historical early milestone, not the current feature checklist. For later verified progress, tests, CI evidence, and outstanding student actions, use [PART3_RELEASE_CHECKLIST.md](PART3_RELEASE_CHECKLIST.md) and [PART3_DEMO_AND_HANDOVER.md](PART3_DEMO_AND_HANDOVER.md).
+
+# Original early milestone
 
 Student: Thabiso Khumalo. Project: RaceDay. This branch is a **development milestone**, not a completed assessed submission.
 
