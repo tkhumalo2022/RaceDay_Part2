@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using RaCeDay.Services;
@@ -29,5 +30,38 @@ public sealed class AzureBlobRoundTripTests
         Assert.Equal("image/png", actual.Value.Type);
         Assert.Equal(data, actual.Value.Bytes);
         Assert.Null(await storage.ReadAsync("events/19/missing", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task DownloadRejectsOversizedAndUnrecognisedStoredImages()
+    {
+        var connection = Environment.GetEnvironmentVariable("RACEDAY_TEST_BLOB_CONNECTION");
+        if (string.IsNullOrWhiteSpace(connection)) return;
+
+        var containerName = "raceday-qa-" + Guid.NewGuid().ToString("N")[..16];
+        var config = new ConfigurationBuilder().AddInMemoryCollection(
+            new Dictionary<string, string?>
+            {
+                ["AzureBlob:ConnectionString"] = connection,
+                ["AzureBlob:Container"] = containerName
+            }).Build();
+        var storage = new AzureRaceImageStore(config);
+        var container = new BlobContainerClient(connection, containerName);
+        await container.CreateIfNotExistsAsync();
+
+        const string key = "events/30/banner";
+        using (var oversized = new MemoryStream(new byte[3 * 1024 * 1024 + 1]))
+        {
+            await container.GetBlobClient(key).UploadAsync(oversized, overwrite: true);
+        }
+        await Assert.ThrowsAsync<ImageStorageUnavailableException>(() =>
+            storage.ReadAsync(key, CancellationToken.None));
+
+        using (var unrecognised = new MemoryStream(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }))
+        {
+            await container.GetBlobClient(key).UploadAsync(unrecognised, overwrite: true);
+        }
+        await Assert.ThrowsAsync<ImageStorageUnavailableException>(() =>
+            storage.ReadAsync(key, CancellationToken.None));
     }
 }
