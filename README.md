@@ -8,7 +8,7 @@
 - **Separate MVC app:** [src/RaCeDay.Portal](src/RaCeDay.Portal), calling the Part 2 API through `RaceDayApiClient` (no direct EF/database access).
 - **Existing API/backend:** [src/RaCeDay](src/RaCeDay), including role-protected operations and private Azure Blob Storage integration.
 - **Docker:** [MVC Dockerfile](src/RaCeDay.Portal/Dockerfile), [API Dockerfile](src/RaCeDay/Dockerfile), [local four-service Compose](compose.yaml) and [single-command launch guide](docs/PART3_DOCKER_COMPOSE.md). GitHub Actions PR run [#41331598518](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41331598518) passed all four jobs, including SQL Server/Azurite/API/MVC startup, on commit `62177a8`. Later commits require new CI verification. This is CI evidence, not a local Docker installation or a completed authenticated container-user workflow.
-- **Tests:** [tests/RaCeDay.Tests](tests/RaCeDay.Tests), [actual QA E2E evidence](docs/evidence/Part3-E2E-20261101.txt), and [31-assertion search E2E transcript](docs/evidence/Part3-E2E-Search-20261101.txt) and [fresh 2 November isolated 31-assertion QA](docs/evidence/Part3-E2E-20261102.txt). The [Part 3 review PR](https://github.com/tkhumalo2022/RaceDay_Part2/pull/3) remains draft.
+- **Tests:** [tests/RaCeDay.Tests](tests/RaCeDay.Tests), [actual QA E2E evidence](docs/evidence/Part3-E2E-20261101.txt), and [31-assertion search E2E transcript](docs/evidence/Part3-E2E-Search-20261101.txt) and [fresh 2 November isolated 34-assertion date-filter QA](docs/evidence/Part3-E2E-Date-Filters-20261102.txt). The [Part 3 review PR](https://github.com/tkhumalo2022/RaceDay_Part2/pull/3) remains draft.
 - **Setup, remaining sign-offs and student demo checklist:** [Part 3 release checklist](docs/PART3_RELEASE_CHECKLIST.md) and [demonstration handover](docs/PART3_DEMO_AND_HANDOVER.md).
 - **Progress verification:** Run `powershell -ExecutionPolicy Bypass -File scripts/part3-preflight.ps1` from the repository root.
 
@@ -121,7 +121,7 @@ This repository contains a separately developed Part 2 working implementation; i
 
 Part 3 extends the Part 2 API with a separate ASP.NET Core MVC frontend under `src/RaCeDay.Portal`. The MVC site does **not** access SQL Server or use EF Core; event, participant, result, profile and image operations call the Part 2 API.
 
-**Features:** organiser and participant registration/login/logout, role-aware navigation, event discovery, event and category management, enrolment, organiser results entry, participant history and profile, Azure Blob Storage event banners/profile pictures (through API only), Dockerfile, and CI checks.
+**Features:** organiser and participant registration/login/logout, role-aware navigation, event discovery with activity, name/location and 7/30-day filters, event and category management, enrolment, organiser results entry, participant history and profile, Azure Blob Storage event banners/profile pictures (through API only), Dockerfile, and CI checks.
 
 **Quick start:** See [Part 3 release and QA checklist](docs/PART3_RELEASE_CHECKLIST.md) for SQL Server setup, both app launch commands, Azure Storage configuration, Docker build/run instructions, tests and disclosure notes. Start the API at `http://localhost:5001`, start the portal at `http://localhost:5250`, then open the portal in a browser. Both apps must use the **same hostname** in local development to relay session cookies.
 

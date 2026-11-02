@@ -24,7 +24,8 @@ try {
         'tests/RaCeDay.Tests/PortalResultFormTests.cs',
         'tests/RaCeDay.Tests/PortalEventDiscoveryTests.cs',
         'docs/evidence/Part3-E2E-Search-20261101.txt',
-        'docs/evidence/Part3-E2E-20261102.txt'
+        'docs/evidence/Part3-E2E-20261102.txt',
+        'docs/evidence/Part3-E2E-Date-Filters-20261102.txt'
     )
     foreach ($file in $expected) {
         $ok = Test-Path $file

@@ -82,6 +82,12 @@ $searched = Page ('/Home/Index?query=' + [uri]::EscapeDataString($eventName)) $p
 CheckBody $searched ([regex]::Escape($eventName)) 'Event-name search finds a published race'
 $searchedByPlace = Page '/Home/Index?query=Durban%20QA%20Circuit' $participant
 CheckBody $searchedByPlace ([regex]::Escape($eventName)) 'Location search finds the correct event'
+$raceCard = '<h3>\s*' + [regex]::Escape($eventName) + '\s*</h3>'
+$week = Page ('/Home/Index?window=7&query=' + [uri]::EscapeDataString($eventName)) $participant
+Ensure ($week.Content -notmatch $raceCard) 'Seven-day filter excludes a race scheduled 21 days away'
+$month = Page ('/Home/Index?window=30&type=Run&query=' + [uri]::EscapeDataString($eventName)) $participant
+CheckBody $month $raceCard 'Thirty-day filter finds a future Run matching the search'
+Ensure ($month.Content -match 'name="window"\s+value="30"') 'Search form preserves the selected date window'
 $noMatch = Page ('/Home/Index?query=absent-' + $suffix) $participant
 Ensure ($noMatch.Content -notmatch [regex]::Escape($eventName)) 'Unmatched search excludes other events'
 $detail = Page ("/Home/Details/$eventId") $participant

@@ -7,7 +7,7 @@ public sealed record RaceCategory(int Id, int EventId, string CategoryName,
     decimal DistanceKm, decimal EntryFee, int MaxParticipants, int CurrentParticipants);
 public sealed record ApiSession(string UserId, string Role);
 public sealed record EventListModel(IReadOnlyList<RaceEvent> Events, string? Role,
-    bool SignInRequired, string? Error, string? Filter, string? Query);
+    bool SignInRequired, string? Error, string? Filter, string? Query, string? Window = null);
 public sealed record EventPageModel(RaceEvent Event, IReadOnlyList<RaceCategory> Categories);
 public sealed class LoginInput
 {

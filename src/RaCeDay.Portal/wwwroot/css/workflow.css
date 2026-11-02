@@ -65,3 +65,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .search-feedback{font-size:13px;line-height:1.6;color:var(--muted);margin:13px 0 0}
 .search-feedback a{font-weight:700;text-decoration:underline;text-underline-offset:3px;margin-left:8px}
 @media(max-width:600px){.event-search{max-width:100%}.event-search button{padding:13px}.event-search-controls{width:100%}}
+
+/* Date-window links are fully usable without client-side JavaScript. */
+.date-filters{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:22px}
+.date-filters-label{font-size:11px;letter-spacing:.1em;font-weight:800;color:#586357;margin-right:10px}
+.date-filters a{display:inline-flex;align-items:center;min-height:44px;padding:10px 14px;border:1px solid #b5c0ad;text-decoration:none;font-size:13px;font-weight:700}
+.date-filters a.selected,.date-filters a:hover{background:#141a16;color:#fff;border-color:#141a16}
+@media(max-width:600px){.date-filters-label{width:100%}.date-filters a{justify-content:center;flex:1 1 auto}}

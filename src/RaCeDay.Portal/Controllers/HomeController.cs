@@ -7,19 +7,19 @@ namespace RaCeDay.Portal.Controllers;
 public class HomeController(RaceDayApiClient api) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index(string? type, string? query, CancellationToken ct)
+    public async Task<IActionResult> Index(string? type, string? query, string? window, CancellationToken ct)
     {
         try
         {
             var (session, _) = await api.SessionAsync(Request, ct);
             var (events, status) = await api.GetAsync<List<RaceEvent>>("api/events", Request, ct);
             var matching = EventDiscovery.Find(
-                events ?? [], type, query, DateOnly.FromDateTime(DateTime.UtcNow.AddHours(2)));
+                events ?? [], type, query, DateOnly.FromDateTime(DateTime.UtcNow.AddHours(2)), window);
             ViewData["Role"] = session?.Role;
             return View(new EventListModel(matching.Events, session?.Role,
                 status == HttpStatusCode.Unauthorized,
                 status is HttpStatusCode.OK or HttpStatusCode.Unauthorized ? null : "Events are temporarily unavailable.",
-                matching.Filter, matching.Query));
+                matching.Filter, matching.Query, matching.Window));
         }
         catch (HttpRequestException)
         {
