@@ -1,11 +1,11 @@
 # PROG6212 Part 3 — RaceDay quality and handover
 **Student:** Thabiso Khumalo | **Status:** Working draft for learner review, not final ARC submission.
 
-## Current verified development evidence — 1 November 2026
-- [GitHub Actions run #41327840762](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41327840762) **passed all four jobs** on commit `018faf5`: Windows solution build/tests, Azure Blob SDK against Azurite, Docker image/route smoke, and four-service SQL Server + Azurite + API + MVC startup/HTTP readiness. This does **not** prove an authenticated container user journey or live Azure cloud deployment.
-- After that CI run, local development added: MVC result-form time/position validation and four unit tests; accessible contrast/focus/mobile navigation adjustments; independently testable race discovery filters with four new tests; and search-result count/clear-filter/selected-state feedback.
-- Latest local Debug build: **0 warnings, 0 errors**. Latest local test run: **55 passed, 0 failed, 0 skipped**, up from 47 before these changes. The existing isolated 31-assertion live QA transcript remains [Part3-E2E-Search-20261101.txt](evidence/Part3-E2E-Search-20261101.txt); it has **not** been rerun after the new UI edits.
-- The newer branch commits need a **fresh green CI run**. Physical-phone, keyboard/screen-reader, live Azure, student video and ARC sign-offs remain separate and unverified.
+## Current verified development evidence — 2 November 2026
+- [GitHub Actions PR run #41331598518](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41331598518) **passed all four jobs** at branch commit `62177a8`: Windows build/tests, Azure SDK/Azurite, Docker smoke and four-service startup. The companion push run #41331593808 passed its three applicable jobs, with Compose skipped by design. Neither run covers later local edits; authenticated container journeys and real Azure remain unverified.
+- The branch already contains MVC result-form validation, improved contrast and focus states, searchable/filterable race discovery and regression tests. On 2 November, the QA script was updated to use adjustable **loopback-only** API/MVC endpoints and relative event dates, making isolated retesting reproducible without editing the normal demo database.
+- The 2 November local Debug build had **0 warnings, 0 errors** and **55 tests passed, 0 failed, 0 skipped**. An updated end-to-end run against the freshly created LocalDB `RaceDayPart3QA_20261102_IsolatedV4` with API port 5101, MVC port 5351 and Azurite passed **31 of 31 workflow assertions** after the UI edits. The actual output is preserved in [Part3-E2E-20261102.txt](evidence/Part3-E2E-20261102.txt). This is emulator evidence, not a real Azure upload.
+- After pushing this 2 November QA/documentation work, confirm a new green CI run for that resulting commit. Physical-phone, keyboard/screen-reader, live Azure, authenticated container-user journeys, student video and ARC sign-offs remain separate and unverified.
 
 
 ## Implemented

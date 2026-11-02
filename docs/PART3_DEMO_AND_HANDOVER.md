@@ -59,7 +59,7 @@ Do not submit a false statement of personal review or testing. Check the lecture
 - The four-service Compose startup and HTTP readiness passed in CI at 018faf5. Authenticated container workflows and locally run Docker remain unverified.
 - Physical-phone and keyboard/screen-reader checks need human validation.
 - The student video and real unlisted URL are not recorded here.
-- The Part 3 branch may have fewer than the minimum meaningful commits.
+- Preflight on 2 November reported **20 branch commits ahead of main**. Their meaning and authorship still require an honest student review; the raw count alone does not guarantee rubric credit.
 - ARC submission has not taken place. No final-grade claim is made.
 
 ## Quick commands

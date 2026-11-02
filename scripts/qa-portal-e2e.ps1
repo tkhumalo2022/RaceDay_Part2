@@ -1,8 +1,25 @@
-# QA ONLY. Run exclusively with both apps bound to loopback and the isolated QA SQL database.
-# Requires an already running Part 2 API (127.0.0.1:5001) and MVC portal (127.0.0.1:5250).
+# QA ONLY. Run exclusively with both apps bound to loopback and an isolated QA SQL database.
+# Default endpoints: Part 2 API (127.0.0.1:5001), MVC portal (127.0.0.1:5250).
+param(
+    [string]$PortalBaseUrl = 'http://127.0.0.1:5250',
+    [string]$ApiBaseUrl = 'http://127.0.0.1:5001'
+)
 $ErrorActionPreference = 'Stop'
 if ($env:RACEDAY_QA_APPROVED -ne 'YES') { throw 'Set RACEDAY_QA_APPROVED=YES for the isolated QA environment.' }
-$portal = 'http://127.0.0.1:5250'
+foreach ($endpoint in @($PortalBaseUrl, $ApiBaseUrl)) {
+    $uri = $null
+    if (-not [uri]::TryCreate($endpoint, [UriKind]::Absolute, [ref]$uri) -or
+        $uri.Scheme -ne 'http' -or $uri.Host -notin @('127.0.0.1', 'localhost', '::1')) {
+        throw 'QA requires HTTP loopback URLs only; never run this script against a deployed app.'
+    }
+}
+$portal = $PortalBaseUrl.TrimEnd('/')
+$api = $ApiBaseUrl.TrimEnd('/')
+$today = (Get-Date).Date
+$futureEventDate = $today.AddDays(21).ToString('yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)
+$futureClosingDate = $today.AddDays(18).ToString('yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)
+$completedEventDate = $today.AddDays(-3).ToString('yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)
+$completedClosingDate = $today.AddDays(-4).ToString('yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)
 function Page($path, $session) {
     Invoke-WebRequest -Uri ($portal + $path) -WebSession $session -UseBasicParsing -TimeoutSec 30
 }
@@ -42,7 +59,7 @@ $eventName="QA Race $suffix"
 $saved = Send '/Organiser/Save' $org @{
     __RequestVerificationToken=(Token $create.Content)
     Id=0;EventName=$eventName;Description='Isolated QA race for Part 3 validation.'
-    Location='Durban QA Circuit';EventDate='2026-11-20';ClosingDate='2026-11-18'
+    Location='Durban QA Circuit';EventDate=$futureEventDate;ClosingDate=$futureClosingDate
     EventType='Run';Status='Open'
 }
 CheckBody $saved ([regex]::Escape($eventName)) 'Organiser can create event'
@@ -69,7 +86,7 @@ $noMatch = Page ('/Home/Index?query=absent-' + $suffix) $participant
 Ensure ($noMatch.Content -notmatch [regex]::Escape($eventName)) 'Unmatched search excludes other events'
 $detail = Page ("/Home/Details/$eventId") $participant
 CheckBody $detail 'ENROL NOW' 'Participant sees eligible category'
-$cats = Invoke-RestMethod -Uri ('http://127.0.0.1:5001/api/events/' + $eventId + '/categories') -WebSession $participant -TimeoutSec 10
+$cats = Invoke-RestMethod -Uri ($api + '/api/events/' + $eventId + '/categories') -WebSession $participant -TimeoutSec 10
 $categoryId = @($cats | Where-Object CategoryName -eq '10 km Open')[0].id
 Ensure ($categoryId -gt 0) 'Real category ID retrieved from API'
 $enrol = Send '/Participant/Enrol' $participant @{
@@ -91,11 +108,11 @@ CheckBody $editPage 'EDIT YOUR EVENT' 'Organiser can edit event'
 $updated = Send '/Organiser/Save' $org @{
     __RequestVerificationToken=(Token $editPage.Content)
     Id=$eventId;EventName=$eventName;Description='Completed isolated QA race.'
-    Location='Durban QA Circuit';EventDate='2026-10-30';ClosingDate='2026-10-29'
+    Location='Durban QA Circuit';EventDate=$completedEventDate;ClosingDate=$completedClosingDate
     EventType='Run';Status='Completed'
 }
 CheckBody $updated ([regex]::Escape($eventName)) 'Event update through API'
-$entriesFromApi = Invoke-RestMethod -Uri ('http://127.0.0.1:5001/api/events/' + $eventId + '/enrolments') -WebSession $org -TimeoutSec 10
+$entriesFromApi = Invoke-RestMethod -Uri ($api + '/api/events/' + $eventId + '/enrolments') -WebSession $org -TimeoutSec 10
 $entryId = @($entriesFromApi)[0].id
 Ensure ($entryId -gt 0) 'Organiser can retrieve enrolment IDs'
 $resultPage = Page ("/Organiser/Result?eventId=$eventId&enrolmentId=$entryId") $org
