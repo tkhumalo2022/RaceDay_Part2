@@ -1,7 +1,14 @@
 # PROG6212 Part 3 — RaceDay quality and handover
 **Student:** Thabiso Khumalo | **Status:** Working draft for learner review, not final ARC submission.
 
-## Current verified development evidence — 2 November 2026
+## Latest verification — 7 November 2026
+- See [PART3_VERIFICATION_20261107.md](PART3_VERIFICATION_20261107.md): freshly rerun **58/58 local tests**, Debug **build with 0 warnings/errors**, **16/16 preflight paths**, and exact-source CI green. Real cloud, actual phone, original Part 3 video, lecturer rubric and ARC submission remain unverified.
+
+## Previous verification — 5 November 2026
+- See [PART3_VERIFICATION_20261105.md](PART3_VERIFICATION_20261105.md) for the new evidence-backed checkpoint: local **58/58 tests passed**, preflight's **16/16 required paths present**, and [GitHub Actions run #41501949381](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41501949381) green on commit `f025338` (**four of four jobs**). The branch is **22 commits ahead of main**; meaningfulness is for human review.
+- This confirms test/CI health, **not** final submission, local Docker, real Azure Storage, actual-phone accessibility, production authentication, original student demo, or ARC submission.
+
+## Earlier verified development evidence — 2 November 2026
 - [GitHub Actions PR run #41331598518](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41331598518) **passed all four jobs** at branch commit `62177a8`: Windows build/tests, Azure SDK/Azurite, Docker smoke and four-service startup. The companion push run #41331593808 passed its three applicable jobs, with Compose skipped by design. Neither run covers later local edits; authenticated container journeys and real Azure remain unverified.
 - The branch contains MVC result-form validation, improved contrast/focus states, and race discovery with name/location, Run/Walk/Cycle activity, and **Any date / Next 7 days / Next 30 days** date-window filters that preserve current selections. On 2 November, the QA script was updated to use adjustable **loopback-only** API/MVC endpoints and relative event dates, making isolated retesting reproducible without editing the normal demo database.
 - On 2 November the updated local Debug build had **0 warnings, 0 errors** and **58 tests passed, 0 failed, 0 skipped**, including 3 new date-window tests. A fresh end-to-end run against isolated LocalDB `RaceDayPart3QA_20261102_DateFiltersV5`, API port 5101, MVC port 5351 and Azurite passed **34 of 34 workflow assertions**. The actual transcript is in [Part3-E2E-Date-Filters-20261102.txt](evidence/Part3-E2E-Date-Filters-20261102.txt). The earlier 31-assertion run is preserved in [Part3-E2E-20261102.txt](evidence/Part3-E2E-20261102.txt). These are local emulator tests, not live Azure proof.
@@ -44,7 +51,7 @@
 ## Remaining real-world sign-off
 - Configure an authorised **real** Azure Storage account securely (env var `AzureBlob__ConnectionString`) and verify cloud round-trip; local Azurite is not proof of cloud account setup.
 - Review UI on actual phone, keyboard and screen reader; optional improvements after feedback.
-- Confirm **all four** GitHub Actions jobs green for the latest branch commit. The preceding four-service integration passed on `018faf5`; Docker is not installed locally.
+- **CI verified 5 November:** all four GitHub Actions jobs passed at `f025338` in [run #41501949381](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41501949381). Recheck against HEAD after any new commit. Docker is not installed locally, and authenticated deployed workflows remain unverified.
 - Verify production HTTPS, domain/routing, session cookie scope and secure deployment for two apps before making a public deployment; current cookie relay is for same-host local development only.
 - Create original video demo with student explanation and unlisted YouTube URL; do not invent video evidence or a screenshot.
 - Verify **at least 20 genuinely meaningful Part 3 commits** before ARC submission and explain their changes; commit count alone does not establish marking acceptance.

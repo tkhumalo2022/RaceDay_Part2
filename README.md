@@ -1,7 +1,8 @@
 # RaceDay — PROG6212 Part 3 (MVC Portal + Part 2 API)
 
 **Part 3 review branch:** [feature/part3-mvc-review](https://github.com/tkhumalo2022/RaceDay_Part2/tree/feature/part3-mvc-review)
-**Status:** Assessment review draft. The video and ARC submission are **not** complete.
+**Status:** Assessment review draft. The Part 3 video and ARC submission are **not** complete.
+**Latest verification (7 November 2026):** 58/58 local tests passed; Debug build with warnings-as-errors succeeded with 0 warnings and 0 errors; 16/16 preflight paths are present. Four-job GitHub Actions [run #41501949381](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41501949381) passed on source commit `f025338`. [Detailed submission readiness and remaining sign-offs](docs/PART3_VERIFICATION_20261107.md).
 
 ## Part 3: assessor quick navigation
 
