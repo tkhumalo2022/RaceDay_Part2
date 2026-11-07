@@ -1,0 +1,81 @@
+﻿@model EventListModel
+@{
+    ViewData["Title"] = "Discover your next challenge";
+}
+<section class="hero">
+    <div class="wrap">
+        <p class="eyebrow">● COMMUNITY RACING / SOUTH AFRICA</p>
+        <h1>EVERY FINISH<br /><em>STARTS HERE.</em></h1>
+        <p class="hero-text">Run the streets. Ride the distance. Walk for a cause. Find the next race worth showing up for.</p>
+        <a class="button lime" href="#events">EXPLORE EVENTS <span aria-hidden="true">↗</span></a>
+        <div class="hero-meta"><span>01 / THE START LINE</span><span>RUN · WALK · CYCLE</span></div>
+    </div>
+</section>
+<section class="wrap events" id="events">
+    <p class="eyebrow muted">YOUR NEXT CHALLENGE</p>
+    <div class="section-heading">
+        <h2>What's coming up<span class="dot">.</span></h2>
+        <div class="filters" role="group" aria-label="Activity filters">
+            <a class="@(Model.Filter == null ? "selected" : "")" aria-current="@(Model.Filter == null ? "page" : null)" asp-action="Index" asp-route-query="@Model.Query" asp-route-window="@Model.Window" asp-fragment="events">All</a>
+            @foreach (var activity in new[] { "Run", "Walk", "Cycle" })
+            {
+                <a class="@(Model.Filter == activity ? "selected" : "")" aria-current="@(Model.Filter == activity ? "page" : null)" asp-action="Index" asp-route-type="@activity" asp-route-query="@Model.Query" asp-route-window="@Model.Window" asp-fragment="events">@activity</a>
+            }
+        </div>
+    </div>
+    <div class="date-filters" role="group" aria-label="Filter by race date">
+        <span class="date-filters-label">WHEN</span>
+        <a class="@(Model.Window is null ? "selected" : "")" aria-current="@(Model.Window is null ? "page" : null)" asp-action="Index" asp-route-type="@Model.Filter" asp-route-query="@Model.Query" asp-fragment="events">Any date</a>
+        <a class="@(Model.Window == "7" ? "selected" : "")" aria-current="@(Model.Window == "7" ? "page" : null)" asp-action="Index" asp-route-type="@Model.Filter" asp-route-query="@Model.Query" asp-route-window="7" asp-fragment="events">Next 7 days</a>
+        <a class="@(Model.Window == "30" ? "selected" : "")" aria-current="@(Model.Window == "30" ? "page" : null)" asp-action="Index" asp-route-type="@Model.Filter" asp-route-query="@Model.Query" asp-route-window="30" asp-fragment="events">Next 30 days</a>
+    </div>
+    <form asp-controller="Home" asp-action="Index" method="get" class="event-search" role="search">
+        <label for="race-query">Search by race name or location</label>
+        <div class="event-search-controls">
+            <input id="race-query" name="query" type="search" maxlength="100" value="@Model.Query" placeholder="e.g. Durban 10K" />
+            @if (Model.Filter is not null) { <input type="hidden" name="type" value="@Model.Filter" /> }
+            @if (Model.Window is not null) { <input type="hidden" name="window" value="@Model.Window" /> }
+            <button type="submit">SEARCH <span aria-hidden="true">↗</span></button>
+        </div>
+    </form>
+    @if (Model.Error is null && !Model.SignInRequired)
+    {
+        <p class="search-feedback" role="status">
+            @Model.Events.Count upcoming @(Model.Events.Count == 1 ? "race" : "races") found.
+            @if (Model.Query is not null || Model.Filter is not null || Model.Window is not null)
+            {
+                <a asp-action="Index" asp-fragment="events">Clear filters</a>
+            }
+        </p>
+    }
+    @if (TempData["Error"] is string error) { <p class="notice" role="alert">@error</p> }
+    @if (Model.Error is not null)
+    {
+        <div class="empty" role="alert"><h3>Not connected yet.</h3><p>@Model.Error</p></div>
+    }
+    else if (Model.SignInRequired)
+    {
+        <div class="empty"><p class="eyebrow muted">READY WHEN YOU ARE</p><h3>Sign in to see upcoming events.</h3>
+        <p>RaceDay protects event data until you sign in with your Participant or Organiser account.</p>
+        <a class="button" asp-controller="Account" asp-action="Login">SIGN IN ↗</a>
+        <a class="secondary" asp-controller="Account" asp-action="Register">CREATE ACCOUNT</a></div>
+    }
+    else if (Model.Events.Count == 0)
+    {
+        <div class="empty"><h3>@(Model.Filter is not null || Model.Query is not null || Model.Window is not null ? "No matching races." : "Nothing on the calendar yet.")</h3><p>Try another filter or check back when organisers publish new races.</p></div>
+    }
+    else
+    {
+        <div class="event-list">
+        @foreach (var race in Model.Events.OrderBy(x => x.EventDate))
+        {
+            <article class="event-item">
+                <div class="date"><strong>@race.EventDate.ToString("dd")</strong><span>@race.EventDate.ToString("MMM yyyy").ToUpperInvariant()</span></div>
+                <div class="event-info"><span class="eyebrow muted">@race.EventType.ToUpperInvariant() / @race.Status.ToUpperInvariant()</span><h3>@race.EventName</h3><p>@race.Location</p></div>
+                <a class="arrow" asp-action="Details" asp-route-id="@race.Id" aria-label="Details for @race.EventName">↗</a>
+            </article>
+        }
+        </div>
+    }
+</section>
+<section class="endcap"><div class="wrap"><p class="eyebrow">YOUR NEXT MILE IS WAITING</p><h2>THE ROAD IS<br />YOURS TO TAKE.</h2></div></section>

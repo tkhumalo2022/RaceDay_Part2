@@ -1,0 +1,62 @@
+# Local assessment demo only. Uses Development settings, an isolated SQL Server
+# instance and Azurite emulator. DO NOT deploy this Compose file publicly.
+name: raceday-part3-demo
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "${RACEDAY_SA_PASSWORD:?Set RACEDAY_SA_PASSWORD in your local shell; do not commit it}"
+    volumes:
+      - sql_data:/var/opt/mssql
+    restart: unless-stopped
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck --location /data
+    volumes:
+      - blob_data:/data
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: src/RaCeDay/Dockerfile
+    depends_on:
+      - sqlserver
+      - azurite
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=RaceDayPart3Compose;User Id=sa;Password=${RACEDAY_SA_PASSWORD:?Set RACEDAY_SA_PASSWORD};TrustServerCertificate=True;MultipleActiveResultSets=true;Connect Timeout=5"
+      AzureBlob__Container: raceday-images
+      # Public, well-known emulator key; never use this setting in production.
+      AzureBlob__ConnectionString: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
+    ports:
+      - "127.0.0.1:8081:8080"
+    # Initialises ONLY the isolated demo database. On failure, exits after
+    # retries instead of silently running with a broken schema.
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - 'n=0; until dotnet RaCeDay.dll --init-demo-db; do n=$$((n + 1)); if [ "$$n" -ge 15 ]; then exit 1; fi; sleep 4; done; exec dotnet RaCeDay.dll'
+    restart: unless-stopped
+
+  portal:
+    build:
+      context: .
+      dockerfile: src/RaCeDay.Portal/Dockerfile
+    depends_on:
+      - api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      RaCeDayApi__BaseUrl: http://api:8080/
+    ports:
+      - "127.0.0.1:8080:8080"
+    restart: unless-stopped
+
+volumes:
+  sql_data:
+  blob_data:

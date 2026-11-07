@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/RaCeDay.Portal/RaCeDay.Portal.csproj" />
     <Project Path="src/RaCeDay/RaCeDay.csproj" />
   </Folder>
   <Folder Name="/tests/">

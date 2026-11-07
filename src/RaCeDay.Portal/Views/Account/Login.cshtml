@@ -1,0 +1,12 @@
+﻿@model LoginInput
+@{ ViewData["Title"] = "Sign in"; }
+<section class="wrap form-screen">
+<div class="form-intro"><p class="eyebrow muted">BACK ON THE START LINE</p><h1>Welcome<br /><em>back.</em></h1><p>Sign in to discover races and manage your journey.</p></div>
+<form class="auth-form" asp-controller="Account" asp-action="Login" method="post">
+<h2>Sign in</h2><div asp-validation-summary="All" class="validation" role="alert"></div>
+<label asp-for="Email">Email address</label><input asp-for="Email" autocomplete="username" />
+<label asp-for="Password">Password</label><input asp-for="Password" type="password" autocomplete="current-password" />
+<button class="button" type="submit">SIGN IN <span aria-hidden="true">↗</span></button>
+<p>New here? <a asp-action="Register">Create an account</a></p>
+</form>
+</section>

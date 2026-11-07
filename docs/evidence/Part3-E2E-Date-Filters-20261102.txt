@@ -1,0 +1,42 @@
+﻿RaceDay Part 3: live event date-window filters QA — 2 Nov 2026
+Captured: 2026-11-02T20:33:25.5980365+02:00
+Isolated SQL LocalDB: RaceDayPart3QA_20261102_DateFiltersV5
+API: http://127.0.0.1:5101; MVC: http://127.0.0.1:5351 (loopback only)
+Blob backend: Azurite emulator (NOT live Azure)
+Run: scripts/qa-portal-e2e.ps1 -PortalBaseUrl http://127.0.0.1:5351 -ApiBaseUrl http://127.0.0.1:5101
+---
+PASS: Organiser register HTTP 200 after redirect
+PASS: Organiser authentication established
+PASS: Organiser dashboard loads
+PASS: Event form available
+PASS: Organiser can create event
+PASS: Created event ID available
+PASS: Category creation through Part 2 API
+PASS: Participant authentication established
+PASS: Event-name search finds a published race
+PASS: Location search finds the correct event
+PASS: Seven-day filter excludes a race scheduled 21 days away
+PASS: Thirty-day filter finds a future Run matching the search
+PASS: Search form preserves the selected date window
+PASS: Unmatched search excludes other events
+PASS: Participant sees eligible category
+PASS: Real category ID retrieved from API
+PASS: Participant enrolment completes
+PASS: Participant profile form loads
+PASS: Participant updates profile through API
+PASS: Organiser sees enrolment
+PASS: Organiser can edit event
+PASS: Event update through API
+PASS: Organiser can retrieve enrolment IDs
+PASS: Result entry form loads
+PASS: Organiser publishes finish time and position
+PASS: Participant sees published finishing position
+PASS: Participant sees recorded finish time
+PASS: Participant receives HTTP 403 for Organiser-only create screen
+PASS: Organiser receives HTTP 403 for Participant enrolment action
+PASS: Banner form includes event id hidden input
+PASS: Organiser banner stored through API in Azurite
+PASS: Event banner retrieved from private Azure container
+PASS: Participant picture stored through API in Azurite
+PASS: Profile picture retrieved by authenticated owner
+QA COMPLETE: event=3; suffix=54fdba22 (isolated QA database and Azurite)

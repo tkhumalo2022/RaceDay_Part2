@@ -1,8 +1,5 @@
-name: Build and test RaCeDay Part 2
-
-# The marking brief requires validation on every push, including new feature branches.
+name: Build and test RaceDay Parts 2 and 3
 on: [push, pull_request]
-
 permissions:
   contents: read
 
@@ -13,12 +10,10 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
-
       - name: Set up .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-
       - name: Start SQL Server LocalDB
         shell: pwsh
         run: |
@@ -35,16 +30,12 @@ jobs:
           }
           & $exe start MSSQLLocalDB
           if ($LASTEXITCODE -ne 0) { throw 'Could not start SQL Server LocalDB.' }
-
       - name: Restore solution
         run: dotnet restore RaCeDay.slnx
-
-      - name: Build solution
+      - name: Build complete solution with warnings as errors
         run: dotnet build RaCeDay.slnx -c Release --no-restore --warnaserror
-
       - name: Run unit and SQL Server integration tests
         run: dotnet test RaCeDay.slnx -c Release --no-restore --no-build --logger "trx;LogFileName=github-ci.trx"
-
       - name: Preserve test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -52,3 +43,92 @@ jobs:
           name: raceday-test-results
           path: tests/RaCeDay.Tests/TestResults/**/*.trx
           if-no-files-found: warn
+
+  docker-portal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Validate complete local Docker Compose specification
+        env:
+          RACEDAY_SA_PASSWORD: CI-local-only-N0tARealSecret
+        run: docker compose -f compose.yaml config --quiet
+      - name: Build backend API container from Dockerfile
+        run: docker build -f src/RaCeDay/Dockerfile -t raceday-api:ci .
+      - name: Build MVC container from Dockerfile
+        run: docker build -f src/RaCeDay.Portal/Dockerfile -t raceday-portal:ci .
+      - name: Start container without production credentials
+        run: |
+          docker run -d --name raceday-portal-ci -p 8080:8080 \
+            -e RaCeDayApi__BaseUrl=http://host.docker.internal:5001/ \
+            raceday-portal:ci
+      - name: Check login and registration routes inside container
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:8080/Account/Login -o /tmp/login.html; then break; fi
+            sleep 2
+          done
+          test -s /tmp/login.html
+          grep -q "Sign in" /tmp/login.html
+          curl --fail --silent --show-error http://127.0.0.1:8080/Account/Register -o /tmp/register.html
+          grep -q "Join RaceDay" /tmp/register.html
+      - name: Stop test container
+        if: always()
+        run: docker logs raceday-portal-ci || true; docker rm -f raceday-portal-ci || true
+
+  blob-sdk-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Start local Azure Blob emulator
+        run: |
+          docker run -d --name raceday-azurite -p 10000:10000 \
+            mcr.microsoft.com/azure-storage/azurite \
+            azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
+          for attempt in $(seq 1 30); do
+            if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:10000; then break; fi
+            sleep 2
+          done
+          curl --silent --output /dev/null --max-time 3 http://127.0.0.1:10000
+      - name: Run actual Azure SDK upload, retrieval and missing-image checks
+        env:
+          RACEDAY_TEST_BLOB_CONNECTION: UseDevelopmentStorage=true
+        run: dotnet test tests/RaCeDay.Tests/RaCeDay.Tests.csproj -c Release --filter FullyQualifiedName~AzureBlobRoundTripTests --logger "trx;LogFileName=blob-ci.trx"
+      - name: Preserve blob test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: raceday-blob-sdk-test-results
+          path: tests/RaCeDay.Tests/TestResults/**/*.trx
+          if-no-files-found: warn
+      - name: Stop emulator
+        if: always()
+        run: docker logs raceday-azurite || true; docker rm -f raceday-azurite || true
+
+  compose-integration:
+    # This checks the real four-service Compose startup, not public hosting or Azure cloud.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RACEDAY_SA_PASSWORD: CI-local-only-N0tARealSecret!
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Build and start SQL Server, Azurite, API and MVC portal
+        run: docker compose -f compose.yaml up --build -d
+      - name: Verify database initialization and both HTTP applications
+        run: bash scripts/ci-compose-smoke.sh
+      - name: Preserve container diagnostic output and tear down test stack
+        if: always()
+        run: |
+          docker compose -f compose.yaml ps || true
+          docker compose -f compose.yaml logs --no-color --tail 60 api portal || true
+          docker compose -f compose.yaml down --remove-orphans || true
