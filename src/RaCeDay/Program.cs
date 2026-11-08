@@ -13,8 +13,11 @@ var connection = builder.Configuration.GetConnectionString("DefaultConnection")
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection));
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
-    // Development-only bypass: production requires verified email and a real sender.
-    options.SignIn.RequireConfirmedAccount = !builder.Environment.IsDevelopment();
+    // Production requires confirmed email and a real sender. The opt-in staging flag
+    // permits disposable peer-review accounts, never production accounts.
+    var allowReviewAccounts = builder.Environment.IsStaging() &&
+        builder.Configuration.GetValue<bool>("RaceDay:AllowUnconfirmedReviewAccounts");
+    options.SignIn.RequireConfirmedAccount = !builder.Environment.IsDevelopment() && !allowReviewAccounts;
     options.User.RequireUniqueEmail = true;
     options.Lockout.MaxFailedAccessAttempts = 5;
 })
@@ -29,7 +32,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
 });
 builder.Services.AddScoped<RaceWorkflow>();
 builder.Services.AddScoped<ProfileImageStorage>();
@@ -39,6 +43,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
     options.Events.OnRedirectToLogin = context =>
     {
         if (context.Request.Path.StartsWithSegments("/api")) context.Response.StatusCode = 401;
@@ -149,4 +155,19 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+// Health endpoints disclose no connection strings, SQL details, or user data.
+app.MapGet("/healthz", () => Results.Ok(new { status = "ok" }));
+app.MapGet("/readyz", async (ApplicationDbContext db, CancellationToken ct) =>
+{
+    try
+    {
+        // Check that the SQL Server schema exists, not merely that TCP is reachable.
+        _ = await db.Users.AsNoTracking().AnyAsync(ct);
+        return Results.Ok(new { status = "ready" });
+    }
+    catch (Exception)
+    {
+        return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
+});
 app.Run();
