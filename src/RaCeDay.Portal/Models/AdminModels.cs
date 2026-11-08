@@ -23,5 +23,9 @@ public sealed record AdminDashboardPage(
     string? RoleFilter,
     string? Error)
 {
+    public bool OverviewLoaded { get; init; }
+    public bool UsersLoaded { get; init; }
+    public bool EventsLoaded { get; init; }
+    public bool EnrolmentsLoaded { get; init; }
     public int TotalPages => Math.Max(1, (int)Math.Ceiling((double)Users.Total / Users.PageSize));
 }
