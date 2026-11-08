@@ -15,6 +15,8 @@ public sealed class DashboardController(RaceDayApiClient api) : Controller
             if (status == HttpStatusCode.Unauthorized || session is null)
                 return RedirectToAction("Login", "Account");
             ViewData["Role"] = session.Role;
+            if (session.Role == "Admin")
+                return RedirectToAction("Index", "Admin");
             if (session.Role == "Organiser")
             {
                 var (owned, result) = await api.GetAsync<List<RaceEvent>>(
