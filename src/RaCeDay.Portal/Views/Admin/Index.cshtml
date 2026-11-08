@@ -1,0 +1,151 @@
+@model RaCeDay.Portal.Models.AdminDashboardPage
+@{
+    ViewData["Title"] = "Admin command centre";
+}
+<section class="admin-hero">
+    <div class="wrap">
+        <p class="eyebrow">RACEDAY / OPERATIONS / ROLE-RESTRICTED</p>
+        <div class="admin-hero-line">
+            <div><h1>THE CONTROL<br /><em>ROOM.</em></h1>
+                <p class="admin-intro">Live race operations, account access and a clear view of every event. Administrative actions are permission checked by the API.</p>
+            </div>
+            <div class="admin-hero-mark" aria-hidden="true">R<span>/</span></div>
+        </div>
+        <div class="admin-hero-meta"><span>ADMIN COMMAND CENTRE</span><span>DATA FROM RACEDAY API · SQL SERVER</span></div>
+    </div>
+</section>
+<div class="wrap admin-main">
+    @if (TempData["Notice"] is string notice) { <p class="admin-alert success" role="status">@notice</p> }
+    @if (TempData["Error"] is string actionError) { <p class="admin-alert" role="alert">@actionError</p> }
+    @if (Model.Error is not null) { <p class="admin-alert" role="alert">@Model.Error</p> }
+
+    <section aria-labelledby="overview-heading">
+        <div class="admin-section-title"><div>
+            <p class="admin-kicker">01 / THE BIG PICTURE</p><h2 id="overview-heading">Platform overview<span class="dot">.</span></h2>
+        </div><span class="admin-small-note">ACTUAL RECORD COUNTS</span></div>
+        <div class="admin-metrics">
+            <div class="admin-metric dark"><span>REGISTERED USERS</span><strong>@Model.Overview.Users</strong><small>@Model.Overview.Organisers organisers · @Model.Overview.Participants participants</small></div>
+            <div class="admin-metric"><span>RACE EVENTS</span><strong>@Model.Overview.Events</strong><small>@Model.Overview.UpcomingEvents upcoming</small></div>
+            <div class="admin-metric"><span>ENROLMENTS</span><strong>@Model.Overview.Enrolments</strong><small>@Model.Overview.Categories categories</small></div>
+            <div class="admin-metric"><span>RESULTS RECORDED</span><strong>@Model.Overview.Results</strong><small>Across all events</small></div>
+        </div>
+        <div class="admin-payment-note"><strong>@Model.Overview.PendingPaymentAttempts pending attempts</strong> · @Model.Overview.PaymentAttempts total payment attempts.
+            RaceDay does not settle payments; these figures are <strong>not revenue</strong>.
+        </div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="users-heading">
+        <div class="admin-section-title"><div>
+            <p class="admin-kicker">02 / ACCESS CONTROL</p><h2 id="users-heading">User management<span class="dot">.</span></h2>
+        </div><span class="admin-small-note">@Model.Users.Total ACCOUNTS</span></div>
+        <form method="get" asp-controller="Admin" asp-action="Index" class="admin-filters">
+            <div><label for="admin-search">Search people</label>
+                <input id="admin-search" type="search" name="query" value="@Model.Query" maxlength="100" placeholder="Name or email" /></div>
+            <div><label for="admin-role">Account role</label>
+                <select id="admin-role" name="role">
+                    <option value="" selected="@(Model.RoleFilter is null)">All roles</option>
+                    <option value="Admin" selected="@(Model.RoleFilter == "Admin")">Admin</option>
+                    <option value="Organiser" selected="@(Model.RoleFilter == "Organiser")">Organiser</option>
+                    <option value="Participant" selected="@(Model.RoleFilter == "Participant")">Participant</option>
+                </select></div>
+            <button type="submit" class="admin-apply">FILTER ACCOUNTS ↗</button>
+            <a asp-controller="Admin" asp-action="Index" class="admin-clear">Clear</a>
+        </form>
+        <div class="admin-table-scroll">
+            <table class="admin-table"><thead><tr><th>Account</th><th>Role</th><th>Joined</th><th>Status</th><th>Controls</th></tr></thead>
+            <tbody>
+            @foreach (var u in Model.Users.Items)
+            {
+                <tr>
+                    <td><strong>@u.Name</strong><small>@u.Email</small></td>
+                    <td>@u.Role</td>
+                    <td>@u.CreatedAt.ToString("dd MMM yyyy")</td>
+                    <td><span class="admin-state @(u.Disabled ? "suspended" : "enabled")">@(u.Disabled ? "Disabled" : "Active")</span>
+                        @if (!u.EmailConfirmed) { <small>Email unconfirmed</small> }</td>
+                    <td class="admin-controls">
+                        @if (u.Role == "Admin")
+                        {
+                            <span class="admin-restricted">Protected administrator</span>
+                        }
+                        else
+                        {
+                            <form asp-controller="Admin" asp-action="SetAccess" method="post" class="admin-inline-action">
+                                <input type="hidden" name="id" value="@u.Id" />
+                                <input type="hidden" name="disabled" value="@(!u.Disabled ? "true" : "false")" />
+                                <input type="hidden" name="query" value="@Model.Query" />
+                                <input type="hidden" name="role" value="@Model.RoleFilter" />
+                                <input type="hidden" name="page" value="@Model.Users.Page" />
+                                <button class="admin-mini-button @(u.Disabled ? "" : "danger")" type="submit">@(u.Disabled ? "Enable" : "Disable")</button>
+                            </form>
+                            <details class="admin-role-details">
+                                <summary>Change role</summary>
+                                <form asp-controller="Admin" asp-action="SetRole" method="post" class="admin-role-form">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <input type="hidden" name="query" value="@Model.Query" />
+                                    <input type="hidden" name="roleFilter" value="@Model.RoleFilter" />
+                                    <input type="hidden" name="page" value="@Model.Users.Page" />
+                                    <label>New role
+                                        <select name="role" aria-label="New role for @u.Name">
+                                            <option value="Participant" selected="@(u.Role == "Participant")">Participant</option>
+                                            <option value="Organiser" selected="@(u.Role == "Organiser")">Organiser</option>
+                                        </select>
+                                    </label>
+                                    <label>Organisation name (if changing to Organiser)
+                                        <input name="organiserName" maxlength="100" placeholder="Organisation name" />
+                                    </label>
+                                    <button class="admin-mini-button" type="submit">Save role</button>
+                                    <small>Accounts with race records cannot change role.</small>
+                                </form>
+                            </details>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody></table>
+            @if (Model.Users.Items.Count == 0)
+            {
+                <p class="admin-empty">No accounts match those filters.</p>
+            }
+        </div>
+        <div class="admin-pagination">
+            <span>Page @Model.Users.Page of @Model.TotalPages</span>
+            <div>
+                @if (Model.Users.Page > 1) { <a asp-action="Index" asp-route-query="@Model.Query" asp-route-role="@Model.RoleFilter" asp-route-page="@(Model.Users.Page - 1)">← Previous</a> }
+                @if (Model.Users.Page < Model.TotalPages) { <a asp-action="Index" asp-route-query="@Model.Query" asp-route-role="@Model.RoleFilter" asp-route-page="@(Model.Users.Page + 1)">Next →</a> }
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="events-heading">
+        <div class="admin-section-title"><div>
+            <p class="admin-kicker">03 / RACE OPERATIONS</p><h2 id="events-heading">Event oversight<span class="dot">.</span></h2>
+        </div><span class="admin-small-note">LATEST @Model.Events.Items.Count OF @Model.Events.Total</span></div>
+        <div class="admin-table-scroll">
+            <table class="admin-table"><thead><tr><th>Event</th><th>Organiser</th><th>Date</th><th>Enrolled</th><th>Results</th><th>Status</th></tr></thead><tbody>
+                @foreach (var e in Model.Events.Items)
+                {
+                    <tr><td><strong>@e.EventName</strong><small>@e.Location</small></td><td>@e.Organiser</td><td>@e.EventDate.ToString("dd MMM yyyy")</td>
+                        <td>@e.Enrolments</td><td>@e.Results</td><td><span class="admin-state">@e.Status</span></td></tr>
+                }
+            </tbody></table>
+            @if (Model.Events.Items.Count == 0) { <p class="admin-empty">No events have been created.</p> }
+        </div>
+        <p class="admin-footnote">Cross-organiser event editing is intentionally disabled. Organisers retain ownership of their races.</p>
+    </section>
+
+    <section class="admin-section" aria-labelledby="enrolments-heading">
+        <div class="admin-section-title"><div>
+            <p class="admin-kicker">04 / RECENT ACTIVITY</p><h2 id="enrolments-heading">Enrolment oversight<span class="dot">.</span></h2>
+        </div><span class="admin-small-note">LATEST @Model.Enrolments.Items.Count OF @Model.Enrolments.Total</span></div>
+        <div class="admin-table-scroll">
+            <table class="admin-table"><thead><tr><th>Participant</th><th>Event</th><th>Race number</th><th>Registered</th><th>Status</th></tr></thead><tbody>
+            @foreach (var e in Model.Enrolments.Items)
+            {
+                <tr><td><strong>@e.Participant</strong></td><td>@e.EventName</td><td>@e.RaceNumber</td>
+                    <td>@e.EnrolmentDate.ToString("dd MMM yyyy")</td><td><span class="admin-state">@e.Status</span></td></tr>
+            }
+            </tbody></table>
+            @if (Model.Enrolments.Items.Count == 0) { <p class="admin-empty">No enrolments recorded.</p> }
+        </div>
+    </section>
+</div>
