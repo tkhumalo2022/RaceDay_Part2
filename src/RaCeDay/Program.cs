@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RaCeDay.Data;
@@ -152,6 +153,32 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
+// A disabled review account must lose API access immediately, not just after the
+// normal Identity security-stamp validation interval. Applies to authenticated
+// API and legacy MVC routes; the portal itself only relays API sessions.
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        var id = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrWhiteSpace(id))
+        {
+            var users = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+            var account = await users.FindByIdAsync(id);
+            if (account is null ||
+                (account.LockoutEnabled && account.LockoutEnd == DateTimeOffset.MaxValue))
+            {
+                await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+                if (context.Request.Path.StartsWithSegments("/api"))
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                else
+                    context.Response.Redirect("/Identity/Account/Login");
+                return;
+            }
+        }
+    }
+    await next();
+});
 app.UseAuthorization();
 app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
