@@ -2,7 +2,8 @@
 <html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="theme-color" content="#141a16" /><title>@ViewData["Title"] | RaceDay</title>
 <link rel="stylesheet" asp-append-version="true" href="~/css/site.css" />
-<link rel="stylesheet" asp-append-version="true" href="~/css/workflow.css" /></head>
+<link rel="stylesheet" asp-append-version="true" href="~/css/workflow.css" />
+<link rel="stylesheet" asp-append-version="true" href="~/css/admin.css" /></head>
 <body><a href="#main" class="skip-link">Skip to content</a>
 @if (Context.RequestServices.GetRequiredService<IWebHostEnvironment>().IsStaging())
 {
@@ -13,7 +14,8 @@
 <div class="nav-links"><a asp-controller="Home" asp-action="Index">Events</a>
 @if(ViewData["Role"] is string role){
 <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
-<a asp-controller="Participant" asp-action="Profile">Profile</a>
+@if(role=="Participant"){<a asp-controller="Participant" asp-action="Profile">Profile</a>}
+@if(role=="Admin"){<a asp-controller="Admin" asp-action="Index">Admin overview</a>}
 @if(role=="Organiser"){<a asp-controller="Organiser" asp-action="Create">Create event</a>}
 <form asp-controller="Account" asp-action="Logout" method="post"><button class="nav-link-button" type="submit">Sign out</button></form>
 }else{
