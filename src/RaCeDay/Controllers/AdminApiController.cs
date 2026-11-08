@@ -115,6 +115,41 @@ public sealed class AdminApiController(
         return Ok(new AdminPage<AdminEnrolmentRow>(total, page, size, rows));
     }
 
+    // Admin-only operational report. CSV values are encoded against spreadsheet
+    // formula injection and always quoted; no personal contact data is exported.
+    [HttpGet("reports/events.csv")]
+    public async Task<IActionResult> ExportEvents(CancellationToken ct)
+    {
+        var data = await (from e in db.Events.AsNoTracking()
+            join owner in db.Users.AsNoTracking() on e.OrganiserId equals owner.Id
+            orderby e.EventDate descending, e.Id descending
+            select new AdminEventRow(e.Id, e.EventName, e.EventDate,
+                e.Location, e.Status, (owner.FirstName + " " + owner.LastName).Trim(),
+                db.Enrolments.Count(x => x.EventId == e.Id),
+                db.Results.Count(x => db.Enrolments.Any(en => en.Id == x.EnrolmentId && en.EventId == e.Id))))
+            .Take(2000).ToListAsync(ct);
+        var output = new System.Text.StringBuilder(
+            "Event ID,Event,Date,Location,Status,Organiser,Enrolments,Results\r\n");
+        foreach (var e in data)
+            output.Append(e.Id).Append(',').Append(Csv(e.EventName)).Append(',')
+                .Append(e.EventDate.ToString("yyyy-MM-dd")).Append(',')
+                .Append(Csv(e.Location)).Append(',').Append(Csv(e.Status)).Append(',')
+                .Append(Csv(e.Organiser)).Append(',').Append(e.Enrolments).Append(',')
+                .Append(e.Results).Append("\r\n");
+        return File(new System.Text.UTF8Encoding(true).GetBytes(output.ToString()),
+            "text/csv", "RaceDay-admin-events.csv");
+    }
+
+    private static string Csv(string? value)
+    {
+        var result = value ?? "";
+        // Excel may interpret imported cells beginning with a formula prefix.
+        if (result.TrimStart().StartsWith('=') || result.TrimStart().StartsWith('+') ||
+            result.TrimStart().StartsWith('-') || result.TrimStart().StartsWith('@'))
+            result = "'" + result;
+        return "\"" + result.Replace("\"", "\"\"") + "\"";
+    }
+
     // Disabling accounts prevents future sign-in and rejects active API sessions
     // via the lockout middleware. Admins cannot disable themselves or other admins.
     [HttpPost("users/{id}/access")]
