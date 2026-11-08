@@ -4,6 +4,10 @@
 <link rel="stylesheet" asp-append-version="true" href="~/css/site.css" />
 <link rel="stylesheet" asp-append-version="true" href="~/css/workflow.css" /></head>
 <body><a href="#main" class="skip-link">Skip to content</a>
+@if (Context.RequestServices.GetRequiredService<IWebHostEnvironment>().IsStaging())
+{
+    <div class="review-banner" role="status">RACEDAY / REVIEW PREVIEW — Use test accounts only. Not a final submission or production service.</div>
+}
 <header class="site-header"><nav class="wrap navigation" aria-label="Main navigation">
 <a class="brand" asp-controller="Home" asp-action="Index"><span>R/</span> RACEDAY</a>
 <div class="nav-links"><a asp-controller="Home" asp-action="Index">Events</a>
