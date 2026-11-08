@@ -1,0 +1,51 @@
+# Preview infrastructure only; do not deploy without configuring Azure SQL and Blob secrets.
+# The assessed PROG6212 code remains on feature/part3-mvc-review.
+services:
+  - type: web
+    name: raceday-prog6212-api-review
+    runtime: docker
+    plan: free
+    region: frankfurt
+    repo: https://github.com/tkhumalo2022/RaceDay_Part2
+    branch: deploy/raceday-cloud-review-20261108
+    dockerfilePath: ./src/RaCeDay/Dockerfile
+    dockerContext: .
+    healthCheckPath: /readyz
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Staging
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+        value: 'true'
+      - key: RaceDay__AllowUnconfirmedReviewAccounts
+        value: 'true'
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: AzureBlob__ConnectionString
+        sync: false
+      - key: AzureBlob__Container
+        value: raceday-images
+  - type: web
+    name: raceday-prog6212-portal-review
+    runtime: docker
+    plan: free
+    region: frankfurt
+    repo: https://github.com/tkhumalo2022/RaceDay_Part2
+    branch: deploy/raceday-cloud-review-20261108
+    dockerfilePath: ./src/RaCeDay.Portal/Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: 'off'
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Staging
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
+      - key: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+        value: 'true'
+      # Use the public HTTPS URL for the API web service (including trailing /).
+      # Render Free web services cannot accept private-network traffic.
+      - key: RaCeDayApi__BaseUrl
+        sync: false
