@@ -51,7 +51,13 @@ public sealed class AdminController(RaceDayApiClient api) : Controller
                 users ?? new(0, 1, 15, []),
                 events ?? new(0, 1, 12, []),
                 entries ?? new(0, 1, 12, []),
-                query, role, warning));
+                query, role, warning)
+            {
+                OverviewLoaded = overviewStatus == HttpStatusCode.OK && overview is not null,
+                UsersLoaded = usersStatus == HttpStatusCode.OK && users is not null,
+                EventsLoaded = eventsStatus == HttpStatusCode.OK && events is not null,
+                EnrolmentsLoaded = entriesStatus == HttpStatusCode.OK && entries is not null
+            });
         }
         catch (HttpRequestException)
         {
