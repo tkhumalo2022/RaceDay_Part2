@@ -60,6 +60,8 @@ public class AdminApiTests(IdentityFixture fixture) : IClassFixture<IdentityFixt
         Assert.Equal(HttpStatusCode.Forbidden,
             (await participantBrowser.GetAsync("/api/admin/overview")).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden,
+            (await participantBrowser.GetAsync("/api/admin/reports/events.csv")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden,
             (await participantBrowser.PostAsJsonAsync(
                 $"/api/admin/users/{admin.Id}/access", new { disabled = true })).StatusCode);
 
@@ -119,7 +121,7 @@ public class AdminApiTests(IdentityFixture fixture) : IClassFixture<IdentityFixt
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             db.Events.Add(new RaceEvent
             {
-                OrganiserId = organiser.Id, EventName = "QA Trail Run",
+                OrganiserId = organiser.Id, EventName = "=2+2 QA Trail Run",
                 EventDate = new DateOnly(2027, 2, 14), ClosingDate = new DateOnly(2027, 2, 12),
                 EventType = "Run", Status = "Open", Location = "Durban"
             });
@@ -131,6 +133,9 @@ public class AdminApiTests(IdentityFixture fixture) : IClassFixture<IdentityFixt
         Assert.True(overview.GetProperty("events").GetInt32() > 0);
         var eventPage = await client.GetFromJsonAsync<JsonElement>("/api/admin/events?query=Trail");
         Assert.True(eventPage.GetProperty("total").GetInt32() > 0);
+        var csv = await client.GetStringAsync("/api/admin/reports/events.csv");
+        Assert.Contains("'=2+2 QA Trail Run", csv);
+        Assert.Contains("Enrolments,Results", csv);
         Assert.Equal(HttpStatusCode.Conflict,
             (await client.PostAsJsonAsync(
                 $"/api/admin/users/{organiser.Id}/role",
