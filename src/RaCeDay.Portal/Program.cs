@@ -24,5 +24,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+app.MapGet("/healthz", () => Results.Ok(new { status = "ok" }));
 app.Run();
 public partial class Program { }
