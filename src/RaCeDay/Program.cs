@@ -165,8 +165,16 @@ app.Use(async (context, next) =>
         {
             var users = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
             var account = await users.FindByIdAsync(id);
+            // A role change also invalidates old cookies immediately. A removed
+            // Organiser must not retain access through stale role claims.
+            var oldRoles = context.User.FindAll(System.Security.Claims.ClaimTypes.Role)
+                .Select(claim => claim.Value).ToHashSet(StringComparer.Ordinal);
+            var effectiveRoles = account is null
+                ? new HashSet<string>(StringComparer.Ordinal)
+                : (await users.GetRolesAsync(account)).ToHashSet(StringComparer.Ordinal);
             if (account is null ||
-                (account.LockoutEnabled && account.LockoutEnd == DateTimeOffset.MaxValue))
+                (account.LockoutEnabled && account.LockoutEnd == DateTimeOffset.MaxValue) ||
+                !oldRoles.SetEquals(effectiveRoles))
             {
                 await context.SignOutAsync(IdentityConstants.ApplicationScheme);
                 if (context.Request.Path.StartsWithSegments("/api"))
