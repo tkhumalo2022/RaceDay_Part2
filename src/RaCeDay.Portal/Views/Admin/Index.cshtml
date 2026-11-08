@@ -23,6 +23,8 @@
         <div class="admin-section-title"><div>
             <p class="admin-kicker">01 / THE BIG PICTURE</p><h2 id="overview-heading">Platform overview<span class="dot">.</span></h2>
         </div><span class="admin-small-note">ACTUAL RECORD COUNTS</span></div>
+        @if (Model.OverviewLoaded)
+        {
         <div class="admin-metrics">
             <div class="admin-metric dark"><span>REGISTERED USERS</span><strong>@Model.Overview.Users</strong><small>@Model.Overview.Organisers organisers · @Model.Overview.Participants participants</small></div>
             <div class="admin-metric"><span>RACE EVENTS</span><strong>@Model.Overview.Events</strong><small>@Model.Overview.UpcomingEvents upcoming</small></div>
@@ -32,6 +34,8 @@
         <div class="admin-payment-note"><strong>@Model.Overview.PendingPaymentAttempts pending attempts</strong> · @Model.Overview.PaymentAttempts total payment attempts.
             RaceDay does not settle payments; these figures are <strong>not revenue</strong>.
         </div>
+        }
+        else { <p class="admin-alert" role="alert">Live statistics are unavailable. Values have not been assumed.</p> }
     </section>
 
     <section class="admin-section" aria-labelledby="users-heading">
@@ -102,10 +106,8 @@
                 </tr>
             }
             </tbody></table>
-            @if (Model.Users.Items.Count == 0)
-            {
-                <p class="admin-empty">No accounts match those filters.</p>
-            }
+            @if (!Model.UsersLoaded) { <p class="admin-empty">User list unavailable. Please retry.</p> }
+            else if (Model.Users.Items.Count == 0) { <p class="admin-empty">No accounts match those filters.</p> }
         </div>
         <div class="admin-pagination">
             <span>Page @Model.Users.Page of @Model.TotalPages</span>
@@ -128,7 +130,8 @@
                         <td>@e.Enrolments</td><td>@e.Results</td><td><span class="admin-state">@e.Status</span></td></tr>
                 }
             </tbody></table>
-            @if (Model.Events.Items.Count == 0) { <p class="admin-empty">No events have been created.</p> }
+            @if (!Model.EventsLoaded) { <p class="admin-empty">Event list unavailable. Please retry.</p> }
+            else if (Model.Events.Items.Count == 0) { <p class="admin-empty">No events have been created.</p> }
         </div>
         <div class="admin-pagination">
             <span>Event page @Model.Events.Page of @Math.Max(1, (int)Math.Ceiling((double)Model.Events.Total / Model.Events.PageSize))</span>
@@ -152,7 +155,8 @@
                     <td>@e.EnrolmentDate.ToString("dd MMM yyyy")</td><td><span class="admin-state">@e.Status</span></td></tr>
             }
             </tbody></table>
-            @if (Model.Enrolments.Items.Count == 0) { <p class="admin-empty">No enrolments recorded.</p> }
+            @if (!Model.EnrolmentsLoaded) { <p class="admin-empty">Enrolment list unavailable. Please retry.</p> }
+            else if (Model.Enrolments.Items.Count == 0) { <p class="admin-empty">No enrolments recorded.</p> }
         </div>
         <div class="admin-pagination">
             <span>Enrolment page @Model.Enrolments.Page of @Math.Max(1, (int)Math.Ceiling((double)Model.Enrolments.Total / Model.Enrolments.PageSize))</span>
