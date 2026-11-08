@@ -119,7 +119,7 @@
     <section class="admin-section" aria-labelledby="events-heading">
         <div class="admin-section-title"><div>
             <p class="admin-kicker">03 / RACE OPERATIONS</p><h2 id="events-heading">Event oversight<span class="dot">.</span></h2>
-        </div><span class="admin-small-note">LATEST @Model.Events.Items.Count OF @Model.Events.Total</span></div>
+        </div><div class="admin-section-actions"><span class="admin-small-note">LATEST @Model.Events.Items.Count OF @Model.Events.Total</span><a class="admin-export" asp-controller="Admin" asp-action="EventsCsv">DOWNLOAD CSV ↓</a></div></div>
         <div class="admin-table-scroll">
             <table class="admin-table"><thead><tr><th>Event</th><th>Organiser</th><th>Date</th><th>Enrolled</th><th>Results</th><th>Status</th></tr></thead><tbody>
                 @foreach (var e in Model.Events.Items)
@@ -129,6 +129,13 @@
                 }
             </tbody></table>
             @if (Model.Events.Items.Count == 0) { <p class="admin-empty">No events have been created.</p> }
+        </div>
+        <div class="admin-pagination">
+            <span>Event page @Model.Events.Page of @Math.Max(1, (int)Math.Ceiling((double)Model.Events.Total / Model.Events.PageSize))</span>
+            <div>
+                @if (Model.Events.Page > 1) { <a asp-action="Index" asp-route-query="@Model.Query" asp-route-role="@Model.RoleFilter" asp-route-page="@Model.Users.Page" asp-route-eventPage="@(Model.Events.Page - 1)" asp-route-enrolmentPage="@Model.Enrolments.Page">← Previous</a> }
+                @if (Model.Events.Page * Model.Events.PageSize < Model.Events.Total) { <a asp-action="Index" asp-route-query="@Model.Query" asp-route-role="@Model.RoleFilter" asp-route-page="@Model.Users.Page" asp-route-eventPage="@(Model.Events.Page + 1)" asp-route-enrolmentPage="@Model.Enrolments.Page">Next →</a> }
+            </div>
         </div>
         <p class="admin-footnote">Cross-organiser event editing is intentionally disabled. Organisers retain ownership of their races.</p>
     </section>
@@ -146,6 +153,13 @@
             }
             </tbody></table>
             @if (Model.Enrolments.Items.Count == 0) { <p class="admin-empty">No enrolments recorded.</p> }
+        </div>
+        <div class="admin-pagination">
+            <span>Enrolment page @Model.Enrolments.Page of @Math.Max(1, (int)Math.Ceiling((double)Model.Enrolments.Total / Model.Enrolments.PageSize))</span>
+            <div>
+                @if (Model.Enrolments.Page > 1) { <a asp-action="Index" asp-route-query="@Model.Query" asp-route-role="@Model.RoleFilter" asp-route-page="@Model.Users.Page" asp-route-eventPage="@Model.Events.Page" asp-route-enrolmentPage="@(Model.Enrolments.Page - 1)">← Previous</a> }
+                @if (Model.Enrolments.Page * Model.Enrolments.PageSize < Model.Enrolments.Total) { <a asp-action="Index" asp-route-query="@Model.Query" asp-route-role="@Model.RoleFilter" asp-route-page="@Model.Users.Page" asp-route-eventPage="@Model.Events.Page" asp-route-enrolmentPage="@(Model.Enrolments.Page + 1)">Next →</a> }
+            </div>
         </div>
     </section>
 </div>
