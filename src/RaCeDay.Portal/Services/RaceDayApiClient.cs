@@ -28,6 +28,28 @@ public sealed partial class RaceDayApiClient(HttpClient client)
         if (!response.IsSuccessStatusCode) return (default, response.StatusCode);
         return (await response.Content.ReadFromJsonAsync<T>(Json, ct), response.StatusCode);
     }
+    public async Task<(byte[]? Content, HttpStatusCode Status)> DownloadReportAsync(
+        string path, HttpRequest browser, CancellationToken ct)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, path);
+        ForwardCookies(browser, request);
+        using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+        if (!response.IsSuccessStatusCode) return (null, response.StatusCode);
+        if (response.Content.Headers.ContentLength > 2 * 1024 * 1024)
+            return (null, HttpStatusCode.RequestEntityTooLarge);
+        await using var stream = await response.Content.ReadAsStreamAsync(ct);
+        using var output = new MemoryStream();
+        var buffer = new byte[16384];
+        int read;
+        while ((read = await stream.ReadAsync(buffer.AsMemory(), ct)) > 0)
+        {
+            if (output.Length + read > 2 * 1024 * 1024)
+                return (null, HttpStatusCode.RequestEntityTooLarge);
+            await output.WriteAsync(buffer.AsMemory(0, read), ct);
+        }
+        return (output.ToArray(), response.StatusCode);
+    }
+
     public Task<(ApiSession? Data, HttpStatusCode Status)> SessionAsync(HttpRequest browser, CancellationToken ct)
         => GetAsync<ApiSession>("api/auth/session", browser, ct);
 
