@@ -5,6 +5,12 @@ namespace RaCeDay.Portal.Services;
 // Keeps the MVC discovery rules testable without needing a SQL Server connection.
 public static class EventDiscovery
 {
+    // Match the API's enrolment date and capacity checks before showing the button.
+    // The API still makes the final decision when someone submits an entry.
+    public static bool CanEnrol(RaceEvent race, RaceCategory category, DateOnly today) =>
+        race.Status == "Open" && race.ClosingDate >= today && race.EventDate >= today &&
+        category.CurrentParticipants < category.MaxParticipants;
+
     public static (List<RaceEvent> Events, string? Filter, string? Query, string? Window) Find(
         IEnumerable<RaceEvent> events, string? type, string? query, DateOnly today,
         string? window = null)

@@ -84,4 +84,17 @@ public class PortalEventDiscoveryTests
         Assert.Null(result.Window);
         Assert.Equal([1, 2], result.Events.Select(x => x.Id).ToArray());
     }
+
+    [Fact]
+    public void EnrolButtonMatchesEventDatesStatusAndCapacity()
+    {
+        var race = Races[0] with { EventDate = Today.AddDays(3) };
+        var category = new RaceCategory(1, race.Id, "5 km", 5, 50, 10, 2);
+
+        Assert.True(EventDiscovery.CanEnrol(race, category, Today));
+        Assert.False(EventDiscovery.CanEnrol(race with { EventDate = Today.AddDays(-1) }, category, Today));
+        Assert.False(EventDiscovery.CanEnrol(race with { ClosingDate = Today.AddDays(-1) }, category, Today));
+        Assert.False(EventDiscovery.CanEnrol(race with { Status = "Closed" }, category, Today));
+        Assert.False(EventDiscovery.CanEnrol(race, category with { CurrentParticipants = 10 }, Today));
+    }
 }

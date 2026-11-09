@@ -1,5 +1,8 @@
+@using RaCeDay.Portal.Services
 @model EventPageModel
-@{ViewData["Title"]=Model.Event.EventName; var role=ViewData["Role"]?.ToString();}
+@{ViewData["Title"]=Model.Event.EventName; var role=ViewData["Role"]?.ToString();
+  // Use the same South African calendar date as the API enrolment check.
+  var today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(2));}
 <section class="detail-top"><div class="wrap"><a class="back-link" asp-action="Index">← Explore events</a>
 <p class="eyebrow">@Model.Event.EventType.ToUpperInvariant() / @Model.Event.Status.ToUpperInvariant()</p>
 <h1>@Model.Event.EventName</h1><p>@Model.Event.Location | @Model.Event.EventDate.ToString("dd MMM yyyy")</p>
@@ -29,7 +32,7 @@
 @foreach(var item in Model.Categories){
 <div class="category"><div><strong>@item.CategoryName</strong><p>@item.DistanceKm km | @item.CurrentParticipants / @item.MaxParticipants entered</p>
 @if(role=="Participant"){
-@if(Model.Event.Status=="Open" && Model.Event.ClosingDate>=DateOnly.FromDateTime(DateTime.UtcNow) && item.CurrentParticipants<item.MaxParticipants){
+@if(EventDiscovery.CanEnrol(Model.Event, item, today)){
 <form asp-controller="Participant" asp-action="Enrol" method="post" class="enrol-form">
 <input type="hidden" name="eventId" value="@Model.Event.Id" /><input type="hidden" name="categoryId" value="@item.Id" />
 <button class="button lime" type="submit">ENROL NOW</button></form>
