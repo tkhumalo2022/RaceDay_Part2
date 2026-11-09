@@ -9,7 +9,9 @@ builder.Services.AddHttpClient<RaceDayApiClient>((provider, client) =>
         address.Scheme is not ("http" or "https"))
         throw new InvalidOperationException("Set a valid RaCeDayApi:BaseUrl.");
     client.BaseAddress = address;
-    client.Timeout = TimeSpan.FromSeconds(6);
+    // The peer-review API may wake from the free cloud tier after an idle period.
+    client.Timeout = provider.GetRequiredService<IHostEnvironment>().IsStaging()
+        ? TimeSpan.FromSeconds(90) : TimeSpan.FromSeconds(6);
 }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 {
     UseCookies = false, AllowAutoRedirect = false
@@ -24,5 +26,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+app.MapGet("/healthz", () => Results.Ok(new { status = "ok" }));
 app.Run();
 public partial class Program { }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RaCeDay.Data;
@@ -13,8 +14,11 @@ var connection = builder.Configuration.GetConnectionString("DefaultConnection")
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection));
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
-    // Development-only bypass: production requires verified email and a real sender.
-    options.SignIn.RequireConfirmedAccount = !builder.Environment.IsDevelopment();
+    // Production requires confirmed email and a real sender. The opt-in staging flag
+    // permits disposable peer-review accounts, never production accounts.
+    var allowReviewAccounts = builder.Environment.IsStaging() &&
+        builder.Configuration.GetValue<bool>("RaceDay:AllowUnconfirmedReviewAccounts");
+    options.SignIn.RequireConfirmedAccount = !builder.Environment.IsDevelopment() && !allowReviewAccounts;
     options.User.RequireUniqueEmail = true;
     options.Lockout.MaxFailedAccessAttempts = 5;
 })
@@ -29,7 +33,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
 });
 builder.Services.AddScoped<RaceWorkflow>();
 builder.Services.AddScoped<ProfileImageStorage>();
@@ -39,6 +44,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
     options.Events.OnRedirectToLogin = context =>
     {
         if (context.Request.Path.StartsWithSegments("/api")) context.Response.StatusCode = 401;
@@ -146,7 +153,56 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
+// A disabled review account must lose API access immediately, not just after the
+// normal Identity security-stamp validation interval. Applies to authenticated
+// API and legacy MVC routes; the portal itself only relays API sessions.
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        var id = context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrWhiteSpace(id))
+        {
+            var users = context.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
+            var account = await users.FindByIdAsync(id);
+            // A role change also invalidates old cookies immediately. A removed
+            // Organiser must not retain access through stale role claims.
+            var oldRoles = context.User.FindAll(System.Security.Claims.ClaimTypes.Role)
+                .Select(claim => claim.Value).ToHashSet(StringComparer.Ordinal);
+            var effectiveRoles = account is null
+                ? new HashSet<string>(StringComparer.Ordinal)
+                : (await users.GetRolesAsync(account)).ToHashSet(StringComparer.Ordinal);
+            if (account is null ||
+                (account.LockoutEnabled && account.LockoutEnd == DateTimeOffset.MaxValue) ||
+                !oldRoles.SetEquals(effectiveRoles))
+            {
+                await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+                if (context.Request.Path.StartsWithSegments("/api"))
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                else
+                    context.Response.Redirect("/Identity/Account/Login");
+                return;
+            }
+        }
+    }
+    await next();
+});
 app.UseAuthorization();
 app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+// Health endpoints disclose no connection strings, SQL details, or user data.
+app.MapGet("/healthz", () => Results.Ok(new { status = "ok" }));
+app.MapGet("/readyz", async (ApplicationDbContext db, CancellationToken ct) =>
+{
+    try
+    {
+        // Check that the SQL Server schema exists, not merely that TCP is reachable.
+        _ = await db.Users.AsNoTracking().AnyAsync(ct);
+        return Results.Ok(new { status = "ready" });
+    }
+    catch (Exception)
+    {
+        return Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+    }
+});
 app.Run();
