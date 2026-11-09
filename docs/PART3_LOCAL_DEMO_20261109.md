@@ -43,8 +43,9 @@ Keep all three windows running while filming. Do not share `localhost` as a publ
 - .NET 10 Release solution build: **0 errors, 0 warnings**.
 - Automated local solution test suite: **59/59 passed**.
 - Azure Blob SDK specific tests against local Azurite: **2/2 passed** after emulator restart.
-- Real HTTP/browser-session QA script: **34/34 PASS** for organiser and participant registration, API session, event/category management, filtered discovery, enrolment, profile edit, results, role restrictions, **event banner upload/retrieval**, and **profile picture upload/retrieval**. See [actual 34-pass transcript](evidence/Part3-Full-Local-QA-20261109.txt).
-- Latest cloud CI source check (at `0502a09`): [four GitHub Actions jobs successful](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42636076552).
+- Updated 9 November rubric workflow: **38/38 PASS** through MVC → API → SQL Server → private Azurite, including banner field checks and an event edit with bundled banner upload. [Actual 38-check transcript](evidence/Part3-Rubric-Workflow-20261109.txt).
+- Earlier real HTTP/browser-session QA script: **34/34 PASS** for organiser and participant registration, API session, event/category management, filtered discovery, enrolment, profile edit, results, role restrictions, **event banner upload/retrieval**, and **profile picture upload/retrieval**. See [actual 34-pass transcript](evidence/Part3-Full-Local-QA-20261109.txt).
+- Latest cloud CI source check (at `242374a`): [all four GitHub Actions jobs successful, including 38/38 authenticated container checks](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42640996423).
 
 For a further QA run against **only this isolated database**, with the above processes running:
 

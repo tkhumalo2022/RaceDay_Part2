@@ -8,7 +8,7 @@
 
 - Open the Part 3 review branch: https://github.com/tkhumalo2022/RaceDay_Part2/tree/feature/part3-mvc-review
 - Make sure the SQL Server API and separate MVC portal are running; use the isolated QA database, not real client/production data.
-- Check the final GitHub Actions run is GREEN and includes Windows build/tests, Docker image smoke, Azurite SDK integration and the four-service Compose integration. Run #42636076552 passed all four on 0502a09, including local SQL/Azurite/API/MVC container startup; check any NEW head separately. Save the actual run URL.
+- Check the final GitHub Actions run is GREEN and includes Windows build/tests, Docker image smoke, Azurite SDK integration and the four-service Compose integration. Run #42640996423 passed all four on 242374a, including local SQL/Azurite/API/MVC container startup **and all 38 authenticated integration checks**; check any NEW head separately. Save the actual run URL.
 - Configure and verify an **authorised real Azure Storage account** if the lecturer requires cloud evidence. The local Azurite emulator demonstrates Azure SDK behaviour but is not a live cloud account. Do not display keys or connection strings.
 - Make sure Docker demonstration runs with the backend accessible; a container sign-in page alone is not proof of API integration.
 - Create sample Organiser and Participant accounts and at least one suitable future event/category. Do not expose real passwords.

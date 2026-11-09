@@ -1,7 +1,13 @@
 # PROG6212 Part 3 — RaceDay quality and handover
 **Student:** Thabiso Khumalo | **Status:** Working draft for learner review, not final ARC submission.
 
-## Latest verification — 7 November 2026
+## Latest verification — 9 November 2026
+
+- Current Part 3 code at `242374a`: Release solution build succeeded with **0 warnings/0 errors**; **59/59 local tests** passed. Local full organiser/participant/SQL/Azurite browser-session QA passed **38/38 assertions**, including direct Create/Edit banner input and multipart event-edit+banner save. [Raw local transcript](evidence/Part3-Rubric-Workflow-20261109.txt).
+- [GitHub Actions PR run #42640996423](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42640996423) passed **all four jobs** at `242374a`. The `compose-integration` job executed the **authenticated 38-step workflow inside the complete four-service Docker stack**. Its downloaded artifact contains **38 PASS lines** and a QA COMPLETE record.
+- See [rubric-by-rubric marking evidence and remaining sign-offs](PART3_RUBRIC_AUDIT_20261109.md). Original Part 3 video, live Azure cloud proof, real-device sign-off, full original marking rubric extraction, and ARC submission are **not** established by these checks.
+
+## Earlier verification — 7 November 2026
 - See [PART3_VERIFICATION_20261107.md](PART3_VERIFICATION_20261107.md): freshly rerun **58/58 local tests**, Debug **build with 0 warnings/errors**, **16/16 preflight paths**, and exact-source CI green. Real cloud, actual phone, original Part 3 video, lecturer rubric and ARC submission remain unverified.
 
 ## Previous verification — 5 November 2026
