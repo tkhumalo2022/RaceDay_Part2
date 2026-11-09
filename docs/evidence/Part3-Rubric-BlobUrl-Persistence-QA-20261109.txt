@@ -1,0 +1,41 @@
+PASS: Organiser register HTTP 200 after redirect
+PASS: Organiser authentication established
+PASS: Organiser dashboard loads
+PASS: Event form available
+PASS: Create event form provides optional banner upload
+PASS: Organiser can create event
+PASS: Created event ID available
+PASS: Category creation through Part 2 API
+PASS: Participant authentication established
+PASS: Event-name search finds a published race
+PASS: Location search finds the correct event
+PASS: Seven-day filter excludes a race scheduled 21 days away
+PASS: Thirty-day filter finds a future Run matching the search
+PASS: Search form preserves the selected date window
+PASS: Unmatched search excludes other events
+PASS: Participant sees eligible category
+PASS: Real category ID retrieved from API
+PASS: Participant enrolment completes
+PASS: Participant profile form loads
+PASS: Participant updates profile through API
+PASS: Organiser sees enrolment
+PASS: Organiser can edit event
+PASS: Edit event form provides optional banner upload
+PASS: Event update through API
+PASS: Organiser can retrieve enrolment IDs
+PASS: Result entry form loads
+PASS: Organiser publishes finish time and position
+PASS: Participant sees published finishing position
+PASS: Participant sees recorded finish time
+PASS: Participant receives HTTP 403 for Organiser-only create screen
+PASS: Organiser receives HTTP 403 for Participant enrolment action
+PASS: Banner form includes event id hidden input
+PASS: Organiser banner stored through API in Azurite
+PASS: Real event blob URL persisted in SQL and reflected by MVC API response
+PASS: Event banner retrieved from private Azure container
+PASS: Participant picture stored through API in Azurite
+PASS: Real profile blob URL persisted in Identity database and returned to MVC
+PASS: Profile picture retrieved by authenticated owner
+PASS: Event edit with attached banner redirects after save
+PASS: One-step event edit and banner upload succeeds through API
+QA COMPLETE: event=1; suffix=349cfa4c (isolated QA database and Azurite)

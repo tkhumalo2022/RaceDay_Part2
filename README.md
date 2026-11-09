@@ -1,17 +1,41 @@
-# RaCeDay — PROG6212 Part 2
+# RaceDay — PROG6212 Part 3 (MVC Portal + Part 2 API)
 
-**Student:** Thabiso Khumalo (ST10477675)  
-**Module:** PROG6212 Programming 2B  
-**Assessment:** Portfolio of Evidence, Part 2 — RESTful API Development
+**Part 3 review branch:** [feature/part3-mvc-review](https://github.com/tkhumalo2022/RaceDay_Part2/tree/feature/part3-mvc-review)
+**Status:** Assessment review draft. **Student-supplied Part 3 presentation:** [YouTube video](https://youtu.be/XoXfNxmoALU) (content and unlisted access not independently verified). **ARC submission is not confirmed.**
+**Actual Part 3 rubric review (9 November):** [Read the criterion-by-criterion 100-mark audit](docs/PART3_RUBRIC_AUDIT_20261109.md). The lecturer's Word table requires an image URL stored in the database: the new [EF Core migration](src/RaCeDay/Data/Migrations/20261109152958_Part3PersistBlobImageUrls.cs) adds private Azure Blob URLs for event banners and participant pictures. The API persists them; the MVC displays the images through authenticated endpoints. An **isolated SQL Server database** and Azurite demonstrated **40/40 passing workflow checks** ([raw evidence](docs/evidence/Part3-Rubric-BlobUrl-Persistence-QA-20261109.txt)) plus [direct SQL persistence checks](docs/evidence/Part3-Sql-Blob-Url-Check-20261109.txt). [The updated code passed all four CI jobs with 40 authenticated Docker workflow assertions on commit `2448cfa`](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42646700257). Real Azure cloud and ARC submission remain unverified; the student-supplied video link has not been independently reviewed.
+
+**Earlier verification (9 November 2026, before Blob URL database migration):** 59/59 local tests passed; Release build with warnings-as-errors succeeded with 0 warnings and 0 errors. A fresh isolated MVC → API → SQL Server → Azurite run passed **38/38** full workflow assertions, including private banner/profile image upload and retrieval and the new Create/Edit banner field checks. See [9 November rubric audit](docs/PART3_RUBRIC_AUDIT_20261109.md) and [genuine 38-check output](docs/evidence/Part3-Rubric-Workflow-20261109.txt). See [full local demo and QA evidence](docs/PART3_LOCAL_DEMO_20261109.md). GitHub Actions [run #42640996423](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42640996423) passed all four CI jobs on `242374a`, including an authenticated **38/38 Docker Compose workflow**. [9 November integration evidence](docs/evidence/Part3-Core-Integration-20261109.md) · [Earlier submission readiness checks](docs/PART3_VERIFICATION_20261107.md). The original Part 3 video, real Azure cloud and ARC submission remain unverified.
+
+## Part 3: assessor quick navigation
+
+- **Separate MVC app:** [src/RaCeDay.Portal](src/RaCeDay.Portal), calling the Part 2 API through `RaceDayApiClient` (no direct EF/database access).
+- **Existing API/backend:** [src/RaCeDay](src/RaCeDay), including role-protected operations and private Azure Blob Storage integration.
+- **Docker:** [MVC Dockerfile](src/RaCeDay.Portal/Dockerfile), [API Dockerfile](src/RaCeDay/Dockerfile), [local four-service Compose](compose.yaml) and [single-command launch guide](docs/PART3_DOCKER_COMPOSE.md). The four-job GitHub Actions PR run [#42640996423](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42640996423) verifies SQL Server/Azurite/API/MVC startup **and 38 successful authenticated workflow checks** on commit `242374a`. This is genuine CI/container evidence, not real Azure Cloud or a public production deployment.
+- **Tests:** [tests/RaCeDay.Tests](tests/RaCeDay.Tests), [actual QA E2E evidence](docs/evidence/Part3-E2E-20261101.txt), and [31-assertion search E2E transcript](docs/evidence/Part3-E2E-Search-20261101.txt) and [fresh 2 November isolated 34-assertion date-filter QA](docs/evidence/Part3-E2E-Date-Filters-20261102.txt). The [Part 3 review PR](https://github.com/tkhumalo2022/RaceDay_Part2/pull/3) remains draft.
+- **Assessment-ready evidence and remaining sign-offs:** [9 November submission audit](docs/PART3_SUBMISSION_AUDIT_20261109.md), [Part 3 release checklist](docs/PART3_RELEASE_CHECKLIST.md) and [demonstration handover](docs/PART3_DEMO_AND_HANDOVER.md) and [five-minute student video plan](docs/PART3_SHORT_VIDEO_PLAN_20261109.md). Public hosting requires the separate [cloud deployment safety gate](docs/PART3_CLOUD_DEPLOYMENT_GATE.md).
+- **Presentation and hand-in:** [Student-supplied Part 3 video](https://youtu.be/XoXfNxmoALU) (check playback, contents and Unlisted visibility) · [final submission sheet](docs/PART3_FINAL_HANDIN_20261109.md). ARC submission is still unconfirmed.
+- **Progress verification:** Run `powershell -ExecutionPolicy Bypass -File scripts/part3-preflight.ps1` from the repository root.
+
+**Important:** Azure SDK tests run against the Azurite emulator. A live Azure account is not yet verified. This code was developed with AI assistance and must be reviewed and attributed according to the lecturer's rules. The supplied Part 3 YouTube presentation must be the student's authentic recording. Verify the video covers all rubric topics and opens as Unlisted before handing in.
+
+---
+
+## Original Part 2 documentation (kept for traceability)
+
+# RaCeDay â€” PROG6212 Part 2
+
+**Student:** Thabiso Khumalo (ST10477675)
+**Module:** PROG6212 Programming 2B
+**Assessment:** Portfolio of Evidence, Part 2 â€” RESTful API Development
 
 RaCeDay is an ASP.NET Core race management application for organisers and participants. Organisers manage events, categories, entries and results. Participants register, enter races and view their results.
 
 ## Submission links
 
 - **Repository:** https://github.com/tkhumalo2022/RaceDay_Part2
-- **Source code:** [ASP.NET Core project](src/RaCeDay) · [automated tests](tests/RaCeDay.Tests) · [commit history](https://github.com/tkhumalo2022/RaceDay_Part2/commits/main)
+- **Source code:** [ASP.NET Core project](src/RaCeDay) Â· [automated tests](tests/RaCeDay.Tests) Â· [commit history](https://github.com/tkhumalo2022/RaceDay_Part2/commits/main)
 - **Presentation:** [RaCeDay Part 2 video](https://youtu.be/jytTUheNxYw)
-- **Build and tests:** [Successful GitHub Actions run — 19 October 2026](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39265809171) (39 passed, 0 failed, 0 skipped)
+- **Build and tests:** [Successful GitHub Actions run â€” 19 October 2026](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/39265809171) (39 passed, 0 failed, 0 skipped)
 - **Assessment evidence:** [Part 2 evidence index](docs/PART2_EVIDENCE_INDEX.md)
 
 ## Features
@@ -94,3 +118,21 @@ Authentication uses **Identity cookies**, not JWT. For Swagger requests that cha
 Part 1 used separate `Organiser` and `Participant` tables with integer keys. Part 2 uses ASP.NET Core Identity's `AspNetUsers` and role tables with string keys. The physical schemas are therefore **not identical**, although the race-management functions are implemented. The difference is documented in [Part 1 / Part 2 database comparison](docs/PART1_PART2_DB_COMPARISON_20261019.md); lecturer acceptance of this change has not been confirmed.
 
 This repository contains a separately developed Part 2 working implementation; it should not be represented as an exact recovery of the original local Visual Studio solution. GitHub content and passing CI do not by themselves confirm submission on ARC.
+
+---
+
+## PROG6212 Part 3: Separate MVC RaceDay Portal
+
+Part 3 extends the Part 2 API with a separate ASP.NET Core MVC frontend under `src/RaCeDay.Portal`. The MVC site does **not** access SQL Server or use EF Core; event, participant, result, profile and image operations call the Part 2 API.
+
+**Features:** organiser and participant registration/login/logout, role-aware navigation, event discovery with activity, name/location and 7/30-day filters, event and category management, enrolment, organiser results entry, participant history and profile, Azure Blob Storage event banners/profile pictures (through API only), Dockerfile, and CI checks.
+
+**Quick start:** See [Part 3 release and QA checklist](docs/PART3_RELEASE_CHECKLIST.md) for SQL Server setup, both app launch commands, Azure Storage configuration, Docker build/run instructions, tests and disclosure notes. Start the API at `http://localhost:5001`, start the portal at `http://localhost:5250`, then open the portal in a browser. Both apps must use the **same hostname** in local development to relay session cookies.
+
+**QA:** `dotnet build RaCeDay.slnx -c Release --warnaserror` and `dotnet test RaCeDay.slnx -c Release`. The opt-in PowerShell E2E test script uses an isolated QA database and Azurite; do not run it against your normal database. Latest local automated and live checks are documented in the checklist. GitHub Actions builds and tests on Windows and performs a Linux Docker smoke build.
+
+**Visual evidence:** [Desktop home screenshot](docs/evidence/Part3-Desktop-RaceDay-20261031.png) Â· [Mobile home screenshot](docs/evidence/Part3-Mobile-RaceDay-20261031.png). These are genuine QA renders, not a live hosted demo.
+
+**Part 3 demo and student handover:** [Full walkthrough and assessment checklist](docs/PART3_DEMO_AND_HANDOVER.md) · [Local submission preflight](scripts/part3-preflight.ps1). These are preparation materials, not proof of an unrecorded video.
+
+**Submission status:** This branch is still a learner review draft, not an ARC submission. The 20-commit requirement is reached through feature, testing and evidence changes, but commit quality remains subject to lecturer review. The genuine student-recorded unlisted YouTube walkthrough, real Azure account validation and actual-phone/accessibility sign-off remain incomplete. Re-check fresh CI for the latest commit before submitting. Do not fabricate video links, screenshots, passing test claims or evidence. AI assistance was used and should be disclosed as required by the assessment brief.

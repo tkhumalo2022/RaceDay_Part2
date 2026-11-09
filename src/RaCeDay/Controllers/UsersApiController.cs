@@ -12,7 +12,7 @@ public class UsersApiController(UserManager<ApplicationUser> users, SignInManage
 {
     private static UserProfileDto ViewUser(ApplicationUser u) =>
         new(u.Id, u.Email, u.FirstName, u.LastName, u.Gender, u.PhoneNumber,
-            u.OrganiserName, u.DateOfBirth, u.CreatedAt);
+            u.OrganiserName, u.DateOfBirth, u.CreatedAt, u.ProfileBlobUrl);
 
     /// <summary>Get the signed-in user profile.</summary>
     [HttpGet("me")]
@@ -49,4 +49,4 @@ public class UsersApiController(UserManager<ApplicationUser> users, SignInManage
 }
 
 public record UserProfileDto(string Id, string? Email, string FirstName, string LastName,
-    string? Gender, string? PhoneNumber, string? OrganiserName, DateOnly? DateOfBirth, DateTime CreatedAt);
+    string? Gender, string? PhoneNumber, string? OrganiserName, DateOnly? DateOfBirth, DateTime CreatedAt, string? ProfileBlobUrl = null);

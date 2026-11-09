@@ -13,7 +13,7 @@ public class WorkflowException(int status, string message) : Exception(message)
 }
 
 // Shared by MVC and REST so ownership and business rules cannot diverge.
-public class RaceWorkflow(ApplicationDbContext db)
+public partial class RaceWorkflow(ApplicationDbContext db)
 {
     private static string UserId(ClaimsPrincipal actor) => actor.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? throw new WorkflowException(401, "Sign in to continue.");
@@ -47,7 +47,7 @@ public class RaceWorkflow(ApplicationDbContext db)
         catch (DbUpdateException e) when (e.InnerException is SqlException { Number: 2601 or 2627 or 547 })
         { throw new WorkflowException(409, "The change conflicts with an existing entry or related data. Refresh and try again."); }
     }
-    private static EventDto EventView(RaceEvent e, string actor) => new(e.Id, e.EventName, e.Description, e.EventDate, e.Location, e.EventType, e.Status, e.ClosingDate, e.OrganiserId == actor);
+    private static EventDto EventView(RaceEvent e, string actor) => new(e.Id, e.EventName, e.Description, e.EventDate, e.Location, e.EventType, e.Status, e.ClosingDate, e.OrganiserId == actor, e.BannerBlobUrl);
     public async Task<IReadOnlyList<EventDto>> Events(ClaimsPrincipal actor, bool mine = false)
     {
         var id = UserId(actor);
@@ -139,11 +139,23 @@ public class RaceWorkflow(ApplicationDbContext db)
         orderby e.Id descending
         select new EntryDto(e.Id, e.EventId, e.CategoryId, race.EventName, category.CategoryName, e.RaceNumber, e.Status,
             r == null ? null : r.ResultStatus, r == null ? null : r.StartTime, r == null ? null : r.FinishTime, r == null ? null : r.OverallPosition,
-            participant.FirstName + " " + participant.LastName);
+            participant.FirstName + " " + participant.LastName, null, race.EventDate);
     public async Task<IReadOnlyList<EntryDto>> MyEntries(ClaimsPrincipal actor, bool resultsOnly = false)
     {
         var id = Role(actor, "Participant");
-        return await EntriesQuery(db.Enrolments.AsNoTracking().Where(e => e.ParticipantId == id && (!resultsOnly || db.Results.Any(r => r.EnrolmentId == e.Id)))).ToListAsync();
+        var entries = await EntriesQuery(db.Enrolments.AsNoTracking().Where(e =>
+            e.ParticipantId == id && (!resultsOnly || db.Results.Any(r => r.EnrolmentId == e.Id)))).ToListAsync();
+        if (!resultsOnly || entries.Count == 0) return entries;
+        var eventIds = entries.Select(e => e.EventId).Distinct().ToArray();
+        var totals = await (from enrolment in db.Enrolments.AsNoTracking()
+            join result in db.Results.AsNoTracking() on enrolment.Id equals result.EnrolmentId
+            where eventIds.Contains(enrolment.EventId) && result.ResultStatus == "Finished"
+            group enrolment by enrolment.EventId into grouped
+            select new { EventId = grouped.Key, Count = grouped.Count() })
+            .ToDictionaryAsync(x => x.EventId, x => x.Count);
+        return entries.Select(entry => entry with {
+            TotalFinishers = totals.GetValueOrDefault(entry.EventId, 0)
+        }).ToList();
     }
     public async Task<IReadOnlyList<EntryDto>> EventEntries(ClaimsPrincipal actor, int eventId, bool resultsOnly = false)
     {

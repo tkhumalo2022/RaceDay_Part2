@@ -33,6 +33,7 @@ builder.Services.AddSession(options =>
 });
 builder.Services.AddScoped<RaceWorkflow>();
 builder.Services.AddScoped<ProfileImageStorage>();
+builder.Services.AddScoped<AzureRaceImageStore>();
 builder.Services.AddControllersWithViews(options => options.Filters.Add<WorkflowExceptionFilter>());
 builder.Services.AddRazorPages();
 builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
@@ -66,6 +67,21 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+// Explicit, Development-only database initialisation for the isolated Docker Compose demo.
+// Production still requires reviewed EF migrations and must never self-initialise.
+if (args.Contains("--init-demo-db"))
+{
+    if (!app.Environment.IsDevelopment())
+        throw new InvalidOperationException("Demo database initialisation is Development-only.");
+
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+    await IdentityRoleSeeder.SeedRolesAsync(scope.ServiceProvider);
+    Console.WriteLine("RaceDay local Docker demo database migrated; role names seeded.");
+    return;
+}
 
 // Schema changes are applied explicitly with EF tooling after review/backup.
 // This command seeds role names only; it never grants a user a privileged role.

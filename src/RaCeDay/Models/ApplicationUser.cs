@@ -27,4 +27,7 @@ public class ApplicationUser : IdentityUser
     // Do not store uploads or absolute local paths here.
     [StringLength(260)]
     public string? ProfileImagePath { get; set; }
+
+    // Persist the real private Azure Blob URL separately from older Part 2 local image paths.
+    [StringLength(2048)] public string? ProfileBlobUrl { get; set; }
 }

@@ -227,6 +227,10 @@ namespace RaCeDay.Data.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("ProfileBlobUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
                     b.Property<string>("ProfileImagePath")
                         .HasMaxLength(260)
                         .HasColumnType("nvarchar(260)");
@@ -418,6 +422,10 @@ namespace RaCeDay.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BannerBlobUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<DateOnly>("ClosingDate")
                         .HasColumnType("date");

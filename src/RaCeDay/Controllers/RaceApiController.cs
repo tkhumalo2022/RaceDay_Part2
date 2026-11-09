@@ -16,6 +16,10 @@ public class RaceApiController(RaceWorkflow workflow) : ControllerBase
     /// <summary>List races available to signed-in users.</summary>
     [HttpGet("events")]
     public async Task<ActionResult<IReadOnlyList<EventDto>>> Events() => Ok(await workflow.Events(User));
+    /// <summary>Organiser dashboard statistics, with enrolment and finisher counts per event.</summary>
+    [HttpGet("organiser/event-summary"), Authorize(Roles = "Organiser")]
+    public async Task<ActionResult<IReadOnlyList<OrganiserEventSummary>>> EventSummary() =>
+        Ok(await workflow.EventSummary(User));
     /// <summary>List races belonging to the current organiser.</summary>
     [HttpGet("organiser/events"), Authorize(Roles = "Organiser")]
     public async Task<ActionResult<IReadOnlyList<EventDto>>> OwnEvents() => Ok(await workflow.Events(User, true));
