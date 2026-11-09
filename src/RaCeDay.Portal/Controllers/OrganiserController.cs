@@ -35,11 +35,16 @@ public sealed class OrganiserController(RaceDayApiClient api) : Controller
         return View(EventForm.From(race));
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Save(EventForm model, CancellationToken ct)
+    [HttpPost, ValidateAntiForgeryToken, RequestSizeLimit(4_194_304)]
+    public async Task<IActionResult> Save(EventForm model, IFormFile? bannerImage, CancellationToken ct)
     {
         if (!await IsOrganiser(ct)) return SignIn();
         if (!ModelState.IsValid) return View("Edit", model);
+        if (bannerImage is { Length: < 1 or > 3 * 1024 * 1024 })
+        {
+            ModelState.AddModelError(nameof(bannerImage), "Choose a JPG or PNG image under 3 MB.");
+            return View("Edit", model);
+        }
         var creating = model.Id == 0;
         var result = await api.MutateAsync(HttpContext,
             creating ? HttpMethod.Post : HttpMethod.Put,
@@ -49,8 +54,22 @@ public sealed class OrganiserController(RaceDayApiClient api) : Controller
             ModelState.AddModelError("", result.Error ?? $"Could not save event ({(int)result.Status}).");
             return View("Edit", model);
         }
-        TempData["Notice"] = "Event saved.";
-        return RedirectToAction("Details", "Home", new { id = result.Id ?? model.Id });
+        var savedId = result.Id ?? model.Id;
+        if (bannerImage is not null && savedId > 0)
+        {
+            // Part 3 never talks to Azure directly: the Part 2 API handles validation and private storage.
+            var imageResult = await api.MutateAsync<object>(HttpContext, HttpMethod.Post,
+                $"api/events/{savedId}/banner", null, ct, image: bannerImage);
+            TempData["Notice"] = imageResult.Successful
+                ? "Event and banner saved to private image storage."
+                : "Event saved, but its banner was not uploaded: " +
+                  (imageResult.Error ?? "Check the image type and storage configuration.");
+        }
+        else
+        {
+            TempData["Notice"] = "Event saved.";
+        }
+        return RedirectToAction("Details", "Home", new { id = savedId });
     }
 
     [HttpPost, ValidateAntiForgeryToken]

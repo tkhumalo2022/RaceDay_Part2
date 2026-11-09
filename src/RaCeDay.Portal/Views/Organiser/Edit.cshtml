@@ -1,7 +1,7 @@
 @model EventForm
 @{ViewData["Title"]= Model.Id==0?"Create event":"Edit event";}
 <section class="detail-top"><div class="wrap"><a class="back-link" asp-controller="Dashboard" asp-action="Index">← Dashboard</a><p class="eyebrow">ORGANISER / RACE MANAGEMENT</p><h1>@(Model.Id==0?"CREATE AN EVENT.":"EDIT YOUR EVENT.")</h1><p>Give participants the details they need to show up.</p></div></section>
-<section class="wrap form-shell"><form class="auth-form workflow-form" asp-action="Save" method="post">
+<section class="wrap form-shell"><form class="auth-form workflow-form" asp-action="Save" method="post" enctype="multipart/form-data">
 <input asp-for="Id" type="hidden" /><h2>Race information</h2><div asp-validation-summary="All" class="validation" role="alert"></div>
 <label asp-for="EventName">Event name</label><input asp-for="EventName" />
 <label asp-for="Description">Description</label><textarea asp-for="Description" rows="4"></textarea>
@@ -9,5 +9,10 @@
 <div class="field-grid"><div><label asp-for="EventDate">Race date</label><input asp-for="EventDate" type="date" /></div><div><label asp-for="ClosingDate">Registration closing date</label><input asp-for="ClosingDate" type="date" /></div></div>
 <div class="field-grid"><div><label asp-for="EventType">Activity</label><select asp-for="EventType"><option>Run</option><option>Walk</option><option>Cycle</option></select></div>
 <div><label asp-for="Status">Event status</label><select asp-for="Status"><option>Planned</option><option>Open</option><option>Closed</option><option>Completed</option><option>Cancelled</option></select></div></div>
+<div class="upload-form">
+<label for="bannerImage">Event banner (optional JPG or PNG, maximum 3 MB)</label>
+<input id="bannerImage" type="file" name="bannerImage" accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+<p class="muted-copy">If you add a banner, RaceDay sends it securely to the API after saving the event. You can replace it later on the event details page.</p>
+</div>
 <button class="button" type="submit">SAVE EVENT ↗</button><p>Set event distances and entry fees after creating the event.</p>
 </form></section>

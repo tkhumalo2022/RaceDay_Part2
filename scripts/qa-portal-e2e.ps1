@@ -55,6 +55,7 @@ $dashboard = Page '/Dashboard/Index' $org
 CheckBody $dashboard 'CREATE EVENT' 'Organiser dashboard loads'
 $create = Page '/Organiser/Create' $org
 CheckBody $create 'Event name' 'Event form available'
+CheckBody $create 'name="bannerImage"' 'Create event form provides optional banner upload'
 $eventName="QA Race $suffix"
 $saved = Send '/Organiser/Save' $org @{
     __RequestVerificationToken=(Token $create.Content)
@@ -63,7 +64,8 @@ $saved = Send '/Organiser/Save' $org @{
     EventType='Run';Status='Open'
 }
 CheckBody $saved ([regex]::Escape($eventName)) 'Organiser can create event'
-$eventId = [regex]::Match($saved.BaseResponse.ResponseUri.AbsolutePath, '/(?:Home/)?Details/(\d+)').Groups[1].Value
+$savedUri = if ($saved.BaseResponse.ResponseUri) { $saved.BaseResponse.ResponseUri } else { $saved.BaseResponse.RequestMessage.RequestUri }
+$eventId = [regex]::Match($savedUri.AbsolutePath, '/(?:Home/)?Details/(\d+)').Groups[1].Value
 Ensure (-not [string]::IsNullOrWhiteSpace($eventId)) 'Created event ID available'
 $catForm = Page ("/Organiser/Category?eventId=" + $eventId) $org
 $cat = Send '/Organiser/SaveCategory' $org @{
@@ -111,6 +113,7 @@ $start = Page ("/Organiser/Entries/$eventId") $org
 CheckBody $start 'ParticipantQA' 'Organiser sees enrolment'
 $editPage = Page ("/Organiser/Edit/" + $eventId) $org
 CheckBody $editPage 'EDIT YOUR EVENT' 'Organiser can edit event'
+CheckBody $editPage 'name="bannerImage"' 'Edit event form provides optional banner upload'
 $updated = Send '/Organiser/Save' $org @{
     __RequestVerificationToken=(Token $editPage.Content)
     Id=$eventId;EventName=$eventName;Description='Completed isolated QA race.'
@@ -135,7 +138,7 @@ CheckBody $participantDashboard 'Position: 1' 'Participant sees published finish
 CheckBody $participantDashboard '08:43:00' 'Participant sees recorded finish time'
 $restrictedStatus=0
 try { $restrictedResponse=Page '/Organiser/Create' $participant; $restrictedStatus=[int]$restrictedResponse.StatusCode }
-catch [System.Net.WebException] { $restrictedStatus=[int]$_.Exception.Response.StatusCode }
+catch { if ($_.Exception.Response) { $restrictedStatus=[int]$_.Exception.Response.StatusCode } else { throw } }
 Ensure ($restrictedStatus -eq 403) 'Participant receives HTTP 403 for Organiser-only create screen'
 # Image upload smoke runs against local Azurite (never production Storage).
 Add-Type -AssemblyName System.Net.Http
@@ -167,7 +170,7 @@ try {
     } | Out-Null
     $deniedEnrolStatus=200
 }
-catch [System.Net.WebException] { $deniedEnrolStatus=[int]$_.Exception.Response.StatusCode }
+catch { if ($_.Exception.Response) { $deniedEnrolStatus=[int]$_.Exception.Response.StatusCode } else { throw } }
 Ensure ($deniedEnrolStatus -eq 403) 'Organiser receives HTTP 403 for Participant enrolment action'
 Ensure ($orgEvent.Content -match ('name="id"\s+value="' + $eventId + '"')) 'Banner form includes event id hidden input'
 $bannerRedirect = UploadImage '/Organiser/Banner' $org (Token $orgEvent.Content) $eventId
@@ -181,4 +184,38 @@ $pictureResult = (Page '/Participant/Profile' $participant).Content
 Ensure ($pictureResult -match 'Profile picture saved to private image storage.') 'Participant picture stored through API in Azurite'
 $pictureBytes = Invoke-WebRequest -Uri ($portal+'/Images/Profile') -WebSession $participant -UseBasicParsing -TimeoutSec 15
 Ensure ($pictureBytes.StatusCode -eq 200 -and $pictureBytes.Headers['Content-Type'] -match 'image/png') 'Profile picture retrieved by authenticated owner'
+# Verify one-step event edit + banner upload (distinct from the Details page upload).
+$editWithImage = Page ("/Organiser/Edit/$eventId") $org
+$handler = [System.Net.Http.HttpClientHandler]::new()
+$handler.CookieContainer = $org.Cookies
+$handler.AllowAutoRedirect = $false
+$httpClient = [System.Net.Http.HttpClient]::new($handler)
+$multi = [System.Net.Http.MultipartFormDataContent]::new()
+$fields = @{
+    '__RequestVerificationToken'=(Token $editWithImage.Content)
+    'Id'=[string]$eventId
+    'EventName'=$eventName
+    'Description'='Completed isolated QA race with edited banner.'
+    'Location'='Durban QA Circuit'
+    'EventDate'=$completedEventDate
+    'ClosingDate'=$completedClosingDate
+    'EventType'='Run'
+    'Status'='Completed'
+}
+foreach ($field in $fields.GetEnumerator()) {
+    $multi.Add([System.Net.Http.StringContent]::new([string]$field.Value), [string]$field.Key)
+}
+$editedPng = [Convert]::FromBase64String('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9YNwUxwAAAAASUVORK5CYII=')
+$editedFile = [System.Net.Http.ByteArrayContent]::new($editedPng)
+$editedFile.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::new('image/png')
+$multi.Add($editedFile, 'bannerImage', 'qa-event-edit.png')
+try {
+    $uploadAndEdit = $httpClient.PostAsync(($portal + '/Organiser/Save'), $multi).GetAwaiter().GetResult()
+    Ensure ([int]$uploadAndEdit.StatusCode -eq 302) 'Event edit with attached banner redirects after save'
+} finally {
+    $httpClient.Dispose()
+    $handler.Dispose()
+    $multi.Dispose()
+}
+CheckBody (Page ("/Home/Details/$eventId") $org) 'Event and banner saved to private image storage.' 'One-step event edit and banner upload succeeds through API'
 Write-Output "QA COMPLETE: event=$eventId; suffix=$suffix (isolated QA database and Azurite)"

@@ -113,7 +113,7 @@ jobs:
         run: docker logs raceday-azurite || true; docker rm -f raceday-azurite || true
 
   compose-integration:
-    # This checks the real four-service Compose startup, not public hosting or Azure cloud.
+    # Four-service startup plus authenticated MVC/API/SQL/Azurite workflow; not public Azure hosting.
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -126,6 +126,25 @@ jobs:
         run: docker compose -f compose.yaml up --build -d
       - name: Verify database initialization and both HTTP applications
         run: bash scripts/ci-compose-smoke.sh
+      - name: Verify full Organiser and Participant workflow in four-service containers
+        shell: pwsh
+        env:
+          RACEDAY_QA_APPROVED: 'YES'
+        run: |
+          ./scripts/qa-portal-e2e.ps1 -PortalBaseUrl http://127.0.0.1:8080 -ApiBaseUrl http://127.0.0.1:8081 |
+            Tee-Object -FilePath raceday-compose-e2e.txt
+          if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $checks = @(Get-Content raceday-compose-e2e.txt | Where-Object { $_ -match '^PASS:' }).Count
+          if ($checks -ne 38 -or -not (Select-String -Path raceday-compose-e2e.txt -Pattern '^QA COMPLETE:' -Quiet)) {
+            throw "Compose E2E verification incomplete: $checks of 38 checks passed."
+          }
+      - name: Preserve full container workflow evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: raceday-compose-full-workflow
+          path: raceday-compose-e2e.txt
+          if-no-files-found: warn
       - name: Preserve container diagnostic output and tear down test stack
         if: always()
         run: |
