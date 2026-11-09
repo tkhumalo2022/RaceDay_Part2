@@ -10,6 +10,10 @@
 <section class="wrap details">
 <div>
 <img class="event-banner" src="@Url.Action("Event","Images",new{id=Model.Event.Id})" alt="Race banner for @Model.Event.EventName" loading="lazy" onerror="this.hidden=true" />
+@if (!string.IsNullOrWhiteSpace(Model.Event.BannerBlobUrl))
+{
+    <p class="muted-copy">Event image securely stored in Azure Blob Storage.</p>
+}
 <p class="eyebrow muted">THE EVENT</p><h2>What to expect<span class="dot">.</span></h2><p>@(Model.Event.Description??"The organiser will publish event details soon.")</p>
 <div class="fact"><span>Race date</span><strong>@Model.Event.EventDate.ToString("D")</strong></div>
 <div class="fact"><span>Location</span><strong>@Model.Event.Location</strong></div>

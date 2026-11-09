@@ -1,7 +1,14 @@
 # PROG6212 Part 3 — RaceDay quality and handover
 **Student:** Thabiso Khumalo | **Status:** Working draft for learner review, not final ARC submission.
 
-## Latest verification — 9 November 2026
+## Actual original-rubric verification — 9 November 2026
+
+- Read and checked the actual **PART 3** criterion table in the open institutional `PROG6212_POE.docx`. It explicitly requires a Blob image URL saved in the database; see [updated actual-rubric audit](PART3_RUBRIC_AUDIT_20261109.md).
+- Added `Part3PersistBlobImageUrls` EF Core migration with separate `Event.BannerBlobUrl` and `AspNetUsers.ProfileBlobUrl` columns. Private images are uploaded **MVC → API → Azure SDK** and served through the API; the database URLs are stripped of SAS query parameters.
+- On a new isolated database `RaceDayPart3RubricQA_20261109`: migrations succeeded, Release build **0 errors/0 warnings**, automated tests **59/59**, real organiser/participant workflow **40/40**, and direct SQL confirms **both stored URL columns populated**. [40-pass transcript](evidence/Part3-Rubric-BlobUrl-Persistence-QA-20261109.txt) / [sanitised SQL proof](evidence/Part3-Sql-Blob-Url-Check-20261109.txt).
+- New authenticated **40-step** Docker CI job requires successful verification at the latest GitHub commit after push. Student video, actual Azure cloud and ARC submission are not yet done.
+
+## Earlier verification — 9 November 2026
 
 - Current Part 3 code at `242374a`: Release solution build succeeded with **0 warnings/0 errors**; **59/59 local tests** passed. Local full organiser/participant/SQL/Azurite browser-session QA passed **38/38 assertions**, including direct Create/Edit banner input and multipart event-edit+banner save. [Raw local transcript](evidence/Part3-Rubric-Workflow-20261109.txt).
 - [GitHub Actions PR run #42640996423](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42640996423) passed **all four jobs** at `242374a`. The `compose-integration` job executed the **authenticated 38-step workflow inside the complete four-service Docker stack**. Its downloaded artifact contains **38 PASS lines** and a QA COMPLETE record.

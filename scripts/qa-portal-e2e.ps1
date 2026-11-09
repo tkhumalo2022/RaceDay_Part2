@@ -176,12 +176,14 @@ Ensure ($orgEvent.Content -match ('name="id"\s+value="' + $eventId + '"')) 'Bann
 $bannerRedirect = UploadImage '/Organiser/Banner' $org (Token $orgEvent.Content) $eventId
 $bannerResult = (Page ("/Home/Details/$eventId") $org).Content
 Ensure ($bannerResult -match 'Banner saved to private image storage.') 'Organiser banner stored through API in Azurite'
+Ensure ($bannerResult -match 'Event image securely stored in Azure Blob Storage.') 'Real event blob URL persisted in SQL and reflected by MVC API response'
 $bannerBytes = Invoke-WebRequest -Uri ($portal+"/Images/Event/$eventId") -WebSession $org -UseBasicParsing -TimeoutSec 15
 Ensure ($bannerBytes.StatusCode -eq 200 -and $bannerBytes.Headers['Content-Type'] -match 'image/png') 'Event banner retrieved from private Azure container'
 $profileImagePage = Page '/Participant/Profile' $participant
 $pictureRedirect = UploadImage '/Participant/Picture' $participant (Token $profileImagePage.Content)
 $pictureResult = (Page '/Participant/Profile' $participant).Content
 Ensure ($pictureResult -match 'Profile picture saved to private image storage.') 'Participant picture stored through API in Azurite'
+Ensure ($pictureResult -match 'Profile photo securely stored in Azure Blob Storage.') 'Real profile blob URL persisted in Identity database and returned to MVC'
 $pictureBytes = Invoke-WebRequest -Uri ($portal+'/Images/Profile') -WebSession $participant -UseBasicParsing -TimeoutSec 15
 Ensure ($pictureBytes.StatusCode -eq 200 -and $pictureBytes.Headers['Content-Type'] -match 'image/png') 'Profile picture retrieved by authenticated owner'
 # Verify one-step event edit + banner upload (distinct from the Details page upload).

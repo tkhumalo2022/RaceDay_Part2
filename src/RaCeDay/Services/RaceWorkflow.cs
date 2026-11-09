@@ -47,7 +47,7 @@ public partial class RaceWorkflow(ApplicationDbContext db)
         catch (DbUpdateException e) when (e.InnerException is SqlException { Number: 2601 or 2627 or 547 })
         { throw new WorkflowException(409, "The change conflicts with an existing entry or related data. Refresh and try again."); }
     }
-    private static EventDto EventView(RaceEvent e, string actor) => new(e.Id, e.EventName, e.Description, e.EventDate, e.Location, e.EventType, e.Status, e.ClosingDate, e.OrganiserId == actor);
+    private static EventDto EventView(RaceEvent e, string actor) => new(e.Id, e.EventName, e.Description, e.EventDate, e.Location, e.EventType, e.Status, e.ClosingDate, e.OrganiserId == actor, e.BannerBlobUrl);
     public async Task<IReadOnlyList<EventDto>> Events(ClaimsPrincipal actor, bool mine = false)
     {
         var id = UserId(actor);

@@ -2,7 +2,7 @@
 namespace RaCeDay.Portal.Models;
 public sealed record RaceEvent(int Id, string EventName, string? Description,
     DateOnly EventDate, string Location, string EventType, string Status,
-    DateOnly ClosingDate, bool IsOwner);
+    DateOnly ClosingDate, bool IsOwner, string? BannerBlobUrl = null);
 public sealed record RaceCategory(int Id, int EventId, string CategoryName,
     decimal DistanceKm, decimal EntryFee, int MaxParticipants, int CurrentParticipants);
 public sealed record ApiSession(string UserId, string Role);

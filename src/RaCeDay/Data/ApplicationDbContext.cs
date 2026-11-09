@@ -19,6 +19,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         builder.Entity<ApplicationUser>(u =>
         {
             u.Property(x => x.OrganiserName).HasMaxLength(100);
+            u.Property(x => x.ProfileBlobUrl).HasMaxLength(2048);
             u.Property(x => x.CreatedAt).HasDefaultValueSql("SYSUTCDATETIME()");
             u.ToTable("AspNetUsers", t =>
             {
@@ -35,6 +36,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 t.HasCheckConstraint("CK_Event_Status", "[Status] IN ('Planned','Open','Closed','Completed','Cancelled')");
             });
             e.Property(x => x.EventName).HasMaxLength(150);
+            e.Property(x => x.BannerBlobUrl).HasMaxLength(2048);
             e.Property(x => x.Description).HasMaxLength(500);
             e.Property(x => x.Location).HasMaxLength(200);
             e.Property(x => x.EventType).HasMaxLength(20);

@@ -13,6 +13,8 @@ public class RaceEvent
     public string EventType { get; set; } = "Run";
     public string Status { get; set; } = "Planned";
     public DateOnly ClosingDate { get; set; }
+    // URL of the private Azure blob; access is always mediated through our API.
+    [StringLength(2048)] public string? BannerBlobUrl { get; set; }
 }
 public class RaceCategory
 {
@@ -85,7 +87,7 @@ public class ResultInput : IValidatableObject
     }
 }
 
-public record EventDto(int Id, string EventName, string? Description, DateOnly EventDate, string Location, string EventType, string Status, DateOnly ClosingDate, bool IsOwner);
+public record EventDto(int Id, string EventName, string? Description, DateOnly EventDate, string Location, string EventType, string Status, DateOnly ClosingDate, bool IsOwner, string? BannerBlobUrl = null);
 public record CategoryDto(int Id, int EventId, string CategoryName, decimal DistanceKm, decimal EntryFee, int MaxParticipants, int CurrentParticipants);
 public record EntryDto(int Id, int EventId, int CategoryId, string EventName, string CategoryName, string RaceNumber, string Status, string? ResultStatus, TimeOnly? StartTime, TimeOnly? FinishTime, int? OverallPosition, string ParticipantName, int? TotalFinishers = null, DateOnly? EventDate = null);
 public record EventDetails(EventDto Event, IReadOnlyList<CategoryDto> Categories);

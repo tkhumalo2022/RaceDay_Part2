@@ -24,7 +24,10 @@ public sealed class AzureBlobRoundTripTests
         var data = new byte[] { 137, 80, 78, 71, 13, 10, 26, 10, 42, 7 };
         var file = new FormFile(new MemoryStream(data), 0, data.Length, "file", "race.png");
         const string key = "events/19/banner";
-        await storage.SaveAsync(key, file, CancellationToken.None);
+        var storedUrl = await storage.SaveAsync(key, file, CancellationToken.None);
+        Assert.StartsWith("http", storedUrl);
+        Assert.EndsWith("/events/19/banner", storedUrl);
+        Assert.DoesNotContain("?", storedUrl); // Never persist a SAS token in SQL.
         var actual = await storage.ReadAsync(key, CancellationToken.None);
         Assert.NotNull(actual);
         Assert.Equal("image/png", actual.Value.Type);

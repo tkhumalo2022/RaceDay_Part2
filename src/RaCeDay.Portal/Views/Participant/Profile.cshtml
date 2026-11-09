@@ -3,7 +3,11 @@
 <section class="detail-top"><div class="wrap"><a class="back-link" asp-controller="Dashboard" asp-action="Index">← Dashboard</a><p class="eyebrow">YOUR RACEDAY / PROFILE</p><h1>YOUR PROFILE.</h1><p>Keep your details and race identity up to date.</p></div></section>
 <section class="wrap profile-grid">
 <div>
-<div class="profile-avatar" aria-label="Profile picture"><img src="@Url.Action("Profile","Images")" alt="Your profile photo, if uploaded" onerror="this.hidden=true" /></div>
+<div class="profile-avatar" aria-label="Profile picture"><img src="@Url.Action("Profile","Images")" alt="Your RaceDay profile photo, if uploaded" onerror="this.hidden=true" /></div>
+@if (!string.IsNullOrWhiteSpace(Model.ProfileBlobUrl))
+{
+    <p class="muted-copy">Profile photo securely stored in Azure Blob Storage.</p>
+}
 <form asp-controller="Participant" asp-action="Picture" method="post" enctype="multipart/form-data" class="upload-form">
 <label for="photo">Upload profile photo (JPG or PNG, up to 3 MB)</label><input id="photo" type="file" name="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" required />
 <button class="button" type="submit">UPDATE PHOTO ↗</button>

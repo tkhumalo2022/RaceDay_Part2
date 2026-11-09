@@ -67,6 +67,7 @@ public sealed class RaceProfile
     [StringLength(100)] public string? OrganiserName { get; set; }
     [DataType(DataType.Date)] public DateOnly? DateOfBirth { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? ProfileBlobUrl { get; set; }
 }
 public sealed record OrganiserEntriesPage(RaceEvent Event, IReadOnlyList<RaceEntry> Entries);
 public sealed record CategoriesPage(RaceEvent Event, IReadOnlyList<RaceCategory> Categories);

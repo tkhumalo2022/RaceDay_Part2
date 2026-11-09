@@ -135,8 +135,8 @@ jobs:
             Tee-Object -FilePath raceday-compose-e2e.txt
           if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $checks = @(Get-Content raceday-compose-e2e.txt | Where-Object { $_ -match '^PASS:' }).Count
-          if ($checks -ne 38 -or -not (Select-String -Path raceday-compose-e2e.txt -Pattern '^QA COMPLETE:' -Quiet)) {
-            throw "Compose E2E verification incomplete: $checks of 38 checks passed."
+          if ($checks -ne 40 -or -not (Select-String -Path raceday-compose-e2e.txt -Pattern '^QA COMPLETE:' -Quiet)) {
+            throw "Compose E2E verification incomplete: $checks of 40 checks passed."
           }
       - name: Preserve full container workflow evidence
         if: always()

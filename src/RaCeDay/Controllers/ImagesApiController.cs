@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RaCeDay.Data;
 using RaCeDay.Models;
 using RaCeDay.Services;
 
@@ -11,7 +13,7 @@ namespace RaCeDay.Controllers;
 [ApiController, Route("api"), Authorize, AutoValidateAntiforgeryToken]
 public sealed class ImagesApiController(
     RaceWorkflow workflow, AzureRaceImageStore images,
-    UserManager<ApplicationUser> users) : ControllerBase
+    UserManager<ApplicationUser> users, ApplicationDbContext db) : ControllerBase
 {
     [HttpPost("events/{id:int}/banner"), Authorize(Roles = "Organiser"),
      Consumes("multipart/form-data"), RequestSizeLimit(4_194_304)]
@@ -21,8 +23,11 @@ public sealed class ImagesApiController(
         if (!item.IsOwner) return Forbid();
         try
         {
-            await images.SaveAsync(AzureRaceImageStore.EventKey(id), file, ct);
-            return Ok(new { path = $"/api/events/{id}/banner" });
+            var blobUrl = await images.SaveAsync(AzureRaceImageStore.EventKey(id), file, ct);
+            var race = await db.Events.SingleAsync(e => e.Id == id, ct);
+            race.BannerBlobUrl = blobUrl;
+            await db.SaveChangesAsync(ct);
+            return Ok(new { path = $"/api/events/{id}/banner", blobUrl });
         }
         catch (InvalidRaceImageException e) { return BadRequest(new { message = e.Message }); }
         catch (ImageStorageUnavailableException) { return StatusCode(503, new { message = "Image storage unavailable." }); }
@@ -50,8 +55,12 @@ public sealed class ImagesApiController(
         if (user is null) return Unauthorized();
         try
         {
-            await images.SaveAsync(AzureRaceImageStore.ProfileKey(user.Id), file, ct);
-            return Ok(new { path = "/api/users/me/picture" });
+            var blobUrl = await images.SaveAsync(AzureRaceImageStore.ProfileKey(user.Id), file, ct);
+            user.ProfileBlobUrl = blobUrl;
+            var updated = await users.UpdateAsync(user);
+            if (!updated.Succeeded)
+                return StatusCode(500, new { message = "Picture uploaded but its database link could not be saved." });
+            return Ok(new { path = "/api/users/me/picture", blobUrl });
         }
         catch (InvalidRaceImageException e) { return BadRequest(new { message = e.Message }); }
         catch (ImageStorageUnavailableException) { return StatusCode(503, new { message = "Image storage unavailable." }); }

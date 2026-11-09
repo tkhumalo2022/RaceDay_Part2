@@ -1,36 +1,38 @@
-# PROG6212 Part 3 — Rubric-by-rubric evidence audit
+# PROG6212 Part 3 — Actual rubric evidence audit (9 November 2026)
 
-**Date:** 9 November 2026. **Project:** Thabiso's existing RaceDay Part 3 review branch. **Total:** 100 marks across the Part 3 criteria below.
+**Assessment:** Part 3 of PROG6212 POE (100 marks). **Student project:** RaceDay, `feature/part3-mvc-review`.
 
-**Important:** This is an evidence-based readiness audit, not an official grade. The mark bands and task checklist are taken from the available 2026 PROG6212 Part 3 rubric-aligned workplan. The original `PROG6212_POE` Word Online document is open in the student's browser, but the full marking pages have not been extracted or independently reconciled here. Awarded marks depend on the lecturer, video, demonstration and ARC evidence.
+**Rubric source:** Direct visual inspection of the **PART 3** marking table in the institution's open `PROG6212_POE.docx` Word Online tab on 9 November, at reduced zoom to read the complete band columns. This supersedes the earlier workplan-only rubric interpretation. The original document is not modified by this audit. The figures below are *maximum possible marks*, not an awarded grade.
 
-| Criterion | Maximum | Verified implementation/evidence | Outstanding for full marks |
+| Exact Part 3 marking category | Maximum | Strong-band expectations visible in the actual Word rubric | Evidence verified or still missing |
 | --- | ---: | --- | --- |
-| Correct submission | 5 | Public GitHub Part 3 branch, source, README and Docker instructions are present. | Add the actual unlisted Part 3 video link and personally submit the correct ARC fields/files; verify the rubric's exact required deliverables. |
-| GitHub + CI/CD | 10 | 27 pre-audit commits ahead of `main`; prior PR CI run passed 4/4 jobs. This audit adds meaningful code, workflow and evidence changes. | Verify **new HEAD** with all required green jobs. The lecturer decides whether 20+ commits are meaningful. |
-| Authentication and role navigation | 10 | API registration/login/logout; session stores user ID and role; Organiser and Participant views; 403 role restrictions; HTTP E2E proves registration, sessions and restrictions. | Record real browser sign-in/logout and role distinction in the student video. |
-| Organiser interface | 15 | Organiser dashboard, event CRUD, category CRUD, enrolment list and results in code. **New:** optional banner field directly in event Create/Edit forms; API handles private blob. 38-check QA verifies edit + banner, enrolment and results. | Show create/edit/delete, category management, organiser totals, banner and publishing results in the demo; explicit delete UI testing remains worth checking. |
-| Participant interface | 15 | Upcoming event filters, details/categories, enrolment, profile, My Events and My Results; 38-check QA confirms filtering, enrolment, profile edit, finish time and position. | Show persistence after refresh, My Events, My Results and profile picture in the student demo. |
-| Azure Blob Storage | 10 | Private Azure SDK blob store exists in Part 2 API; MVC sends multipart through API; local Azurite banner and profile upload/read passed. | **Real Azure subscription round-trip not verified.** Confirm whether the brief demands actual Azure cloud rather than emulator and whether a persisted blob URL is mandatory; the code uses deterministic private blob keys and authenticated proxy URLs. |
-| Docker | 10 | Dockerfiles for portal/API; local-only 4-service Compose; previous CI checks builds/startup. **Verified:** [GitHub Actions run #42640996423](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42640996423) passed all four jobs, including 38/38 authenticated Compose E2E checks on `242374a`; downloaded workflow artifact confirmed 38 PASS records. | The authenticated container CI workflow is now verified. Demonstrate its result and container launch/usage in the original student video. |
-| UI design | 10 | Branded responsive design, focus states, input validation, skip links, reduced-motion CSS and earlier desktop/mobile QA captures. | Fresh mobile/keyboard/screen-reader checks and real browser evidence required for strongest UI band. |
-| Student video presentation | 15 | [Student video walkthrough plan](PART3_SHORT_VIDEO_PLAN_20261109.md) is prepared. | **No Part 3 video is recorded or uploaded.** Student must narrate genuine feature, API, Azure and Docker demonstrations, publish unlisted to YouTube and paste the working link. |
-| **Total** | **100** | Code and local testing are substantially advanced, but do not establish the mark total. | **Never claim 100/100 until lecturer awards it.** |
+| Correct Submission | 5 | Clear folder layout and complete README with a working Docker run command, CI screenshot, and **video link** | Repository, README, Docker docs and green CI exist. **Need the original Part 3 video link and ARC submission evidence**; screenshot should be included in handover. |
+| GitHub and CI/CD | 10 | **20+ meaningful commits**, CI validates repository structure with a green build | Branch already has 29 commits ahead of main before this final Blob URL change, plus verified prior four-job CI. Lecturer evaluates commit meaningfulness. Recheck the new head after push. |
+| Authentication and Role-Based Navigation | 10 | Working register/login, session contains user ID and role, role-specific menus, logout clears session, guests redirected | Identity + server-side session, two roles, logout and access denial implemented. Login/registration and 403 access tested. Capture visual logout proof. |
+| Organiser Interface | 15 | All pages functional: dashboard, events, categories, enrolments, results and event management | Event CRUD/category CRUD/start lists/results implemented. Create and Edit forms both accept banners via API. E2E verifies organiser workflows; human-run delete evidence still worth capturing. |
+| Participant Interface | 15 | Fully functional home, event detail with enrolment, My Events, My Results showing finish time and position, profile | Event search/filters, categories/enrolments, dashboard/history/results and profile work in integrated tests. Show the complete journey in video. |
+| Azure Blob Storage | 10 | Full **MVC → Part 2 API → Azure Blob Storage** image flow, image appears in MVC; intermediate band **explicitly demands image URL saved to the database** | **Gap addressed in this audit:** new EF migration persists actual Blob URL in `Event.BannerBlobUrl` and `AspNetUsers.ProfileBlobUrl`. Stored URLs have no SAS secrets. Both remain private and render via authenticated MVC/API proxy. 40/40 end-to-end checks and a direct SQL check confirm persistence on an **isolated QA database with Azurite**. **Live Azure subscription evidence is still missing**. |
+| Docker | 10 | Application builds and runs cleanly inside Docker with a working README command | Both Dockerfiles, four-service Compose, CI builds and authenticated workflow. Last confirmed full Docker run #42642195375 passed 4/4 jobs and 38/38 before latest URL migration. Recheck 40-check CI on the new commit. |
+| UI Design | 10 | Professional RaceDay branded design, colour-coded statuses, useful imagery and intuitive navigation | Responsive RaceDay styling and focus states exist, with prior desktop/mobile captures. Confirm actual phone, keyboard accessibility and images in final demo. |
+| Video Presentation | 15 | Original engaging and professional demonstration: MVC pages, API/Blob integration, Docker setup, explanation | Script/storyboard is ready in [student video plan](PART3_SHORT_VIDEO_PLAN_20261109.md). **Actual student recording, unlisted YouTube URL and final ARC upload remain outstanding**. |
+| **TOTAL** | **100** | Top-band requirements must be demonstrated to the assessor | **No claim of an official 100/100.** |
 
-## Actual local technical result for this review
+## Tested in the latest Azure-URL gap-fix
 
-- `dotnet build RaCeDay.slnx -c Release --warnaserror`: 0 errors, 0 warnings.
-- `dotnet test RaCeDay.slnx -c Release --no-build`: **59 passed, 0 failed**.
-- Verified actual session-based, real HTTP workflow through local MVC → API → isolated SQL Server → Azurite: **38 of 38 checks passed**. [Raw transcript](evidence/Part3-Rubric-Workflow-20261109.txt).
-- The complete 38-check script now checks the event Create and Edit banner fields and performs an actual multipart edit+banner write.
-- The authenticated Docker QA workflow is in `.github/workflows/dotnet-build.yml` and **passed** in [run #42640996423](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42640996423) on `242374a`. Check CI again if the branch receives further changes.
+- **Release build:** 0 errors / 0 warnings, with apphost creation disabled locally to avoid locking a separately running demo binary.
+- **Automated tests:** 59 passed, 0 failed.
+- **New isolated QA database:** `RaceDayPart3RubricQA_20261109`; all EF migrations applied, including `Part3PersistBlobImageUrls`. No original Part 2 database was altered.
+- **Full local MVC → API → SQL Server → Azurite E2E:** **40/40 PASS**, including event/banner upload, profile-picture upload, retrieval, and the presence of the newly persisted Blob URLs in the authenticated MVC views. [40-check raw transcript](evidence/Part3-Rubric-BlobUrl-Persistence-QA-20261109.txt).
+- **Direct SQL inspection:** one QA event row and one QA profile row have valid stored Blob URLs without a `?` query/SAS fragment; migration present. [Sanitised SQL count evidence](evidence/Part3-Sql-Blob-Url-Check-20261109.txt).
+- **Secrets/privacy:** storage keys remain private to the Part 2 API, URLs persisted without SAS query parameters, and MVC images are streamed through authenticated endpoints.
+- **Latest hosted CI:** must be checked on the **final pushed commit** to verify the increased 40-check Compose workflow; previous 38-check run cannot be counted for the latest edits.
 
-## Correct final submission order
+## Student sign-offs necessary for the rubric
 
-1. Verify all checks green at the final branch head, with an archived CI log/artifact showing the **authenticated** Docker workflow.
-2. Record original student video, showing **both projects**, organiser/participant roles, event/category, enrolment/results, image flow, Dockerfile/container CI and responsive UI.
-3. Only say **Azure cloud** if an authorised live cloud account was actually used. Local Azurite is emulator evidence; never expose secrets.
-4. Add the genuine unlisted YouTube URL to the README, check it opens in a private browser, and submit the Part 3 GitHub branch/source plus any rubric-mandated files to ARC.
-5. Review and accurately disclose AI assistance under the academic integrity rules.
+1. Film your original Part 3 screencast demonstrating both projects, roles, event/category CRUD, enrolment/results, uploaded images, API endpoints, database link, Docker CI and responsive interface.
+2. Upload to YouTube as **unlisted**, test link from another account/incognito, insert it into the README and required ARC form. Include a genuine passing CI screenshot.
+3. If an **actual Azure cloud account** is required by the lecturer, demonstrate a live Blob upload rather than describing Azurite as Azure cloud; never publish connection strings.
+4. Check keyboard, real phone, and the full organiser/participant journey. Then submit the required ARC artifacts and keep the confirmation receipt.
+5. Review source and disclose AI assistance in accordance with module academic-integrity guidance.
 
-**Not evidenced:** official grade, student's final video, ARC receipt, live Azure Storage account, public production deployment, or physical-phone accessibility sign-off.
+**Not established:** lecturer-issued marks, completed student video, actual Azure subscription, production deployment, physical-phone verification or ARC submission receipt.

@@ -48,7 +48,7 @@ public sealed class AzureRaceImageStore(IConfiguration configuration)
         return (bytes, png ? "image/png" : "image/jpeg");
     }
 
-    public async Task SaveAsync(string key, IFormFile file, CancellationToken ct)
+    public async Task<string> SaveAsync(string key, IFormFile file, CancellationToken ct)
     {
         var (bytes, contentType) = await ValidateAsync(file, ct);
         var container = Container();
@@ -56,8 +56,12 @@ public sealed class AzureRaceImageStore(IConfiguration configuration)
         {
             await container.CreateIfNotExistsAsync(PublicAccessType.None, cancellationToken: ct);
             await using var input = new MemoryStream(bytes, writable: false);
-            await container.GetBlobClient(key).UploadAsync(input,
+            var blob = container.GetBlobClient(key);
+            await blob.UploadAsync(input,
                 new BlobUploadOptions { HttpHeaders = new BlobHttpHeaders { ContentType = contentType } }, ct);
+            // Store the real Azure Blob URL without any SAS query string or credentials.
+            // The container stays private; MVC displays images through authenticated API endpoints.
+            return blob.Uri.GetLeftPart(UriPartial.Path);
         }
         catch (RequestFailedException e)
         {
