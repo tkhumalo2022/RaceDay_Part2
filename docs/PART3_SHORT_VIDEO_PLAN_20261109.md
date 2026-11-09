@@ -22,4 +22,4 @@
 4. Capture genuine screenshots as required; include a real Azure upload only if an authorised cloud account has been provisioned and tested.
 5. Upload **your own** screen recording to YouTube as unlisted. Check the link in a private/incognito browser, then add the real URL to the Part 3 README and final ARC submission.
 
-**Evidence currently available:** 59/59 local unit/integration tests and green four-job GitHub Actions on 9 November 2026. The 28-check end-to-end browser/API workflow used a separate QA database. These are real tests but **not** proof of an unrecorded video.
+**Evidence currently available:** 59/59 local unit/integration tests and green four-job GitHub Actions on 9 November 2026. The complete 34-check end-to-end browser/API/Blob workflow used a separate QA database and local Azurite emulator. These are real tests but **not** proof of an unrecorded video.

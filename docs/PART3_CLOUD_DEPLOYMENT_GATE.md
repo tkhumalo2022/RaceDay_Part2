@@ -18,8 +18,8 @@ A public application must have:
 ## What is verified today
 
 - Local .NET 10 Release build: **0 errors / 0 warnings**; local automated suite: **59 passed**.
-- GitHub Actions [run #42603394014](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42603394014) passed all four jobs on `8db121b`.
-- Isolated local MVC to API to SQL workflow passed 28 checks; Blob SDK was verified against **Azurite**, not a live Azure account.
+- GitHub Actions [run #42636076552](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42636076552) passed all four jobs on `0502a09`.
+- Isolated local MVC -> API -> SQL Server -> Azurite workflow passed **34 checks**, including banner/profile-image upload and retrieval; this is **not** a live Azure account.
 - No live SQL Server/real Azure cloud credentials or hosted HTTPS URL were verified on this machine. The `az` CLI and Docker Desktop are unavailable locally.
 
 ## Recommended path
