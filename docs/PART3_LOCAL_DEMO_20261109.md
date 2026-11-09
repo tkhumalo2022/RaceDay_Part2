@@ -4,6 +4,8 @@
 
 ## Current local URLs
 
+**New rubric URL-persistence QA (separate from the original local demo):** `http://localhost:5351` for MVC and `http://localhost:5101/swagger` for API, backed by isolated SQL database `RaceDayPart3RubricQA_20261109`. The genuine end-to-end test passed **40/40** and the Azure SDK stored actual private Blob URLs in the two new database columns. See the [actual rubric audit](PART3_RUBRIC_AUDIT_20261109.md) and [SQL evidence](evidence/Part3-Sql-Blob-Url-Check-20261109.txt). These temporary test processes may stop after this review; restart from the documentation if needed. The following URLs refer to the older separate demo environment.
+
 - **MVC (show this in video):** http://localhost:5250
 - **Part 2 REST API Swagger:** http://localhost:5001/swagger
 - **Local Azurite Blob:** http://127.0.0.1:10000 (not a user-facing browser site)

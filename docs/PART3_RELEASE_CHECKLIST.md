@@ -6,7 +6,7 @@
 - Read and checked the actual **PART 3** criterion table in the open institutional `PROG6212_POE.docx`. It explicitly requires a Blob image URL saved in the database; see [updated actual-rubric audit](PART3_RUBRIC_AUDIT_20261109.md).
 - Added `Part3PersistBlobImageUrls` EF Core migration with separate `Event.BannerBlobUrl` and `AspNetUsers.ProfileBlobUrl` columns. Private images are uploaded **MVC → API → Azure SDK** and served through the API; the database URLs are stripped of SAS query parameters.
 - On a new isolated database `RaceDayPart3RubricQA_20261109`: migrations succeeded, Release build **0 errors/0 warnings**, automated tests **59/59**, real organiser/participant workflow **40/40**, and direct SQL confirms **both stored URL columns populated**. [40-pass transcript](evidence/Part3-Rubric-BlobUrl-Persistence-QA-20261109.txt) / [sanitised SQL proof](evidence/Part3-Sql-Blob-Url-Check-20261109.txt).
-- New authenticated **40-step** Docker CI job requires successful verification at the latest GitHub commit after push. Student video, actual Azure cloud and ARC submission are not yet done.
+- New authenticated **40-step** Docker CI job **passed in run #42646700257 on code commit `2448cfa`**, all 4 jobs green, with 40 PASS lines downloaded from the CI artifact. Check again after future commits. Student video, actual Azure cloud and ARC submission are not yet done.
 
 ## Earlier verification — 9 November 2026
 
