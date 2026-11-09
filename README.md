@@ -2,7 +2,7 @@
 
 **Part 3 review branch:** [feature/part3-mvc-review](https://github.com/tkhumalo2022/RaceDay_Part2/tree/feature/part3-mvc-review)
 **Status:** Assessment review draft. The Part 3 video and ARC submission are **not** complete.
-**Latest verification (7 November 2026):** 58/58 local tests passed; Debug build with warnings-as-errors succeeded with 0 warnings and 0 errors; 16/16 preflight paths are present. Four-job GitHub Actions [run #41501949381](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/41501949381) passed on source commit `f025338`. [Detailed submission readiness and remaining sign-offs](docs/PART3_VERIFICATION_20261107.md).
+**Latest verification (9 November 2026):** 59/59 local tests passed; Debug build with warnings-as-errors succeeded with 0 warnings and 0 errors. A fresh isolated MVC → API → SQL Server check passed 28/28 core workflow assertions. GitHub Actions [run #42601758972](https://github.com/tkhumalo2022/RaceDay_Part2/actions/runs/42601758972) passed all four CI jobs on `b2877bb`. [9 November integration evidence](docs/evidence/Part3-Core-Integration-20261109.md) · [Earlier submission readiness checks](docs/PART3_VERIFICATION_20261107.md). The original Part 3 video, real Azure cloud and ARC submission remain unverified.
 
 ## Part 3: assessor quick navigation
 
