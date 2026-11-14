@@ -1,6 +1,6 @@
 # PROG6212 Part 2 — Marking evidence
 
-**Student:** Thabiso Khumalo (ST10477675)  
+**Student:** Thabiso Khumalo  
 **Project:** RaCeDay  
 **Repository:** https://github.com/tkhumalo2022/RaceDay_Part2  
 **Source branch:** [recovery/part2-20261017](https://github.com/tkhumalo2022/RaceDay_Part2/tree/recovery/part2-20261017)
