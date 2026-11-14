@@ -2,7 +2,7 @@
 
 **Module:** PROG6212
 **Part:** POE Part 1 - Section B
-**Student:** Thabiso Khumalo (ST10477675)
+**Student:** Thabiso Khumalo
 
 RaceDay uses two application roles: **Organiser** and **Participant**. Authentication credentials are handled by the API authentication layer. Distance is stored on `Race_Category`, because one event may offer several race distances.
 
