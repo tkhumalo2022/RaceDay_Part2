@@ -1,6 +1,6 @@
 # RaCeDay — PROG6212 Part 2
 
-**Student:** Thabiso Khumalo (ST10477675)  
+**Student:** Thabiso Khumalo  
 **Module:** PROG6212 Programming 2B  
 **Assessment:** Portfolio of Evidence, Part 2 — RESTful API Development
 
