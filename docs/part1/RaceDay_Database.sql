@@ -1,6 +1,6 @@
 -- RaceDay database
 -- PROG6212 Part 1
--- Thabiso Khumalo (ST10477675)
+-- Thabiso Khumalo
 
 SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
